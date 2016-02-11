@@ -6,7 +6,7 @@
 
     <!-- Nodelet manager -->
     <node pkg="nodelet" type="nodelet" name="$(arg uav_name)_nodelet_manager" args="manager" output="screen" respawn="true">
-      <param name="num_worker_threads" value="16" />
+      <param name="num_worker_threads" value="4" />
     </node>
 
   </group>
