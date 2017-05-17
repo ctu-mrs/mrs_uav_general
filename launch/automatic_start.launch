@@ -1,0 +1,21 @@
+<launch>
+
+  <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
+
+  <group ns="$(arg uav_name)">
+    
+    <node name="automatic_start" pkg="mbzirc_main" type="automatic_start" output="screen" >
+      
+      <rosparam file="$(find mbzirc_main)/config/automatic_start.yaml" />
+
+      <!-- Subscribers -->
+      <remap from="~mavros_state" to="mavros/state" />
+
+      <!-- Service callers -->
+      <remap from="~change_state" to="mbzirc_communication/change_state" />
+    
+    </node>
+  
+  </group>
+
+</launch>

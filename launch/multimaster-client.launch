@@ -1,0 +1,5 @@
+<launch>
+	<node pkg="master_discovery_fkie" type="master_discovery" name="master_discovery">
+		<param name="mcast_group" value="224.0.0.251" />	
+	</node>   
+</launch>
