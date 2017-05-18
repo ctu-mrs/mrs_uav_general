@@ -101,8 +101,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES mbzirc_main
-   CATKIN_DEPENDS mbzirc_multimaster 
+#  LIBRARIES mrs_main
+   CATKIN_DEPENDS mrs_multimaster 
 #  DEPENDS system_lib
 )
 
@@ -116,23 +116,23 @@ catkin_package(
 include_directories(${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library
-# add_library(mbzirc_main
-#   src/${PROJECT_NAME}/mbzirc_main.cpp
+# add_library(mrs_main
+#   src/${PROJECT_NAME}/mrs_main.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(mbzirc_main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(mrs_main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(mbzirc_main_node src/mbzirc_main_node.cpp)
+# add_executable(mrs_main_node src/mrs_main_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(mbzirc_main_node
+# target_link_libraries(mrs_main_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -161,7 +161,7 @@ target_link_libraries(automatic_start
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS mbzirc_main mbzirc_main_node
+# install(TARGETS mrs_main mrs_main_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -186,7 +186,7 @@ target_link_libraries(automatic_start
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_mbzirc_main.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mrs_main.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

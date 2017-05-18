@@ -3,7 +3,7 @@
 #include <ros/package.h>
 #include <mutex>
 #include <mavros_msgs/State.h>
-#include <mbzirc_multimaster/ChangeState.h>
+#include <mrs_multimaster/ChangeState.h>
 
 // subscribers and publishers
 ros::Subscriber global_odom_subscriber;
@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
   ros::Subscriber sub_state = nh_.subscribe("mavros_state", 1, stateCallback, ros::TransportHints().tcpNoDelay());
 
   // service client for starting the state machine
-  ros::ServiceClient start_service_client = nh_.serviceClient<mbzirc_multimaster::ChangeState>("change_state");
+  ros::ServiceClient start_service_client = nh_.serviceClient<mrs_multimaster::ChangeState>("change_state");
 
   ros::Rate r(30);
 
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
 
           ROS_ERROR("STARTING THE STATE MACHINE!!!!");
 
-          mbzirc_multimaster::ChangeState msg;
+          mrs_multimaster::ChangeState msg;
 
           msg.request.state_id = 1;
 
