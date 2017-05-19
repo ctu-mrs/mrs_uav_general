@@ -41,8 +41,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>roscpp</build_depend>
-  <build_depend>mrs_multimaster</build_depend>
-  <run_depend>mrs_multimaster</run_depend>
+  <build_depend>mrs_msgs</build_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
