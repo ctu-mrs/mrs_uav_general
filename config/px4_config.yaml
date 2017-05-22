@@ -63,7 +63,7 @@ imu:
 local_position:
   frame_id: "local_origin"
   tf:
-    send: false   # tf for fcu is computed and published in mbzirc_odom
+    send: false   # tf for fcu is computed and published in mrs_odometry
     frame_id: "local_origin"
     child_frame_id: "fcu"
     send_fcu: false
