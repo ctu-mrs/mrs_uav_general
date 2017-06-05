@@ -1,7 +1,0 @@
-<launch>
-	<node pkg="master_discovery_fkie" type="master_discovery" name="master_discovery">
-		<param name="mcast_group" value="224.0.0.251" />	
-	</node>  
-	<node pkg="master_sync_fkie" type="master_sync" name="multimaster_client_sync">
-	</node>   
-</launch>
