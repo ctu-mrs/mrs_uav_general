@@ -4,7 +4,6 @@
 #include <mutex>
 #include <mavros_msgs/State.h>
 #include <mrs_msgs/ChangeState.h>
-sdfasdfasdfasdfaf
 // subscribers and publishers
 ros::Subscriber global_odom_subscriber;
 ros::Publisher rtk_publisher;
