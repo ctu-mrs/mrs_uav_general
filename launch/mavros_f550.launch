@@ -1,8 +1,5 @@
 <launch>
 	
-	<!-- Static tf publisher from frame of the drone to gps module on the drone -->
-	<node pkg="tf" type="static_transform_publisher" name="fcu_to_gps_broadcaster" args="0 0.1 0.2 0 0 0 1 fcu fcu_utm 100" />
-
 	<arg name="fcu_url" default="/dev/pixhawk:921600" />
 	<arg name="gcs_url" default="" />
 	<arg name="tgt_system" default="1" />
