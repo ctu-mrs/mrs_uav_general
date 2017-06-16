@@ -7,6 +7,8 @@ use_home_position: false
 home_utm_x: 297675.669252
 home_utm_y: 2675580.58717
 
+use_safety_area: true
+
 safety_area: [-10, -10,
 10, -10,
 10, 10,
