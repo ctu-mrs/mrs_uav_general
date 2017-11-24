@@ -1,0 +1,15 @@
+#
+## DEFINITION OF THE ARENA
+#
+ 
+use_home_position: true
+
+home_utm_x: 458422.2
+home_utm_y: 5551241.4
+
+use_safety_area: true
+
+safety_area: [30.9, 26.4,
+-45.0, 7.27,
+-31.5, -38.0,
+44.5, -23.5]
