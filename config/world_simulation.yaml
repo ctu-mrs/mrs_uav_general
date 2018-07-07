@@ -2,7 +2,7 @@
 ## DEFINITION OF THE ARENA
 #
  
-use_home_position: true
+use_home_position: false
 
 home_utm_x: 465710.758973
 home_utm_y: 5249465.43086
