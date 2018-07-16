@@ -5,7 +5,7 @@
   <group ns="$(arg uav_name)">
 
     <!-- Nodelet manager -->
-    <node pkg="nodelet" type="nodelet" name="standalone_nodelet" args="manager" output="screen"/>
+    <node pkg="nodelet" type="nodelet" name="mrs_nodelet_manager" args="manager" output="screen"/>
 
   </group>
 
