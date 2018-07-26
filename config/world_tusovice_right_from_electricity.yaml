@@ -15,7 +15,8 @@ use_safety_area: true
 
 ## Field only arena RIGHT to the electricity
 safety_area: [-82.0, 0.0,
--90.0, 35.0,
+-15.0, -11.0,
 -32.0, 46.0,
--15.0, -11.0]
+-90.0, 35.0,
+]
 
