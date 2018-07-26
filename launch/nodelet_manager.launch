@@ -5,7 +5,7 @@
   <group ns="$(arg uav_name)">
 
     <!-- Nodelet manager -->
-    <node pkg="nodelet" type="nodelet" name="$(arg uav_name)_nodelet_manager" args="manager" output="screen">
+    <node pkg="nodelet" type="nodelet" name="$(arg uav_name)_nodelet_manager" args="manager" output="screen" respawn="true">
       <param name="num_worker_threads" value="16" />
     </node>
 
