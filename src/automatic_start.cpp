@@ -6,20 +6,20 @@
 #include <mrs_msgs/ChangeState.h>
 // subscribers and publishers
 ros::Subscriber global_odom_subscriber;
-ros::Publisher rtk_publisher;
+ros::Publisher  rtk_publisher;
 
 // publisher rate
 double safety_timeout_ = 5.0;
 
-ros::Time armed_time;
-bool armed = false;
+ros::Time  armed_time;
+bool       armed = false;
 std::mutex mutex_armed;
 
-ros::Time offboard_time;
-bool offboard = false;
+ros::Time  offboard_time;
+bool       offboard = false;
 std::mutex mutex_offboard;
 
-void stateCallback(const mavros_msgs::StateConstPtr &msg) {
+void stateCallback(const mavros_msgs::StateConstPtr& msg) {
 
   mutex_armed.lock();
   {
@@ -29,7 +29,7 @@ void stateCallback(const mavros_msgs::StateConstPtr &msg) {
       // if armed state changed to true, please "start the clock"
       if (msg->armed > 0) {
 
-        armed = true;
+        armed      = true;
         armed_time = ros::Time::now();
       }
 
@@ -53,7 +53,7 @@ void stateCallback(const mavros_msgs::StateConstPtr &msg) {
       // if offboard state changed to true, please "start the clock"
       if (msg->mode.compare(std::string("OFFBOARD")) == 0) {
 
-        offboard = true;
+        offboard      = true;
         offboard_time = ros::Time::now();
       }
 
@@ -80,14 +80,14 @@ int main(int argc, char** argv) {
 
   mutex_armed.lock();
   {
-    armed = false;
+    armed      = false;
     armed_time = ros::Time::now();
   }
   mutex_armed.unlock();
 
   mutex_offboard.lock();
   {
-    offboard = false;
+    offboard      = false;
     offboard_time = ros::Time::now();
   }
   mutex_offboard.unlock();
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
     {
       if (armed && offboard) {
 
-        double armed_time_diff = (ros::Time::now() - armed_time).toSec();
+        double armed_time_diff    = (ros::Time::now() - armed_time).toSec();
         double offboard_time_diff = (ros::Time::now() - offboard_time).toSec();
 
         if ((armed_time_diff > safety_timeout_) && (offboard_time_diff > safety_timeout_)) {
