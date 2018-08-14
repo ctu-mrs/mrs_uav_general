@@ -1,0 +1,15 @@
+<launch>
+
+  <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
+
+  <group ns="$(arg uav_name)">
+
+    <!-- Nodelet manager -->
+    <!-- <node pkg="nodelet" type="nodelet" name="$(arg uav_name)_nodelet_manager" args="manager" output="screen" launch-prefix="urxvt -e gdb -ex run -\-args"> -->
+    <node pkg="nodelet" type="nodelet" name="$(arg uav_name)_nodelet_manager" args="manager" output="screen">
+      <param name="num_worker_threads" value="16" />
+    </node>
+
+  </group>
+
+</launch>
