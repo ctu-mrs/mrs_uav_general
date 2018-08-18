@@ -7,15 +7,15 @@ use_home_position: true
 home_utm_x: 429426.45
 home_utm_y: 5492357.99
 
-use_safety_area: true
+safety_area:
 
-#
-## Leave just one of the following arenas uncommented
-#
+  use_safety_area: true
 
-## Original "garden" arena
-safety_area: [-17.79, -11.02,
-10.9, -9.02,
-2.9, 16.79,
--3.65, 10.01]
+  # convex polygon CCW
+  safety_area: [-17.79, -11.02,
+  10.9, -9.02,
+  2.9, 16.79,
+  -3.65, 10.01]
 
+  max_altitude: 10.0
+  min_altitude: 1.0

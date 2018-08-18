@@ -7,9 +7,15 @@ use_home_position: true
 home_utm_x: 465710.758973
 home_utm_y: 5249465.43086
 
-use_safety_area: false
+safety_area:
 
-safety_area: [-200, -200,
-200, -200,
-200, 200,
--200, 200]
+  use_safety_area: true
+
+  # convex polygon CCW
+  safety_area: [-50, -50,
+  50, -50,
+  50, 50,
+  -50, 50]
+
+  max_altitude: 10.0
+  min_altitude: 1.0
