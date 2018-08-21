@@ -12,10 +12,14 @@ safety_area:
   use_safety_area: true
 
   # convex polygon CCW
-  safety_area: [-50, -50,
-  50, -50,
-  50, 50,
-  -50, 50]
+  # safety_area: [-50, -50,
+  # 50, -50,
+  # 50, 50,
+  # -50, 50]
+  safety_area: [1, 2,
+  3, 4,
+  5, 6,
+  7, 8]
 
   max_altitude: 20.0
   min_altitude: 1.0
