@@ -4,6 +4,8 @@
 #include <mutex>
 #include <mavros_msgs/State.h>
 #include <mrs_msgs/ChangeState.h>
+
+#include <mrs_lib/ParamLoader.h>
 // subscribers and publishers
 ros::Subscriber global_odom_subscriber;
 ros::Publisher  rtk_publisher;
@@ -92,7 +94,13 @@ int main(int argc, char** argv) {
   }
   mutex_offboard.unlock();
 
-  nh_.param("safety_timeout", safety_timeout_, 5.0);
+  mrs_lib::ParamLoader param_loader(nh_, ros::this_node::getName());
+
+  param_loader.load_param("safety_timeout", safety_timeout_);
+
+  if (!param_loader.loaded_successfully()) {
+    ros::shutdown();
+  }
 
   // subscriber for rc transmitter
   ros::Subscriber sub_state = nh_.subscribe("mavros_state", 1, stateCallback, ros::TransportHints().tcpNoDelay());
