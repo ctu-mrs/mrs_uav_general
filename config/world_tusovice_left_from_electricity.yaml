@@ -17,5 +17,5 @@ safety_area:
   -21.0, -28.0,                                                                                        
   -90.0, -23.0]
 
-  max_altitude: 10.0
-  min_altitude: 1.0
+  max_height: 10.0
+  min_height: 1.0
