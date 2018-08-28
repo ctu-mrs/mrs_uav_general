@@ -1,0 +1,21 @@
+#
+## DEFINITION OF THE ARENA
+#
+
+use_home_position: true
+
+home_utm_x: 483012.04037 
+home_utm_y: 4421254.11595
+
+safety_area:
+
+  use_safety_area: true
+
+  # convex polygon CCW
+  safety_area: [-15, 5,
+ -10, -9,
+  10.5, 4.5,
+  8, 12.5]
+
+  max_height: 5.0
+  min_height: 0.5
