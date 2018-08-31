@@ -13,15 +13,15 @@ safety_area:
 
   # # convex polygon CCW
   # safety_area: [-15, 5,
- # -10, -9,
+   # -10, -9,
   # 10.5, 4.5,
   # 8, 12.5]
 
   # convex polygon CCW
-  safety_area: [-5, -5,
-  5, -5,
-  5, 5,
-  -5, 5]
+  safety_area: [-10, -10,
+  10, -10,
+  10, 10,
+  -10, 10]
 
   max_height: 5.0
   min_height: 0.5
