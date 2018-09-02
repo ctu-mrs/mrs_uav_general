@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
   }
 
   // subscriber for rc transmitter
-  ros::Subscriber sub_state = nh_.subscribe("mavros_state", 1, stateCallback, ros::TransportHints().udp());
+  ros::Subscriber sub_state = nh_.subscribe("mavros_state", 1, stateCallback, ros::TransportHints().tcpNoDelay());
 
   // service client for starting the state machine
   ros::ServiceClient start_service_client = nh_.serviceClient<mrs_msgs::ChangeState>("change_state");
