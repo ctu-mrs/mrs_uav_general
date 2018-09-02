@@ -7,7 +7,7 @@
     <!-- Nodelet manager -->
     <!-- <node pkg="nodelet" type="nodelet" name="$(arg uav_name)_nodelet_manager" args="manager" output="screen" launch-prefix="urxvt -e gdb -ex run -\-args"> -->
     <node pkg="nodelet" type="nodelet" name="$(arg uav_name)_nodelet_manager" args="manager" output="screen">
-      <param name="num_worker_threads" value="32" />
+      <param name="num_worker_threads" value="16" />
     </node>
 
   </group>

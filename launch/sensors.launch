@@ -1,18 +1,12 @@
 <launch>
 
-  <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
+  <!-- Teraranger -->
+  <!-- <include file="$(find terarangerone)/launch/uav.launch" /> -->
 
-  <group ns="$(arg uav_name)">
+  <!-- Mavros -->
+  <include file="$(find mrs_main)/launch/mavros_uav.launch" />
 
-    <!-- Mavros -->
-    <include file="$(find mrs_main)/launch/mavros_f550.launch" />
-
-    <!-- Teraranger -->
-    <!-- <include file="$(find terarangerone)/launch/test.launch" /> -->
-
-    <!-- Garmin -->
-    <include file="$(find garmin_rangefinder)/launch/test.launch" />
-
-  </group>
+  <!-- Garmin -->
+  <include file="$(find garmin_rangefinder)/launch/uav.launch" />
 
 </launch>
