@@ -2,11 +2,15 @@
 ## DEFINITION OF THE ARENA
 #
 
-use_utm_origin: false
-utm_origin_x: 483012.04037 
-utm_origin_y: 4421254.11595
+use_utm_origin: true
+# in the net
+# utm_origin_x: 483012.04037 
+# utm_origin_y: 4421254.11595
+# above grass
+utm_origin_x: 483021.04037 
+utm_origin_y: 4421244.11595
 
-use_local_origin: true
+use_local_origin: false
 local_origin_x: 0.0
 local_origin_y: 0.0
 
