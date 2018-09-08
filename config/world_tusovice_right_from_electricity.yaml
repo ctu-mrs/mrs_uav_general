@@ -7,16 +7,15 @@ use_home_position: true
 home_utm_x: 429426.45
 home_utm_y: 5492357.99
 
-use_safety_area: false
+safety_area:
 
-#
-## Leave just one of the following arenas uncommented
-#
+  use_safety_area: true
 
-## Field only arena RIGHT to the electricity
-safety_area: [-82.0, 0.0,
--15.0, -11.0,
--32.0, 46.0,
--90.0, 35.0,
-]
+  # convex polygon CCW
+  safety_area: [-82.0, 0.0,
+  -15.0, -11.0,
+  -32.0, 46.0,
+  -90.0, 35.0]
 
+  max_altitude: 10.0
+  min_altitude: 1.0
