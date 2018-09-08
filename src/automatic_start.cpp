@@ -6,6 +6,7 @@
 #include <mrs_msgs/ChangeState.h>
 
 #include <mrs_lib/ParamLoader.h>
+
 // subscribers and publishers
 ros::Subscriber global_odom_subscriber;
 ros::Publisher  rtk_publisher;
@@ -23,8 +24,9 @@ std::mutex mutex_offboard;
 
 void stateCallback(const mavros_msgs::StateConstPtr& msg) {
 
-  mutex_armed.lock();
   {
+    std::scoped_lock lock(mutex_armed);
+
     // check armed state
     if (armed == false) {
 
@@ -45,10 +47,10 @@ void stateCallback(const mavros_msgs::StateConstPtr& msg) {
       }
     }
   }
-  mutex_armed.unlock();
 
-  mutex_offboard.lock();
   {
+    std::scoped_lock lock(mutex_offboard);
+
     // check offboard state
     if (offboard == false) {
 
@@ -69,7 +71,6 @@ void stateCallback(const mavros_msgs::StateConstPtr& msg) {
       }
     }
   }
-  mutex_offboard.unlock();
 }
 
 int main(int argc, char** argv) {
@@ -80,19 +81,11 @@ int main(int argc, char** argv) {
 
   ros::Time::waitForValid();
 
-  mutex_armed.lock();
-  {
-    armed      = false;
-    armed_time = ros::Time::now();
-  }
-  mutex_armed.unlock();
+  armed      = false;
+  armed_time = ros::Time::now();
 
-  mutex_offboard.lock();
-  {
-    offboard      = false;
-    offboard_time = ros::Time::now();
-  }
-  mutex_offboard.unlock();
+  offboard      = false;
+  offboard_time = ros::Time::now();
 
   mrs_lib::ParamLoader param_loader(nh_, ros::this_node::getName());
 
@@ -112,9 +105,9 @@ int main(int argc, char** argv) {
 
   while (ros::ok()) {
 
-    mutex_armed.lock();
-    mutex_offboard.lock();
     {
+      std::scoped_lock lock(mutex_offboard, mutex_armed);
+
       if (armed && offboard) {
 
         double armed_time_diff    = (ros::Time::now() - armed_time).toSec();
@@ -139,8 +132,6 @@ int main(int argc, char** argv) {
         }
       }
     }
-    mutex_offboard.unlock();
-    mutex_armed.unlock();
 
     ros::spinOnce();
 
