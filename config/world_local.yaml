@@ -3,8 +3,8 @@
 #
 
 use_utm_origin: false
-home_utm_x: 0
-home_utm_y: 0
+utm_origin_x: 0
+utm_origin_y: 0
 
 use_local_origin: true
 local_origin_x: 0.0
@@ -15,10 +15,10 @@ safety_area:
   use_safety_area: true
 
   # convex polygon CCW
-  safety_area: [-10, -10,
-  10, -10,
-  10, 10,
-  -10, 10]
+  safety_area: [-2, -2,
+  2, -2,
+  2, 2,
+  -2, 2]
 
-  max_height: 5.0
-  min_height: 1.0
+  max_height: 2.0
+  min_height: 0.5
