@@ -1,0 +1,10 @@
+<launch>
+
+  <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
+
+  <param name="dev" value="/dev/input/js0" />
+
+  <node name="joystick" pkg="joy" type="joy_node" output="screen" >
+  </node>
+
+</launch>
