@@ -5,7 +5,7 @@
 
   <group ns="$(arg uav_name)">
 
-    <node pkg="rosbag" type="record" name="rosbag_record" args="-o /home/$(optenv USER mrs)/bag_files/$(arg project_name)/ -a -x /$(arg uav_name)/mobius/image_raw|/$(arg uav_name)/mobius/image_raw/compressed/(.*)|/$(arg uav_name)/mobius/image_raw/compressedDepth(.*)|/$(arg uav_name)/mobius/image_raw/theora(.*)|/$(arg uav_name)/bluefox/image_raw|/$(arg uav_name)/bluefox/image_raw/compressed/(.*)|/$(arg uav_name)/bluefox/image_raw/compressedDepth(.*)|/$(arg uav_name)/bluefox/image_raw/theora(.*)"/>   
+    <node pkg="rosbag" type="record" name="rosbag_record" args="-o /home/$(optenv USER mrs)/bag_files/latest/ -a -x /$(arg uav_name)/mobius/image_raw|/$(arg uav_name)/mobius/image_raw/compressed/(.*)|/$(arg uav_name)/mobius/image_raw/compressedDepth(.*)|/$(arg uav_name)/mobius/image_raw/theora(.*)|/$(arg uav_name)/bluefox/image_raw|/$(arg uav_name)/bluefox/image_raw/compressed/(.*)|/$(arg uav_name)/bluefox/image_raw/compressedDepth(.*)|/$(arg uav_name)/bluefox/image_raw/theora(.*)"/>   
 
   </group>
 
