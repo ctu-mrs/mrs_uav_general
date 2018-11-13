@@ -20,5 +20,5 @@ safety_area:
   10, 10,
   -10, 10]
 
-  max_height: 10.0
+  max_height: 8.0
   min_height: 0.5
