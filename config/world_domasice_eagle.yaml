@@ -3,7 +3,7 @@
 #
  
 use_utm_origin: true
-utm_origin_x: 460236.6
+utm_origin_x: 460226.6
 utm_origin_y: 5601198.2
 
 use_local_origin: false
