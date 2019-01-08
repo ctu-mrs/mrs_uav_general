@@ -1,0 +1,46 @@
+<launch>
+
+  <!-- Mavros -->
+  <include file="$(find mrs_main)/launch/mavros_uav.launch" />
+  <!-- Two Garmins over rosserial -->
+  <include file="$(find garmin_rangefinder)/launch/two_garmins_rosserial.launch" />
+  <!-- RPLidar -->
+  <include file="$(find rplidar_ros)/launch/uav.launch" />
+  <!-- Teraranger Tower Evo -->
+  <include file="$(find teraranger_array)/launch/uav.launch" />
+  <!-- Realsense D435 -->
+  <include file="$(find realsense_d435)/launch/high_acc.launch" />
+
+  <!-- Indoor GPS -->
+  <include file="$(find marvelmind_nav)/launch/test.launch" />
+
+  <!-- Front facing bluefox camera (down facing camera is run through optic_flow) -->
+  <include file="$(find bluefox2)/launch/front_camera.launch" />
+
+  <!-- [TF] -->
+
+  <!-- Pixhawk -->
+  <arg name="local_frame" default="fcu_uav5" />
+
+  <!-- Other statically transformed sensors -->
+  <arg name="realsense_frame" default="rs_d435_link" />
+  <arg name="bluefox_front_frame" default="bluefox_front_frame" />
+  <arg name="bluefox_down_frame" default="bluefox_downward_frame" />
+  <arg name="rplidar_frame" default="rplidar_frame" />
+  <arg name="teraranger_tower_frame" default="uav5_teraranger_tower_frame" />
+  <arg name="garmin_down_frame" default="garmin_down_frame" />
+  <arg name="garmin_up_frame" default="garmin_up_frame" />
+  <arg name="indoor_gps_frame" default="indoor_gps_frame" />
+
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="base2ground" args="0 0 1.0 0 0.05 -0.02 ground $(arg local_frame)" /> -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="realsense2base" args="0.265 0 -0.077 0 0.0 0.0 $(arg local_frame) $(arg realsense_frame)" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="bluefoxfront2base" args="0.274 0.07 -0.067 0 0.0 0.0 $(arg local_frame) $(arg bluefox_front_frame)" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="bluefoxdown2base" args="0.041 0.025 -0.083 0 0.0 0.0 $(arg local_frame) $(arg bluefox_down_frame)" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="rplidar2base" args="0 0 0.164 0 0.0 0.0 $(arg local_frame) $(arg rplidar_frame)" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="terarangertower2base" args="0 0 0.105 0 0.0 0.0 $(arg local_frame) $(arg teraranger_tower_frame)" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="garmindown2base" args="0 0.076 0.064 0 1.57 0 $(arg local_frame) $(arg garmin_down_frame)" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="garminup2base" args="0.088 0.054 0.063 0 -1.57 0 $(arg local_frame) $(arg garmin_up_frame)" />
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="indoorgps2base" args="-0.08 -0.04 -0.11 0 0 0 $(arg local_frame) $(arg indoor_gps_frame)" /> -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="indoorgps2base" args="0 0 -0.11 0 0 0 $(arg local_frame) $(arg indoor_gps_frame)" />
+
+</launch>
