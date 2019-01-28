@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(mrs_main)
+project(mrs_general)
 
 set(CMAKE_CXX_FLAGS "-std=c++17 -fno-diagnostics-color")
 
@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   #  INCLUDE_DIRS include
-  #  LIBRARIES mrs_main
+  #  LIBRARIES mrs_general
   CATKIN_DEPENDS
   #  DEPENDS system_lib
   )

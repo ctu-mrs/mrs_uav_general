@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
 
-  <name>mrs_main</name>
+  <name>mrs_general</name>
   <version>1.0.0</version>
   <description>The mrs_main package</description>
 
