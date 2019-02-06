@@ -4,7 +4,7 @@
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
   <!-- Garmin -->
-  <include file="$(find garmin_rangefinder)/launch/two_garmins_rosserial.launch" />
+  <include file="$(find mrs_serial)/launch/two_garmins_rosserial.launch" />
 
   <!-- RPLidar -->
   <include file="$(find rplidar_ros)/launch/uav.launch" />
