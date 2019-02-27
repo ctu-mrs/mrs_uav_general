@@ -16,6 +16,6 @@
   <include file="$(find mrs_general)/launch/bluefox_right.launch" />
 
   <!-- Sweep -->
-  <include file="$(find rplidar_ros)/launch/rplidar_a3.launch" />
+  <include file="$(find rplidar_ros)/launch/uav_a3.launch" />
 
 </launch>
