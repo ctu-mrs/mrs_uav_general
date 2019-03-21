@@ -5,6 +5,8 @@
   <arg name="cam_device" default="$(env BLUEFOX_LEFT)" />
   <arg name="profiler" default="$(optenv PROFILER false)" />
 
+  <arg name="node_start_delay" default="1" />
+
   <arg name="cam_rate" default="10" />
   <arg name="cam_plugin" default="true"/>
   <arg name="cam_output" default="screen"/>
@@ -69,6 +71,9 @@
     </node>
 
     <include file="$(find bluefox2)/launch/single_nodelet.launch">
+
+      <!-- Node delay for multiple cameras -->
+      <arg name="node_start_delay" value="$(arg node_start_delay)"/>
 
       <!-- Common Interface -->
       <arg name="device" value="$(arg cam_device)"/>
