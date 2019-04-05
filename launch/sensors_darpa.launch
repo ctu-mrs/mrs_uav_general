@@ -2,9 +2,11 @@
 
   <arg name="uav_name" default="$(optenv UAV_NAME uav1)"/>
   <arg name="fcu_frame" default="fcu_$(arg uav_name)" />
-  <arg name="garmin_frame" default="garmin_$(arg uav_name)" />
+  <arg name="garmin_frame" default="garmin_frame" />
+  <arg name="garmin_frame_up" default="garmin_frame_up" />
   <arg name="rplidar_frame" default="rplidar_$(arg uav_name)" />
-  
+  <arg name="realsense_frame" default="rs_d435_$(arg uav_name)_link" />
+
   <!-- Mavros -->
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
@@ -14,17 +16,25 @@
   <!-- Rplidar -->
   <include file="$(find rplidar_ros)/launch/uav.launch" />
 
+  <!-- Realsense -->
+  <include file="$(find realsense_d435)/launch/uav_darpa.launch" />
+
   <group ns="$(arg uav_name)">
 
     <!-- x y z r p y parent child -->
 
     <!-- garmin -->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame)" args="0.19918 -0.115 -0.025 0 1.57079632679 0.523599 $(arg fcu_frame) $(arg garmin_frame)" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
+
+    <!-- garmin -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame_up)_to_$(arg fcu_frame)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
 
     <!-- rplidar -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
-  </group>
 
+    <!-- realsense -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0.21 0.0 -0.05 0.0 0.2617 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
+  </group>
 
 
 </launch>
