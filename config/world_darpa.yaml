@@ -1,0 +1,24 @@
+#
+## DEFINITION OF THE ARENA
+#
+
+use_utm_origin: false
+utm_origin_x: 0
+utm_origin_y: 0
+
+use_local_origin: true
+local_origin_x: 0.0
+local_origin_y: 0.0
+
+safety_area:
+
+  use_safety_area: false
+
+  # convex polygon CCW
+  safety_area: [-50, -50,
+  50, -50,
+  50, 50,
+  -50, 50]
+
+  max_height: 4.0
+  min_height: 0.3
