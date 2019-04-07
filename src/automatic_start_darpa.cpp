@@ -172,7 +172,7 @@ void AutomaticStartDarpa::callbackMavrosState(const mavros_msgs::StateConstPtr& 
 
   std::scoped_lock lock(mutex_mavros_state);
 
-  ROS_INFO("[AutomaticStartDarpa]: getting mavros state");
+  ROS_INFO_ONCE("[AutomaticStartDarpa]: getting mavros state");
 
   // check armed state
   if (armed == false) {
