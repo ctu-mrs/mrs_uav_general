@@ -1,5 +1,8 @@
 /* includes //{ */
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
 
@@ -54,6 +57,8 @@ public:
 private:
   ros::NodeHandle nh_;
   bool            is_initialized = false;
+  std::string     scripts_path_;
+  double          shutdown_timeout_;
 
 private:
   double safety_timeout_;
@@ -62,6 +67,9 @@ private:
   ros::ServiceClient service_client_takeoff;
   ros::ServiceClient service_client_gofcu;
   ros::ServiceClient service_client_tunnel_flier;
+
+private:
+  ros::ServiceServer service_server_shutdown;
 
 private:
   ros::Subscriber subscriber_mavros_state;
@@ -100,6 +108,12 @@ private:
 
 private:
   double goto_distance_;
+
+private:
+  bool       callbackShutdown([[maybe_unused]] std_srvs::Trigger::Request& req, std_srvs::Trigger::Response& res);
+  ros::Timer shutdown_timer;
+  void       shutdownTimer(const ros::TimerEvent& event);
+  ros::Time  shutdown_time;
 };
 
 //}
@@ -123,6 +137,8 @@ void AutomaticStartDarpa::onInit() {
   param_loader.load_param("safety_timeout", safety_timeout_);
   param_loader.load_param("main_timer_rate", main_timer_rate_);
   param_loader.load_param("goto_distance", goto_distance_);
+  param_loader.load_param("scripts_path", scripts_path_);
+  param_loader.load_param("shutdown_timeout", shutdown_timeout_);
 
   // --------------------------------------------------------------
   // |                         subscribers                        |
@@ -141,10 +157,17 @@ void AutomaticStartDarpa::onInit() {
   service_client_tunnel_flier = nh_.serviceClient<std_srvs::Trigger>("tunel_out");
 
   // --------------------------------------------------------------
+  // |                       service servers                      |
+  // --------------------------------------------------------------
+
+  service_server_shutdown = nh_.advertiseService("shutdown_in", &AutomaticStartDarpa::callbackShutdown, this);
+
+  // --------------------------------------------------------------
   // |                           timers                           |
   // --------------------------------------------------------------
 
-  main_timer = nh_.createTimer(ros::Rate(main_timer_rate_), &AutomaticStartDarpa::mainTimer, this);
+  main_timer     = nh_.createTimer(ros::Rate(main_timer_rate_), &AutomaticStartDarpa::mainTimer, this);
+  shutdown_timer = nh_.createTimer(ros::Rate(1.0), &AutomaticStartDarpa::shutdownTimer, this, false, false);
 
   if (!param_loader.loaded_successfully()) {
     ROS_ERROR("[MavrosInterface]: Could not load all parameters!");
@@ -255,6 +278,21 @@ void AutomaticStartDarpa::callbackMpcDiagnostics(const mrs_msgs::TrackerDiagnost
 
 //}
 
+/* callbackShutdown() //{ */
+
+bool AutomaticStartDarpa::callbackShutdown([[maybe_unused]] std_srvs::Trigger::Request& req, [[maybe_unused]] std_srvs::Trigger::Response& res) {
+
+  if (!is_initialized)
+    return false;
+
+  shutdown_time = ros::Time::now();
+  shutdown_timer.start();
+
+  return true;
+}
+
+//}
+
 // --------------------------------------------------------------
 // |                           timers                           |
 // --------------------------------------------------------------
@@ -336,6 +374,23 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
     }
 
     break;
+  }
+}
+
+//}
+
+/* shutdownTimer()() //{ */
+
+void AutomaticStartDarpa::shutdownTimer([[maybe_unused]] const ros::TimerEvent& event) {
+
+  double time = (ros::Time::now() - shutdown_time).toSec();
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartDarpa]: shutting down in %d s", int(shutdown_timeout_ - time));
+
+  if (time > shutdown_timeout_) {
+
+    ROS_INFO("[AutomaticStartDarpa]: calling for shutdown");
+    [[maybe_unused]] int res = system((scripts_path_ + std::string("/shutdown.sh")).c_str());
   }
 }
 
