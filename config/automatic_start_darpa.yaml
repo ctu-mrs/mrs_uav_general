@@ -1,0 +1,3 @@
+safety_timeout: 5.0 # [s]
+main_timer_rate: 30 # [Hz]
+goto_distance: 3.0 # [m]

@@ -1,0 +1,31 @@
+<launch>
+
+  <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
+  <arg name="standalone" default="true" />
+
+  <arg unless="$(arg standalone)" name="nodelet" value="load"/>
+  <arg     if="$(arg standalone)" name="nodelet" value="standalone"/>
+  <arg unless="$(arg standalone)" name="nodelet_manager" value="$(arg uav_name)_vision_nodelet_manager"/>
+  <arg     if="$(arg standalone)" name="nodelet_manager" value=""/>
+
+  <group ns="$(arg uav_name)">
+
+    <node name="automatic_start_darpa" pkg="nodelet" type="nodelet" args="$(arg nodelet) mrs_general/AutomaticStartDarpa $(arg nodelet_manager)"  output="screen">
+
+      <rosparam file="$(find mrs_general)/config/automatic_start_darpa.yaml" />
+
+      <!-- Subscribers -->
+      <remap from="~mavros_state_in" to="mavros/state" />
+      <remap from="~tracker_status_in" to="control_manager/tracker_status" />
+      <remap from="~mpc_diagnostics_in" to="control_manager/mpc_tracker/diagnostics" />
+
+      <!-- services -->
+      <remap from="~takeoff_out" to="uav_manager/takeoff" />
+      <remap from="~gofcu_out" to="control_manager/goto_fcu" />
+      <remap from="~tunel_out" to="tunnel_flier/start" />
+
+    </node>
+
+  </group>
+
+</launch>

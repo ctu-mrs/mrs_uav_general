@@ -10,12 +10,15 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   mrs_msgs
   mrs_lib
+  nodelet
+  std_msgs
+  mavros_msgs
   )
 
 catkin_package(
   #  INCLUDE_DIRS include
-  #  LIBRARIES mrs_general
-  CATKIN_DEPENDS
+  LIBRARIES AutomaticStartDarpa
+  CATKIN_DEPENDS std_msgs mrs_msgs mavros_msgs mrs_lib
   #  DEPENDS system_lib
   )
 
@@ -29,15 +32,26 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS})
 
-## Declare a C++ executable
-add_executable(automatic_start
-  src/automatic_start.cpp)
+add_executable(automatic_start_mbzirc
+  src/automatic_start_mbzirc.cpp)
 
-add_dependencies(automatic_start
+add_dependencies(automatic_start_mbzirc
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS})
+  ${catkin_EXPORTED_TARGETS}
+  )
 
-## Specify libraries to link a library or executable target against
-target_link_libraries(automatic_start
+target_link_libraries(automatic_start_mbzirc
+  ${catkin_LIBRARIES}
+  )
+
+add_library(AutomaticStartDarpa
+  src/automatic_start_darpa.cpp)
+
+add_dependencies(AutomaticStartDarpa
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+target_link_libraries(AutomaticStartDarpa
   ${catkin_LIBRARIES}
   )

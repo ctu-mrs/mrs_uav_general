@@ -11,12 +11,15 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>roscpp</build_depend>
-  <build_depend>mrs_msgs</build_depend>
+  <depend>nodelet</depend>
+  <depend>roscpp</depend>
+  <depend>mrs_msgs</depend>
   <depend>mavros_msgs</depend>
   <depend>mrs_lib</depend>
+  <depend>std_msgs</depend>
 
   <export>
+    <nodelet plugin="${prefix}/plugins.xml" />
   </export>
 
 </package>
