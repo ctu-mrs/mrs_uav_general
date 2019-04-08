@@ -1,4 +1,4 @@
 safety_timeout: 5.0 # [s]
 main_timer_rate: 30 # [Hz]
-goto_distance: 2.0 # [m]
+goto_distance: 5.0 # [m]
 shutdown_timeout: 60 # [s]

@@ -346,9 +346,10 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
         goto_out.request.goal[2] = 0;
         goto_out.request.goal[3] = 0;
 
-        service_client_gofcu.call(goto_out);
+        ros::Duration(4.0).sleep();
 
-        ros::Duration(2.0).sleep();
+        service_client_gofcu.call(goto_out);
+        ROS_INFO("[AutomaticStartDarpa]: calling goto");
 
         current_state = GOTO_STATE;
       }
@@ -361,6 +362,8 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
       std::scoped_lock lock(mutex_mpc_diagnostics);
 
       if (!mpc_diagnostics.tracking_trajectory) {
+
+        ros::Duration(4.0).sleep();
 
         ROS_INFO("[AutomaticStartDarpa]: reached goal, triggering tunnel flier");
 
