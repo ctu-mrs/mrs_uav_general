@@ -24,12 +24,13 @@
 
   <arg name="fps" default="$(arg rate)"/>
   <arg name="color" default="true"/>
-  <arg name="aec" default="0"/>
+  <arg name="aec" default="1"/>
+  <arg name="acs" default="1"/>
   <arg name="cbm" default="false"/>
   <arg name="ctm" default="1"/>
   <arg name="dcfm" default="0"/>
   <arg name="hdr" default="false"/>
-  <arg name="wbp" default="-1"/>
+  <arg name="wbp" default="4"/>
   <arg name="expose_us" default="10000"/>
   <arg name="gain_db" default="0.0"/>
   <arg name="boost" default="false"/>
@@ -74,7 +75,7 @@
     </node>
 
     <!-- Node -->
-    <include file="$(find bluefox2)/launch/single_nodelet.launch" >
+    <include file="$(find bluefox2_old)/launch/single_nodelet.launch" >
 
       <!-- Common Interface -->
       <arg name="node_start_delay" default="0"/>
@@ -90,6 +91,7 @@
       <arg name="fps" value="$(arg fps)"/>
       <arg name="color" value="$(arg color)"/>
       <arg name="aec" value="$(arg aec)"/>
+      <arg name="acs" value="$(arg acs)"/>
       <arg name="cbm" value="$(arg cbm)"/>
       <arg name="ctm" value="$(arg ctm)"/>
       <arg name="dcfm" value="$(arg dcfm)"/>
@@ -118,7 +120,7 @@
     </include>
 
     <!-- Node -->
-    <include file="$(find bluefox2)/launch/single_nodelet.launch" >
+    <include file="$(find bluefox2_old)/launch/single_nodelet.launch" >
 
       <!-- Common Interface -->
       <arg name="node_start_delay" default="2"/>
@@ -134,6 +136,7 @@
       <arg name="fps" value="$(arg fps)"/>
       <arg name="color" value="$(arg color)"/>
       <arg name="aec" value="$(arg aec)"/>
+      <arg name="acs" value="$(arg acs)"/>
       <arg name="cbm" value="$(arg cbm)"/>
       <arg name="ctm" value="$(arg ctm)"/>
       <arg name="dcfm" value="$(arg dcfm)"/>

@@ -341,10 +341,10 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
         ROS_INFO("[AutomaticStartDarpa]: takeoff finished");
 
         mrs_msgs::Vec4 goto_out;
-        goto_out.request.goal[0] = goto_distance_;
+        goto_out.request.goal[0] = 3.0;
         goto_out.request.goal[1] = 0;
         goto_out.request.goal[2] = 0;
-        goto_out.request.goal[3] = 0;
+        goto_out.request.goal[3] = 0.0;
 
         ros::Duration(4.0).sleep();
 
