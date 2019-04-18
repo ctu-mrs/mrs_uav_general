@@ -11,6 +11,7 @@
 #include <mavros_msgs/State.h>
 
 #include <std_srvs/Trigger.h>
+#include <std_srvs/Empty.h>
 
 #include <mrs_msgs/Vec4.h>
 #include <mrs_msgs/TrackerStatus.h>
@@ -65,7 +66,7 @@ private:
 
 private:
   ros::ServiceClient service_client_takeoff;
-  ros::ServiceClient service_client_gofcu;
+  ros::ServiceClient service_client_goto;
   ros::ServiceClient service_client_activate;
 
 private:
@@ -148,8 +149,8 @@ void AutomaticStartEagle::onInit() {
   // --------------------------------------------------------------
 
   service_client_takeoff  = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
-  service_client_gofcu    = nh_.serviceClient<mrs_msgs::Vec4>("gofcu_out");
-  service_client_activate = nh_.serviceClient<std_srvs::Trigger>("activate_out");
+  service_client_goto    = nh_.serviceClient<mrs_msgs::Vec4>("goto_out");
+  service_client_activate = nh_.serviceClient<std_srvs::Empty>("start_out");
 
   // --------------------------------------------------------------
   // |                           timers                           |
@@ -321,7 +322,7 @@ void AutomaticStartEagle::mainTimer([[maybe_unused]] const ros::TimerEvent& even
         goto_out.request.goal[2] = goto_z_;
         goto_out.request.goal[3] = goto_yaw_;
 
-        service_client_gofcu.call(goto_out);
+        service_client_goto.call(goto_out);
         ROS_INFO("[AutomaticStartEagle]: calling goto");
 
         ros::Duration(action_delay_).sleep();
@@ -338,10 +339,10 @@ void AutomaticStartEagle::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
       if (!mpc_diagnostics.tracking_trajectory) {
 
-        ROS_INFO("[AutomaticStartEagle]: reached goal, triggering hunter");
+        ROS_INFO("[AutomaticStartEagle]: reached goal, activating hunter");
 
-        std_srvs::Trigger trigger_out;
-        service_client_activate.call(trigger_out);
+        std_srvs::Empty empty_out;
+        service_client_activate.call(empty_out);
 
         current_state = FINISHED_STATE;
       }

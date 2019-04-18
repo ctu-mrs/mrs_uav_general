@@ -23,7 +23,8 @@
 
       <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />
-      <remap from="~gofcu_out" to="control_manager/goto_fcu" />
+      <remap from="~goto_out" to="control_manager/goto" />
+      <remap from="~start_out" to="interceptor/start_interception" />
 
     </node>
 
