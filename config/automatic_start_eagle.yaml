@@ -2,10 +2,10 @@ safety_timeout: 5.0 # [s]
 main_timer_rate: 30 # [Hz]
 
 goto:
-  x: 14.0
-  y: 6.35
+  x: 19.4
+  y: -1.0
   z: 3.0
-  yaw: -1.57
+  yaw: -3.14
 
 # delay between actions
 action_delay: 3.0 # [s]
