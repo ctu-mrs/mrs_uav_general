@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(mrs_general)
 
-set(CMAKE_CXX_FLAGS "-std=c++17 -fno-diagnostics-color")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fno-diagnostics-color")
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -10,12 +10,15 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   mrs_msgs
   mrs_lib
+  nodelet
+  std_msgs
+  mavros_msgs
   )
 
 catkin_package(
   #  INCLUDE_DIRS include
-  #  LIBRARIES mrs_general
-  CATKIN_DEPENDS
+  LIBRARIES AutomaticStartDarpa
+  CATKIN_DEPENDS std_msgs mrs_msgs mavros_msgs mrs_lib
   #  DEPENDS system_lib
   )
 
@@ -29,15 +32,44 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS})
 
-## Declare a C++ executable
-add_executable(automatic_start
-  src/automatic_start.cpp)
+# automatic start MBZIRC
 
-add_dependencies(automatic_start
+add_executable(automatic_start_mbzirc
+  src/automatic_start_mbzirc.cpp)
+
+add_dependencies(automatic_start_mbzirc
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS})
+  ${catkin_EXPORTED_TARGETS}
+  )
 
-## Specify libraries to link a library or executable target against
-target_link_libraries(automatic_start
+target_link_libraries(automatic_start_mbzirc
+  ${catkin_LIBRARIES}
+  )
+
+# automatic start DARPA
+
+add_library(AutomaticStartDarpa
+  src/automatic_start_darpa.cpp)
+
+add_dependencies(AutomaticStartDarpa
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+target_link_libraries(AutomaticStartDarpa
+  ${catkin_LIBRARIES}
+  )
+
+# automatic start EAGLE
+
+add_library(AutomaticStartEagle
+  src/automatic_start_eagle.cpp)
+
+add_dependencies(AutomaticStartEagle
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+target_link_libraries(AutomaticStartEagle
   ${catkin_LIBRARIES}
   )

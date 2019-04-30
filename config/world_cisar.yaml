@@ -4,17 +4,17 @@
  
 use_utm_origin: true
 
-# # cisar race track
-# utm_origin_x: 458422.2
-# utm_origin_y: 5551241.4
+# cisar race track
+utm_origin_x: 458422.2
+utm_origin_y: 5551241.4
 
 # # mezi stromy a lampou
 # utm_origin_x: 458383.0
 # utm_origin_y: 5551267.0
 
-# mezi krtinci
-utm_origin_x: 458326
-utm_origin_y: 5551249
+# # mezi krtinci
+# utm_origin_x: 458326
+# utm_origin_y: 5551249
 
 use_local_origin: false
 local_origin_x: 0.0
@@ -30,6 +30,15 @@ safety_area:
   # -45.0, 7.27,
   # -31.5, -38.0,
   # 44.5, -23.5]
+
+  # convex polygon CCW
+  # race track extended
+  safety_area: [
+  44.8, -26.4,
+  31.8, 25.6,
+  -112.2, -0.4,
+  -48.2, -48.4
+  ]
   
   # # convex polygon CCW
   # # mezi stromy a lampou
@@ -40,16 +49,16 @@ safety_area:
   # 10.0, -10.0
   # ]
 
-  # convex polygon CCW
-  # mezi krtinci
-  safety_area: [
-    -8, -43,
-    52, -54,
-    42, 4,
-    14, 20,
-    -26, 15,
-    -32, -26,
-  ]
+  # # convex polygon CCW
+  # # mezi krtinci
+  # safety_area: [
+  #   -8, -43,
+  #   52, -54,
+  #   42, 4,
+  #   14, 20,
+  #   -26, 15,
+  #   -32, -26,
+  # ]
 
   max_height: 8.0
   min_height: 1.0

@@ -1,0 +1,11 @@
+<library path="lib/libAutomaticStartDarpa">
+  <class name="mrs_general/AutomaticStartDarpa" type="mrs_general::automatic_start_darpa::AutomaticStartDarpa" base_class_type="nodelet::Nodelet">
+    <description>AutomaticStartDarpa nodelet</description>
+  </class>
+</library>
+
+<library path="lib/libAutomaticStartEagle">
+  <class name="mrs_general/AutomaticStartEagle" type="mrs_general::automatic_start_eagle::AutomaticStartEagle" base_class_type="nodelet::Nodelet">
+    <description>AutomaticStartEagle nodelet</description>
+  </class>
+</library>

@@ -1,0 +1,21 @@
+<launch>
+
+  <!-- Teraranger -->
+  <!-- <include file="$(find terarangerone)/launch/uav.launch" /> -->
+
+  <!-- Mavros -->
+  <include file="$(find mrs_general)/launch/mavros_uav.launch" />
+
+  <!-- Garmin -->
+  <include file="$(find mrs_serial)/launch/uav.launch" />
+
+  <!-- Bluefox Left -->
+  <!-- <include file="$(find mrs_general)/launch/bluefox_left.launch" /> -->
+
+  <!-- Bluefox Right -->
+  <!-- <include file="$(find mrs_general)/launch/bluefox_right.launch" /> -->
+
+  <!-- Sweep -->
+  <include file="$(find rplidar_ros)/launch/uav.launch" />
+
+</launch>
