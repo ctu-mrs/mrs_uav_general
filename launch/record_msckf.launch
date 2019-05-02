@@ -1,0 +1,12 @@
+<launch>
+
+  <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
+  <arg name="project_name" default=""/>
+
+  <group ns="$(arg uav_name)">
+
+    <node pkg="rosbag" type="record" name="rosbag_record" args="-o /home/$(optenv USER mrs)/bag_files/latest/ -a -x |/mv(.*)/compressed(.*)|(.*)bluefox/image_raw|(.*)/theora(.*)|(.*)/rs_d435/accel(.*)|(.*)/rs_d435/aligned_depth_to_color/image_raw|(.*)/rs_d435/aligned_depth_to_infra1(.*)|(.*)/rs_d435/color/image_raw|(.*)/rs_d435/color/image_rect_color|(.*)/rs_d435/depth/image_rect_raw|(.*)/rs_d435/extsinsics(.*)|(.*)/rs_d435/gyro(.*)|(.*)/rs_d435/infra1/image_rect_raw|(.*)/rs_d435/infra2/image_rect_raw|(.*)/rs_d435/motion_module(.*)|(.*)/rs_d435/realsense2_camera_manager/bond|(.*)/rs_d435/rgb_camera(.*)|(.*)/rs_d435/stereo_module(.*)"/>
+
+  </group>
+
+</launch>
