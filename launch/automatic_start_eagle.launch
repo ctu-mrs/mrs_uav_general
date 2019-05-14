@@ -10,9 +10,9 @@
 
   <group ns="$(arg uav_name)">
 
-    <node name="automatic_start_darpa" pkg="nodelet" type="nodelet" args="$(arg nodelet) mrs_general/AutomaticStartDarpa $(arg nodelet_manager)" output="screen">
+    <node name="automatic_start_eagle" pkg="nodelet" type="nodelet" args="$(arg nodelet) mrs_general/AutomaticStartEagle $(arg nodelet_manager)" output="screen">
 
-      <rosparam file="$(find mrs_general)/config/automatic_start_darpa.yaml" />
+      <rosparam file="$(find mrs_general)/config/automatic_start_eagle.yaml" />
 
       <param name="scripts_path" value="$(optenv HOME)" />
 
@@ -23,9 +23,8 @@
 
       <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />
-      <remap from="~gofcu_out" to="control_manager/goto_fcu" />
-      <remap from="~tunel_out" to="tunnel_flier/start" />
-      <remap from="~shutdown_in" to="~shutdown" />
+      <remap from="~goto_out" to="control_manager/goto" />
+      <remap from="~start_out" to="interceptor/start_interception" />
 
     </node>
 

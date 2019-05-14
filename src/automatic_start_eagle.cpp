@@ -11,6 +11,7 @@
 #include <mavros_msgs/State.h>
 
 #include <std_srvs/Trigger.h>
+#include <std_srvs/Empty.h>
 
 #include <mrs_msgs/Vec4.h>
 #include <mrs_msgs/TrackerStatus.h>
@@ -29,10 +30,10 @@
 namespace mrs_general
 {
 
-namespace automatic_start_darpa
+namespace automatic_start_eagle
 {
 
-/* class AutomaticStartDarpa //{ */
+/* class AutomaticStartEagle //{ */
 
 // state machine
 typedef enum
@@ -45,11 +46,11 @@ typedef enum
 
 } LandingStates_t;
 
-const char* state_names[4] = {
+const char* state_names[5] = {
 
-    "IDLING", "TAKING OFF", "GOTO", "FINISHED STATE"};
+    "IDLING", "TAKING OFF", "GOTO", "FINISHED"};
 
-class AutomaticStartDarpa : public nodelet::Nodelet {
+class AutomaticStartEagle : public nodelet::Nodelet {
 
 public:
   virtual void onInit();
@@ -58,18 +59,15 @@ private:
   ros::NodeHandle nh_;
   bool            is_initialized = false;
   std::string     scripts_path_;
-  double          shutdown_timeout_;
 
 private:
   double safety_timeout_;
+  double action_delay_;
 
 private:
   ros::ServiceClient service_client_takeoff;
-  ros::ServiceClient service_client_gofcu;
-  ros::ServiceClient service_client_tunnel_flier;
-
-private:
-  ros::ServiceServer service_server_shutdown;
+  ros::ServiceClient service_client_goto;
+  ros::ServiceClient service_client_activate;
 
 private:
   ros::Subscriber subscriber_mavros_state;
@@ -92,6 +90,9 @@ private:
   bool      offboard = false;
 
 private:
+  double goto_x_, goto_y_, goto_z_, goto_yaw_;
+
+private:
   void                         callbackMpcDiagnostics(const mrs_msgs::TrackerDiagnosticsPtr& msg);
   std::mutex                   mutex_mpc_diagnostics;
   mrs_msgs::TrackerDiagnostics mpc_diagnostics;
@@ -105,22 +106,13 @@ private:
 
 private:
   uint current_state = IDLE_STATE;
-
-private:
-  double goto_distance_;
-
-private:
-  bool       callbackShutdown([[maybe_unused]] std_srvs::Trigger::Request& req, std_srvs::Trigger::Response& res);
-  ros::Timer shutdown_timer;
-  void       shutdownTimer(const ros::TimerEvent& event);
-  ros::Time  shutdown_time;
 };
 
 //}
 
 /* inInit() //{ */
 
-void AutomaticStartDarpa::onInit() {
+void AutomaticStartEagle::onInit() {
 
   ros::NodeHandle nh_ = nodelet::Nodelet::getMTPrivateNodeHandle();
 
@@ -132,42 +124,39 @@ void AutomaticStartDarpa::onInit() {
   offboard      = false;
   offboard_time = ros::Time(0);
 
-  mrs_lib::ParamLoader param_loader(nh_, "AutomaticStartDarpa");
+  mrs_lib::ParamLoader param_loader(nh_, "AutomaticStartEagle");
 
   param_loader.load_param("safety_timeout", safety_timeout_);
+  param_loader.load_param("action_delay", action_delay_);
   param_loader.load_param("main_timer_rate", main_timer_rate_);
-  param_loader.load_param("goto_distance", goto_distance_);
   param_loader.load_param("scripts_path", scripts_path_);
-  param_loader.load_param("shutdown_timeout", shutdown_timeout_);
+
+  param_loader.load_param("goto/x", goto_x_);
+  param_loader.load_param("goto/y", goto_y_);
+  param_loader.load_param("goto/z", goto_z_);
+  param_loader.load_param("goto/yaw", goto_yaw_);
 
   // --------------------------------------------------------------
   // |                         subscribers                        |
   // --------------------------------------------------------------
 
-  subscriber_mavros_state    = nh_.subscribe("mavros_state_in", 1, &AutomaticStartDarpa::callbackMavrosState, this, ros::TransportHints().tcpNoDelay());
-  subscriber_tracker_status  = nh_.subscribe("tracker_status_in", 1, &AutomaticStartDarpa::callbackTrackerStatus, this, ros::TransportHints().tcpNoDelay());
-  subscriber_mpc_diagnostics = nh_.subscribe("mpc_diagnostics_in", 1, &AutomaticStartDarpa::callbackMpcDiagnostics, this, ros::TransportHints().tcpNoDelay());
+  subscriber_mavros_state    = nh_.subscribe("mavros_state_in", 1, &AutomaticStartEagle::callbackMavrosState, this, ros::TransportHints().tcpNoDelay());
+  subscriber_tracker_status  = nh_.subscribe("tracker_status_in", 1, &AutomaticStartEagle::callbackTrackerStatus, this, ros::TransportHints().tcpNoDelay());
+  subscriber_mpc_diagnostics = nh_.subscribe("mpc_diagnostics_in", 1, &AutomaticStartEagle::callbackMpcDiagnostics, this, ros::TransportHints().tcpNoDelay());
 
   // --------------------------------------------------------------
   // |                       service clients                      |
   // --------------------------------------------------------------
 
-  service_client_takeoff      = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
-  service_client_gofcu        = nh_.serviceClient<mrs_msgs::Vec4>("gofcu_out");
-  service_client_tunnel_flier = nh_.serviceClient<std_srvs::Trigger>("tunel_out");
-
-  // --------------------------------------------------------------
-  // |                       service servers                      |
-  // --------------------------------------------------------------
-
-  service_server_shutdown = nh_.advertiseService("shutdown_in", &AutomaticStartDarpa::callbackShutdown, this);
+  service_client_takeoff  = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
+  service_client_goto    = nh_.serviceClient<mrs_msgs::Vec4>("goto_out");
+  service_client_activate = nh_.serviceClient<std_srvs::Empty>("start_out");
 
   // --------------------------------------------------------------
   // |                           timers                           |
   // --------------------------------------------------------------
 
-  main_timer     = nh_.createTimer(ros::Rate(main_timer_rate_), &AutomaticStartDarpa::mainTimer, this);
-  shutdown_timer = nh_.createTimer(ros::Rate(1.0), &AutomaticStartDarpa::shutdownTimer, this, false, false);
+  main_timer = nh_.createTimer(ros::Rate(main_timer_rate_), &AutomaticStartEagle::mainTimer, this);
 
   if (!param_loader.loaded_successfully()) {
     ROS_ERROR("[MavrosInterface]: Could not load all parameters!");
@@ -176,7 +165,7 @@ void AutomaticStartDarpa::onInit() {
 
   is_initialized = true;
 
-  ROS_INFO("[AutomaticStartDarpa]: initialized");
+  ROS_INFO("[AutomaticStartEagle]: initialized");
 }
 
 //}
@@ -187,7 +176,7 @@ void AutomaticStartDarpa::onInit() {
 
 /* callbackMavrosState() //{ */
 
-void AutomaticStartDarpa::callbackMavrosState(const mavros_msgs::StateConstPtr& msg) {
+void AutomaticStartEagle::callbackMavrosState(const mavros_msgs::StateConstPtr& msg) {
 
   if (!is_initialized) {
     return;
@@ -195,7 +184,7 @@ void AutomaticStartDarpa::callbackMavrosState(const mavros_msgs::StateConstPtr& 
 
   std::scoped_lock lock(mutex_mavros_state);
 
-  ROS_INFO_ONCE("[AutomaticStartDarpa]: getting mavros state");
+  ROS_INFO_ONCE("[AutomaticStartEagle]: getting mavros state");
 
   // check armed state
   if (armed == false) {
@@ -242,7 +231,7 @@ void AutomaticStartDarpa::callbackMavrosState(const mavros_msgs::StateConstPtr& 
 
 /* callbackTrackerStatus() //{ */
 
-void AutomaticStartDarpa::callbackTrackerStatus(const mrs_msgs::TrackerStatusConstPtr& msg) {
+void AutomaticStartEagle::callbackTrackerStatus(const mrs_msgs::TrackerStatusConstPtr& msg) {
 
   if (!is_initialized) {
     return;
@@ -250,7 +239,7 @@ void AutomaticStartDarpa::callbackTrackerStatus(const mrs_msgs::TrackerStatusCon
 
   std::scoped_lock lock(mutex_tracker_status);
 
-  ROS_INFO_ONCE("[AutomaticStartDarpa]: getting tracker status");
+  ROS_INFO_ONCE("[AutomaticStartEagle]: getting tracker status");
 
   got_tracker_status = true;
 
@@ -261,7 +250,7 @@ void AutomaticStartDarpa::callbackTrackerStatus(const mrs_msgs::TrackerStatusCon
 
 /* callbackMpcDiagnostics() //{ */
 
-void AutomaticStartDarpa::callbackMpcDiagnostics(const mrs_msgs::TrackerDiagnosticsPtr& msg) {
+void AutomaticStartEagle::callbackMpcDiagnostics(const mrs_msgs::TrackerDiagnosticsPtr& msg) {
 
   if (!is_initialized) {
     return;
@@ -269,26 +258,11 @@ void AutomaticStartDarpa::callbackMpcDiagnostics(const mrs_msgs::TrackerDiagnost
 
   std::scoped_lock lock(mutex_mpc_diagnostics);
 
-  ROS_INFO_ONCE("[AutomaticStartDarpa]: getting mpc diagnostics");
+  ROS_INFO_ONCE("[AutomaticStartEagle]: getting mpc diagnostics");
 
   got_mpc_diagnostics = true;
 
   mpc_diagnostics = *msg;
-}
-
-//}
-
-/* callbackShutdown() //{ */
-
-bool AutomaticStartDarpa::callbackShutdown([[maybe_unused]] std_srvs::Trigger::Request& req, [[maybe_unused]] std_srvs::Trigger::Response& res) {
-
-  if (!is_initialized)
-    return false;
-
-  shutdown_time = ros::Time::now();
-  shutdown_timer.start();
-
-  return true;
 }
 
 //}
@@ -299,7 +273,7 @@ bool AutomaticStartDarpa::callbackShutdown([[maybe_unused]] std_srvs::Trigger::R
 
 /* mainTimer() //{ */
 
-void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& event) {
+void AutomaticStartEagle::mainTimer([[maybe_unused]] const ros::TimerEvent& event) {
 
   switch (current_state) {
 
@@ -318,6 +292,8 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
           std_srvs::Trigger trigger_out;
           service_client_takeoff.call(trigger_out);
+
+          ros::Duration(action_delay_).sleep();
 
           current_state = TAKEOFF_STATE;
 
@@ -338,18 +314,18 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
       if (tracker_status.tracker.compare(std::string("mrs_trackers/MpcTracker")) == STRING_EQUAL) {
 
-        ROS_INFO("[AutomaticStartDarpa]: takeoff finished");
+        ROS_INFO("[AutomaticStartEagle]: takeoff finished");
 
         mrs_msgs::Vec4 goto_out;
-        goto_out.request.goal[0] = 3.0;
-        goto_out.request.goal[1] = 0;
-        goto_out.request.goal[2] = 0;
-        goto_out.request.goal[3] = 0.0;
+        goto_out.request.goal[0] = goto_x_;
+        goto_out.request.goal[1] = goto_y_;
+        goto_out.request.goal[2] = goto_z_;
+        goto_out.request.goal[3] = goto_yaw_;
 
-        ros::Duration(4.0).sleep();
+        service_client_goto.call(goto_out);
+        ROS_INFO("[AutomaticStartEagle]: calling goto");
 
-        service_client_gofcu.call(goto_out);
-        ROS_INFO("[AutomaticStartDarpa]: calling goto");
+        ros::Duration(action_delay_).sleep();
 
         current_state = GOTO_STATE;
       }
@@ -363,12 +339,10 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
       if (!mpc_diagnostics.tracking_trajectory) {
 
-        ros::Duration(4.0).sleep();
+        ROS_INFO("[AutomaticStartEagle]: reached goal, activating hunter");
 
-        ROS_INFO("[AutomaticStartDarpa]: reached goal, triggering tunnel flier");
-
-        std_srvs::Trigger trigger_out;
-        service_client_tunnel_flier.call(trigger_out);
+        std_srvs::Empty empty_out;
+        service_client_activate.call(empty_out);
 
         current_state = FINISHED_STATE;
       }
@@ -382,26 +356,9 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
 //}
 
-/* shutdownTimer()() //{ */
-
-void AutomaticStartDarpa::shutdownTimer([[maybe_unused]] const ros::TimerEvent& event) {
-
-  double time = (ros::Time::now() - shutdown_time).toSec();
-
-  ROS_INFO_THROTTLE(1.0, "[AutomaticStartDarpa]: shutting down in %d s", int(shutdown_timeout_ - time));
-
-  if (time > shutdown_timeout_) {
-
-    ROS_INFO("[AutomaticStartDarpa]: calling for shutdown");
-    [[maybe_unused]] int res = system((scripts_path_ + std::string("/shutdown.sh")).c_str());
-  }
-}
-
-//}
-
-}  // namespace automatic_start_darpa
+}  // namespace automatic_start_eagle
 
 }  // namespace mrs_general
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(mrs_general::automatic_start_darpa::AutomaticStartDarpa, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(mrs_general::automatic_start_eagle::AutomaticStartEagle, nodelet::Nodelet)
