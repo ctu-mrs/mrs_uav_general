@@ -1,12 +1,12 @@
 #
 ## DEFINITION OF THE ARENA
 #
- 
-use_utm_origin: true
-utm_origin_x: 465710.758973
-utm_origin_y: 5249465.43086
 
-use_local_origin: false
+use_utm_origin: false
+utm_origin_x: 0
+utm_origin_y: 0
+
+use_local_origin: true
 local_origin_x: 0.0
 local_origin_y: 0.0
 
@@ -20,5 +20,5 @@ safety_area:
   50, 50,
   -50, 50]
 
-  max_height: 10.0
-  min_height: 0.5
+  max_height: 4.0
+  min_height: 0.3
