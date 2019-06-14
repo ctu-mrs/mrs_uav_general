@@ -336,7 +336,7 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
       std::scoped_lock lock(mutex_tracker_status);
 
-      if (tracker_status.tracker.compare(std::string("mrs_trackers/MpcTracker")) == STRING_EQUAL) {
+      if (tracker_status.tracker.compare(std::string("MpcTracker")) == STRING_EQUAL) {
 
         ROS_INFO("[AutomaticStartDarpa]: takeoff finished");
 
