@@ -33,7 +33,7 @@ plugin_blacklist:
 - trajectory
 - odom
 - adsb
-# - debug_value
+- debug_value
 - wind_estimation
 - log_transfer
 
