@@ -1,0 +1,9 @@
+<launch>
+
+  <!-- Mavros -->
+  <include file="$(find mrs_general)/launch/mavros_uav.launch" />
+
+  <!-- Garmin -->
+  <include file="$(find mrs_serial)/launch/uav.launch" />
+
+</launch>
