@@ -5,7 +5,7 @@
   <arg name="garmin_frame" default="garmin_frame" />
   <arg name="garmin_frame_up" default="garmin_frame_up" />
   <arg name="fcu_frame" default="fcu_$(arg uav_name)" />
-
+  <arg name="realsense_frame" default="rs_d435_link" />
   <!-- Mavros -->
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
@@ -28,6 +28,7 @@
     <!-- rplidar -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
 
+    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0.21 0.0 -0.05 0.0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
   </group>
 
 </launch>
