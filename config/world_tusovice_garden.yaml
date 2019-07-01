@@ -3,8 +3,8 @@
 #
  
 use_utm_origin: true
-home_utm_x: 429426.45
-home_utm_y: 5492357.99
+utm_origin_x: 429426.45
+utm_origin_y: 5492357.99
 
 use_local_origin: false
 local_origin_x: 0.0
