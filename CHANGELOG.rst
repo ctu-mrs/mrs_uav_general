@@ -2,8 +2,8 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.2 (2019-07-01)
+------------------
 * updated world configs
 * updated camp safety area
 * added realsense to sensors hector launch file
