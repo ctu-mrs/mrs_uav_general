@@ -15,6 +15,7 @@
       <param name="response_timeout" value="$(arg service_response_timeout)" />
       <param name="call_timeout" value="$(arg service_call_timeout)" />
       <param name="call_repeats" value="$(arg service_call_repeats)" />
+      <param name="topic_prefix" value="$(arg uav_name)" />
       
       <!-- Load a config YAML file -->
       <rosparam command="load" file="$(find mrs_general)/config/uav_names.yaml" />
@@ -27,12 +28,12 @@
       <param name="call_timeout" value="$(arg service_call_timeout)" />
       <param name="call_repeats" value="$(arg service_call_repeats)" />
     </node>   
-
     
     <!-- Topic receiver -->
     <node name="topic_udp_receiver" pkg="nimbro_topic_transport" type="udp_receiver" output="screen">
       <!-- The port to receive packets on -->
       <param name="port" value="$(arg topic_server_port)" />
+      <param name="topic_prefix" value="$(arg uav_name)" />
     </node>
 
     <!-- Topic sender -->
@@ -41,6 +42,7 @@
       <!-- The destination host name or IP address -->
 		  <param name="destination_addr" value="$(arg broadcast_addr)" />
       <param name="destination_port" value="$(arg topic_server_port)" />
+      <param name="topic_prefix" value="$(arg uav_name)" />
 
       <!-- Load a config YAML file -->
       <rosparam command="load" file="$(find mrs_general)/config/communication_config.yaml" />
