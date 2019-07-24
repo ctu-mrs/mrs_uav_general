@@ -1,38 +1,48 @@
 <launch>
   <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
-  <arg name="timeout" default="10"/>
+  <arg name="service_response_timeout" default="3"/>
+  <arg name="service_call_timeout" default="0.2"/>
+  <arg name="service_call_repeats" default="3"/>
+  <arg name="service_server_port" default="6000"/>
+  <arg name="topic_server_port" default="17001"/>
+  <arg name="broadcast_addr" default="192.168.0.255"/>
 
   <group ns="$(arg uav_name)">
     
-    <!-- Service server -->
-    <node name="udp_service_server" pkg="nimbro_service_transport" type="udp_server" output="screen">
-      <param name="port" value="6556" />
-    </node>
-
     <!-- Service client -->
-    <node name="udp_service_client" pkg="nimbro_service_transport" type="udp_client" output="screen">
-		  <param name="port" value="6556" />
-      <param name="limit" type="int" value="$(arg timeout)" /> <!-- Service response timeout [seconds]. --> 
-		  <!-- Load a config YAML file -->
+    <node name="service_udp_client" pkg="nimbro_service_transport" type="udp_client" output="screen">
+      <param name="destination_port" value="$(arg service_server_port)" />
+      <param name="response_timeout" value="$(arg service_response_timeout)" />
+      <param name="call_timeout" value="$(arg service_call_timeout)" />
+      <param name="call_repeats" value="$(arg service_call_repeats)" />
+      
+      <!-- Load a config YAML file -->
       <rosparam command="load" file="$(find mrs_general)/config/uav_names.yaml" />
       <rosparam command="load" file="$(find mrs_general)/config/communication_config.yaml" />
-	  </node>
+    </node>
+    
+    <!-- Service server -->
+    <node name="service_udp_server" pkg="nimbro_service_transport" type="udp_server" output="screen">
+      <param name="port" value="$(arg service_server_port)" />
+      <param name="call_timeout" value="$(arg service_call_timeout)" />
+      <param name="call_repeats" value="$(arg service_call_repeats)" />
+    </node>   
 
     
     <!-- Topic receiver -->
-    <node name="udp_topic_receiver" pkg="nimbro_topic_transport" type="udp_receiver" output="screen">
+    <node name="topic_udp_receiver" pkg="nimbro_topic_transport" type="udp_receiver" output="screen">
       <!-- The port to receive packets on -->
-      <param name="port" value="17001" />
+      <param name="port" value="$(arg topic_server_port)" />
     </node>
 
     <!-- Topic sender -->
-    <node name="udp_topic_sender" pkg="nimbro_topic_transport" type="udp_sender" output="screen">
+    <node name="topic_udp_sender" pkg="nimbro_topic_transport" type="udp_sender" output="screen">
 
       <!-- The destination host name or IP address -->
-      <param name="destination_port" value="17001" />
+		  <param name="destination_addr" value="$(arg broadcast_addr)" />
+      <param name="destination_port" value="$(arg topic_server_port)" />
 
       <!-- Load a config YAML file -->
-      <rosparam command="load" file="$(find mrs_general)/config/uav_names.yaml" />
       <rosparam command="load" file="$(find mrs_general)/config/communication_config.yaml" />
     </node>
   </group>

@@ -1,9 +1,3 @@
-# Set receivers to "all" or list of machines:
-# -> receivers: ["all"]
-# -> receivers: ["uav1", "uav2", "uav3"]
-
-receivers: ["all"] 
-# receivers: ["uav7", "uav8"]
 
 topics: # topics published out of this machine to receivers specified above
  - name: "control_manager/mpc_tracker/predicted_trajectory"
@@ -14,8 +8,6 @@ topics: # topics published out of this machine to receivers specified above
    rate: 1.0
 
 services:
-  # - name: "/*/odometry/change_estimator_type_string"
-  #   type: mrs_msgs/String 
   - name: "/*/control_manager/motors"
     type: std_srvs/SetBool 
   - name: "/*/uav_manager/takeoff"
