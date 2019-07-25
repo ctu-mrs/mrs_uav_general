@@ -24,21 +24,21 @@ safety_area:
 
   use_safety_area: true
 
-  # # convex polygon CCW
-  # # race track
-  # safety_area: [30.9, 26.4,
-  # -45.0, 7.27,
-  # -31.5, -38.0,
-  # 44.5, -23.5]
-
   # convex polygon CCW
-  # race track extended
-  safety_area: [
-  44.8, -26.4,
-  31.8, 25.6,
-  -112.2, -0.4,
-  -48.2, -48.4
-  ]
+  # race track
+  safety_area: [30.9, 26.4,
+  -45.0, 7.27,
+  -31.5, -38.0,
+  44.5, -23.5]
+
+  # # convex polygon CCW
+  # # race track extended
+  # safety_area: [
+  # 44.8, -26.4,
+  # 31.8, 25.6,
+  # -112.2, -0.4,
+  # -48.2, -48.4
+  # ]
   
   # # convex polygon CCW
   # # mezi stromy a lampou
