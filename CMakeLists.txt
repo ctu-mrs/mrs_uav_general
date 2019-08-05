@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   #  INCLUDE_DIRS include
-  LIBRARIES AutomaticStartDarpa
+  LIBRARIES AutomaticStartDarpa AutomaticStartEagle AutomaticStartPointer
   CATKIN_DEPENDS std_msgs mrs_msgs mavros_msgs mrs_lib
   #  DEPENDS system_lib
   )
@@ -71,5 +71,19 @@ add_dependencies(AutomaticStartEagle
   )
 
 target_link_libraries(AutomaticStartEagle
+  ${catkin_LIBRARIES}
+  )
+
+# automatic start POINTER
+
+add_library(AutomaticStartPointer
+  src/automatic_start_pointer.cpp)
+
+add_dependencies(AutomaticStartPointer
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+target_link_libraries(AutomaticStartPointer
   ${catkin_LIBRARIES}
   )

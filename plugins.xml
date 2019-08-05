@@ -9,3 +9,9 @@
     <description>AutomaticStartEagle nodelet</description>
   </class>
 </library>
+
+<library path="lib/libAutomaticStartPointer">
+  <class name="mrs_general/AutomaticStartPointer" type="mrs_general::automatic_start_pointer::AutomaticStartPointer" base_class_type="nodelet::Nodelet">
+    <description>AutomaticStartPointer nodelet</description>
+  </class>
+</library>
