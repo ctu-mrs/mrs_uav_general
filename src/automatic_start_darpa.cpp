@@ -11,6 +11,7 @@
 #include <mavros_msgs/State.h>
 
 #include <std_srvs/Trigger.h>
+#include <mrs_msgs/String.h>
 
 #include <mrs_msgs/Vec4.h>
 #include <mrs_msgs/TrackerStatus.h>
@@ -67,6 +68,8 @@ private:
   ros::ServiceClient service_client_takeoff;
   ros::ServiceClient service_client_gofcu;
   ros::ServiceClient service_client_tunnel_flier;
+  ros::ServiceClient service_client_estimator;
+  ros::ServiceClient service_client_hdg_estimator;
 
 private:
   ros::ServiceServer service_server_shutdown;
@@ -152,9 +155,11 @@ void AutomaticStartDarpa::onInit() {
   // |                       service clients                      |
   // --------------------------------------------------------------
 
-  service_client_takeoff      = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
-  service_client_gofcu        = nh_.serviceClient<mrs_msgs::Vec4>("gofcu_out");
-  service_client_tunnel_flier = nh_.serviceClient<std_srvs::Trigger>("tunel_out");
+  service_client_takeoff       = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
+  service_client_gofcu         = nh_.serviceClient<mrs_msgs::Vec4>("gofcu_out");
+  service_client_tunnel_flier  = nh_.serviceClient<std_srvs::Trigger>("tunel_out");
+  service_client_estimator     = nh_.serviceClient<mrs_msgs::String>("change_estimator_out");
+  service_client_hdg_estimator = nh_.serviceClient<mrs_msgs::String>("change_hdg_estimator_out");
 
   // --------------------------------------------------------------
   // |                       service servers                      |
@@ -341,12 +346,12 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
         ROS_INFO("[AutomaticStartDarpa]: takeoff finished");
 
         mrs_msgs::Vec4 goto_out;
-        goto_out.request.goal[0] = 3.0;
-        goto_out.request.goal[1] = 0;
-        goto_out.request.goal[2] = 0;
+        goto_out.request.goal[0] = goto_distance_;
+        goto_out.request.goal[1] = 0.0;
+        goto_out.request.goal[2] = 0.0;
         goto_out.request.goal[3] = 0.0;
 
-        ros::Duration(4.0).sleep();
+        ros::Duration(2.0).sleep();
 
         service_client_gofcu.call(goto_out);
         ROS_INFO("[AutomaticStartDarpa]: calling goto");
@@ -361,12 +366,22 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
       std::scoped_lock lock(mutex_mpc_diagnostics);
 
-      if (!mpc_diagnostics.tracking_trajectory) {
+      if (!mpc_diagnostics.tracking_trajectory && mpc_diagnostics.tracker_active) {
 
-        ros::Duration(4.0).sleep();
+        ros::Duration(2.0).sleep();
 
         ROS_INFO("[AutomaticStartDarpa]: reached goal, triggering tunnel flier");
 
+        mrs_msgs::String string_out;
+
+        ROS_INFO("[AutomaticStartDarpa]: switching to HECTOR estimators");
+        string_out.request.value = "HECTOR";
+        service_client_estimator.call(string_out);
+        service_client_hdg_estimator.call(string_out);
+
+        ros::Duration(2.0).sleep();
+
+        ROS_INFO("[AutomaticStartDarpa]: activating tunnel flier");
         std_srvs::Trigger trigger_out;
         service_client_tunnel_flier.call(trigger_out);
 
@@ -382,7 +397,7 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
 //}
 
-/* shutdownTimer()() //{ */
+/* shutdownTimer() //{ */
 
 void AutomaticStartDarpa::shutdownTimer([[maybe_unused]] const ros::TimerEvent& event) {
 
