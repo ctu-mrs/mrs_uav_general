@@ -10,14 +10,8 @@
   <!-- Mavros -->
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
-  <!-- Garmin -->
-  <include file="$(find mrs_serial)/launch/uav.launch" />
-
   <!-- Rplidar -->
   <include file="$(find rplidar_ros)/launch/uav.launch" />
-
-  <!-- Realsense -->
-  <include file="$(find realsense_d435)/launch/uav_darpa.launch" />
 
   <group ns="$(arg uav_name)">
 
@@ -31,9 +25,6 @@
 
     <!-- rplidar -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
-
-    <!-- realsense -->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0.21 0.0 -0.05 0.0 0.436332 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
 
   </group>
 
