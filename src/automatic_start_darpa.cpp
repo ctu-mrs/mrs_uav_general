@@ -560,7 +560,7 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
     case FLYING_OUT_STATE: {
 
-      if (dist2(mpc_diagnostics.setpoint.position.x, mpc_diagnostics.setpoint.position.y, start_x, start_y)) {
+      if (dist2(mpc_diagnostics.setpoint.position.x, mpc_diagnostics.setpoint.position.y, start_x, start_y) < 1.0) {
 
         ROS_INFO("[AutomaticStartDarpa]: reached the starting point, landing");
 
