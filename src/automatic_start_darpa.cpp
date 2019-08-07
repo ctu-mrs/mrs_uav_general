@@ -158,7 +158,6 @@ void AutomaticStartDarpa::onInit() {
 
   param_loader.load_param("safety_timeout", safety_timeout_);
   param_loader.load_param("main_timer_rate", main_timer_rate_);
-  param_loader.load_param("flight_time_limit", return_time_);
 
   param_loader.load_param("goto/x", goto_x_);
   param_loader.load_param("goto/y", goto_y_);
