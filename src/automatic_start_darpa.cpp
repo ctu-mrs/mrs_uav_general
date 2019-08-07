@@ -110,7 +110,7 @@ private:
   uint current_state = IDLE_STATE;
 
 private:
-  double goto_distance_;
+  double goto_x_, goto_y_, goto_z_, goto_yaw_;
 
 private:
   bool       callbackShutdown([[maybe_unused]] std_srvs::Trigger::Request& req, std_srvs::Trigger::Response& res);
@@ -139,7 +139,12 @@ void AutomaticStartDarpa::onInit() {
 
   param_loader.load_param("safety_timeout", safety_timeout_);
   param_loader.load_param("main_timer_rate", main_timer_rate_);
-  param_loader.load_param("goto_distance", goto_distance_);
+
+  param_loader.load_param("goto/x", goto_x_);
+  param_loader.load_param("goto/y", goto_y_);
+  param_loader.load_param("goto/z", goto_z_);
+  param_loader.load_param("goto/yaw", goto_yaw_);
+
   param_loader.load_param("scripts_path", scripts_path_);
   param_loader.load_param("shutdown_timeout", shutdown_timeout_);
 
@@ -341,20 +346,42 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
       std::scoped_lock lock(mutex_tracker_status);
 
-      if (tracker_status.tracker.compare(std::string("MpcTracker")) == STRING_EQUAL) {
+      if (mpc_diagnostics.tracker_active) {
 
         ROS_INFO("[AutomaticStartDarpa]: takeoff finished");
 
-        mrs_msgs::Vec4 goto_out;
-        goto_out.request.goal[0] = goto_distance_;
-        goto_out.request.goal[1] = 0.0;
-        goto_out.request.goal[2] = 0.0;
-        goto_out.request.goal[3] = 0.0;
+        mrs_msgs::String string_out;
+
+        ROS_INFO("[AutomaticStartDarpa]: switching to HECTOR estimators");
+
+        string_out.request.value = "HECTOR";
+
+        if (!service_client_hdg_estimator.call(string_out)) {
+
+          ROS_ERROR("[AutomaticStartDarpa]: service call for HDG estimator switch failed");
+
+        } else if (!string_out.response.success) {
+
+          ROS_ERROR("[AutomaticStartDarpa]: service call for HDG estimator switch failed: %s", string_out.response.message.c_str());
+        } else {
+
+          ROS_INFO("[AutomaticStartDarpa]: switching of HDG estimator succeeeeded");
+        }
+
+        if (!service_client_estimator.call(string_out)) {
+
+          ROS_ERROR("[AutomaticStartDarpa]: service for lateral estimator switch failed");
+
+        } else if (!string_out.response.success) {
+
+          ROS_ERROR("[AutomaticStartDarpa]: service call for lateral estimator switch failed: %s", string_out.response.message.c_str());
+
+        } else {
+
+          ROS_INFO("[AutomaticStartDarpa]: switching of lateral estimator succeeeeded");
+        }
 
         ros::Duration(2.0).sleep();
-
-        service_client_gofcu.call(goto_out);
-        ROS_INFO("[AutomaticStartDarpa]: calling goto");
 
         current_state = GOTO_STATE;
       }
@@ -366,27 +393,22 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
       std::scoped_lock lock(mutex_mpc_diagnostics);
 
-      if (!mpc_diagnostics.tracking_trajectory && mpc_diagnostics.tracker_active) {
+      ROS_INFO("[AutomaticStartDarpa]: reached goal, triggering tunnel flier");
 
-        ros::Duration(2.0).sleep();
+      mrs_msgs::Vec4 goto_out;
+      goto_out.request.goal[0] = goto_x_;
+      goto_out.request.goal[1] = goto_y_;
+      goto_out.request.goal[2] = goto_z_;
+      goto_out.request.goal[3] = goto_yaw_;
 
-        ROS_INFO("[AutomaticStartDarpa]: reached goal, triggering tunnel flier");
+      service_client_gofcu.call(goto_out);
+      ROS_INFO("[AutomaticStartDarpa]: calling goto");
 
-        mrs_msgs::String string_out;
+      /* ROS_INFO("[AutomaticStartDarpa]: activating tunnel flier"); */
+      /* std_srvs::Trigger trigger_out; */
+      /* service_client_tunnel_flier.call(trigger_out); */
 
-        ROS_INFO("[AutomaticStartDarpa]: switching to HECTOR estimators");
-        string_out.request.value = "HECTOR";
-        service_client_estimator.call(string_out);
-        service_client_hdg_estimator.call(string_out);
-
-        ros::Duration(2.0).sleep();
-
-        ROS_INFO("[AutomaticStartDarpa]: activating tunnel flier");
-        std_srvs::Trigger trigger_out;
-        service_client_tunnel_flier.call(trigger_out);
-
-        current_state = FINISHED_STATE;
-      }
+      current_state = FINISHED_STATE;
 
       break;
     }
