@@ -1,4 +1,10 @@
+# takeoff can be aborted by turning off the OFFBOARD mode
 safety_timeout: 5.0 # [s]
+
+# Goto fcu by x meters forward after tekeoff
+goto_distance: 1.0 # [m]
+
+# the computer will be shut down after this time
+shutdown_timeout: 600 # [s]
+
 main_timer_rate: 30 # [Hz]
-goto_distance: 5.0 # [m]
-shutdown_timeout: 60 # [s]
