@@ -10,6 +10,8 @@
 
 #include <mavros_msgs/State.h>
 
+#include <nav_msgs/Odometry.h>
+
 #include <std_srvs/Trigger.h>
 #include <mrs_msgs/String.h>
 
@@ -41,14 +43,16 @@ typedef enum
 
   IDLE_STATE,
   TAKEOFF_STATE,
-  GOTO_STATE,
+  FLYING_IN_STATE,
+  FLYING_OUT_STATE,
+  LANDING_STATE,
   FINISHED_STATE
 
 } LandingStates_t;
 
-const char* state_names[4] = {
+const char* state_names[7] = {
 
-    "IDLING", "TAKING OFF", "GOTO", "FINISHED STATE"};
+    "IDLING", "TAKING OFF", "FLYING IN", "FLYING OUT", "LANDING", "FINISHED"};
 
 class AutomaticStartDarpa : public nodelet::Nodelet {
 
@@ -66,8 +70,9 @@ private:
 
 private:
   ros::ServiceClient service_client_takeoff;
-  ros::ServiceClient service_client_gofcu;
-  ros::ServiceClient service_client_tunnel_flier;
+  ros::ServiceClient service_client_goto;
+  ros::ServiceClient service_client_return;
+  ros::ServiceClient service_client_land;
   ros::ServiceClient service_client_estimator;
   ros::ServiceClient service_client_hdg_estimator;
 
@@ -78,11 +83,16 @@ private:
   ros::Subscriber subscriber_mavros_state;
   ros::Subscriber subscriber_tracker_status;
   ros::Subscriber subscriber_mpc_diagnostics;
+  ros::Subscriber subscriber_odometry;
 
 private:
   ros::Timer main_timer;
   void       mainTimer(const ros::TimerEvent& event);
   double     main_timer_rate_;
+
+  double    return_time_;
+  ros::Time start_time;
+  double    start_x, start_y;
 
 private:
   void       callbackMavrosState(const mavros_msgs::StateConstPtr& msg);
@@ -107,7 +117,14 @@ private:
   bool                    got_tracker_status = false;
 
 private:
+  void               callbackOdometry(const nav_msgs::OdometryConstPtr& msg);
+  std::mutex         mutex_odometry;
+  nav_msgs::Odometry odometry;
+  bool               got_odometry = false;
+
+private:
   uint current_state = IDLE_STATE;
+  void changeState(LandingStates_t new_state);
 
 private:
   double goto_x_, goto_y_, goto_z_, goto_yaw_;
@@ -117,6 +134,8 @@ private:
   ros::Timer shutdown_timer;
   void       shutdownTimer(const ros::TimerEvent& event);
   ros::Time  shutdown_time;
+
+  double dist2(const double x1, const double y1, const double x2, const double y2);
 };
 
 //}
@@ -139,6 +158,7 @@ void AutomaticStartDarpa::onInit() {
 
   param_loader.load_param("safety_timeout", safety_timeout_);
   param_loader.load_param("main_timer_rate", main_timer_rate_);
+  param_loader.load_param("flight_time_limit", return_time_);
 
   param_loader.load_param("goto/x", goto_x_);
   param_loader.load_param("goto/y", goto_y_);
@@ -155,14 +175,16 @@ void AutomaticStartDarpa::onInit() {
   subscriber_mavros_state    = nh_.subscribe("mavros_state_in", 1, &AutomaticStartDarpa::callbackMavrosState, this, ros::TransportHints().tcpNoDelay());
   subscriber_tracker_status  = nh_.subscribe("tracker_status_in", 1, &AutomaticStartDarpa::callbackTrackerStatus, this, ros::TransportHints().tcpNoDelay());
   subscriber_mpc_diagnostics = nh_.subscribe("mpc_diagnostics_in", 1, &AutomaticStartDarpa::callbackMpcDiagnostics, this, ros::TransportHints().tcpNoDelay());
+  subscriber_odometry        = nh_.subscribe("odometry_in", 1, &AutomaticStartDarpa::callbackOdometry, this, ros::TransportHints().tcpNoDelay());
 
   // --------------------------------------------------------------
   // |                       service clients                      |
   // --------------------------------------------------------------
 
   service_client_takeoff       = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
-  service_client_gofcu         = nh_.serviceClient<mrs_msgs::Vec4>("gofcu_out");
-  service_client_tunnel_flier  = nh_.serviceClient<std_srvs::Trigger>("tunel_out");
+  service_client_goto          = nh_.serviceClient<mrs_msgs::Vec4>("goto_out");
+  service_client_return        = nh_.serviceClient<std_srvs::Trigger>("return_out");
+  service_client_land          = nh_.serviceClient<std_srvs::Trigger>("land_out");
   service_client_estimator     = nh_.serviceClient<mrs_msgs::String>("change_estimator_out");
   service_client_hdg_estimator = nh_.serviceClient<mrs_msgs::String>("change_hdg_estimator_out");
 
@@ -288,6 +310,25 @@ void AutomaticStartDarpa::callbackMpcDiagnostics(const mrs_msgs::TrackerDiagnost
 
 //}
 
+/* callbackOdometry() //{ */
+
+void AutomaticStartDarpa::callbackOdometry(const nav_msgs::OdometryConstPtr& msg) {
+
+  if (!is_initialized) {
+    return;
+  }
+
+  std::scoped_lock lock(mutex_odometry);
+
+  ROS_INFO_ONCE("[AutomaticStartDarpa]: getting odometry");
+
+  got_odometry = true;
+
+  odometry = *msg;
+}
+
+//}
+
 /* callbackShutdown() //{ */
 
 bool AutomaticStartDarpa::callbackShutdown([[maybe_unused]] std_srvs::Trigger::Request& req, [[maybe_unused]] std_srvs::Trigger::Response& res) {
@@ -306,6 +347,126 @@ bool AutomaticStartDarpa::callbackShutdown([[maybe_unused]] std_srvs::Trigger::R
 // --------------------------------------------------------------
 // |                           timers                           |
 // --------------------------------------------------------------
+
+/* changeState() //{ */
+
+void AutomaticStartDarpa::changeState(LandingStates_t new_state) {
+
+  switch (new_state) {
+
+    case IDLE_STATE: {
+
+      break;
+    }
+
+    case TAKEOFF_STATE: {
+
+      std_srvs::Trigger trigger_out;
+
+      if (!service_client_takeoff.call(trigger_out)) {
+
+        ROS_ERROR("[AutomaticStartDarpa]: service call for takeoff failed");
+
+      } else if (!trigger_out.response.success) {
+
+        ROS_ERROR("[AutomaticStartDarpa]: service fall for takeoff returned false: %s", trigger_out.response.message.c_str());
+
+      } else {
+
+        ROS_INFO("[AutomaticStartDarpa]: service call for takeoff suceeeded");
+      }
+
+      break;
+    }
+
+    case FLYING_IN_STATE: {
+
+      mrs_msgs::Vec4 goto_out;
+      goto_out.request.goal[0] = goto_x_;
+      goto_out.request.goal[1] = goto_y_;
+      goto_out.request.goal[2] = goto_z_;
+      goto_out.request.goal[3] = goto_yaw_;
+
+      {
+        std::scoped_lock lock(mutex_odometry);
+
+        start_x    = odometry.pose.pose.position.x;
+        start_y    = odometry.pose.pose.position.y;
+        start_time = ros::Time::now();
+      }
+
+      ROS_INFO("[AutomaticStartDarpa]: calling goto");
+
+      if (!service_client_goto.call(goto_out)) {
+
+        ROS_ERROR("[AutomaticStartDarpa]: service call for goto failed");
+
+      } else if (!goto_out.response.success) {
+
+        ROS_ERROR("[AutomaticStartDarpa]: service fall for goto returned false: %s", goto_out.response.message.c_str());
+
+      } else {
+
+        ROS_INFO("[AutomaticStartDarpa]: service call for goto suceeeded");
+      }
+
+      break;
+    }
+
+    case FLYING_OUT_STATE: {
+
+      std_srvs::Trigger trigger_out;
+
+      if (!service_client_return.call(trigger_out)) {
+
+        ROS_ERROR("[AutomaticStartDarpa]: service call for returning failed");
+
+      } else if (!trigger_out.response.success) {
+
+        ROS_ERROR("[AutomaticStartDarpa]: service fall for returning returned false: %s", trigger_out.response.message.c_str());
+
+      } else {
+
+        ROS_INFO("[AutomaticStartDarpa]: service call for returning suceeeded");
+      }
+
+      break;
+    }
+
+    case LANDING_STATE: {
+
+      std_srvs::Trigger trigger_out;
+
+      if (!service_client_land.call(trigger_out)) {
+
+        ROS_ERROR("[AutomaticStartDarpa]: service call for landing failed");
+
+      } else if (!trigger_out.response.success) {
+
+        ROS_ERROR("[AutomaticStartDarpa]: service fall for landing returned false: %s", trigger_out.response.message.c_str());
+
+      } else {
+
+        ROS_INFO("[AutomaticStartDarpa]: service call for landing suceeeded");
+      }
+
+      break;
+    }
+
+    case FINISHED_STATE: {
+
+      break;
+    }
+
+    break;
+  }
+
+  ROS_WARN("[AutomaticStartDarpa]: switching states %s -> %s", state_names[current_state], state_names[new_state]);
+
+  current_state = new_state;
+}
+
+//}
 
 /* mainTimer() //{ */
 
@@ -326,10 +487,7 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
           ROS_ERROR("STARTING THE STATE MACHINE!!!!");
 
-          std_srvs::Trigger trigger_out;
-          service_client_takeoff.call(trigger_out);
-
-          current_state = TAKEOFF_STATE;
+          changeState(TAKEOFF_STATE);
 
         } else {
 
@@ -346,6 +504,7 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
       std::scoped_lock lock(mutex_tracker_status);
 
+      // if takeoff finished
       if (mpc_diagnostics.tracker_active) {
 
         ROS_INFO("[AutomaticStartDarpa]: takeoff finished");
@@ -381,41 +540,38 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
           ROS_INFO("[AutomaticStartDarpa]: switching of lateral estimator succeeeeded");
         }
 
-        ros::Duration(2.0).sleep();
-
-        current_state = GOTO_STATE;
+        changeState(FLYING_IN_STATE);
       }
 
       break;
     }
 
-    case GOTO_STATE: {
+    case FLYING_IN_STATE: {
 
-      std::scoped_lock lock(mutex_mpc_diagnostics);
+      if ((ros::Time::now() - start_time).toSec() < return_time_) {
 
-      ROS_INFO("[AutomaticStartDarpa]: reached goal, triggering tunnel flier");
+        ROS_INFO("[AutomaticStartDarpa]: flying over %.2f s, returning home", return_time_);
 
-      mrs_msgs::Vec4 goto_out;
-      goto_out.request.goal[0] = goto_x_;
-      goto_out.request.goal[1] = goto_y_;
-      goto_out.request.goal[2] = goto_z_;
-      goto_out.request.goal[3] = goto_yaw_;
-
-      service_client_gofcu.call(goto_out);
-      ROS_INFO("[AutomaticStartDarpa]: calling goto");
-
-      /* ROS_INFO("[AutomaticStartDarpa]: activating tunnel flier"); */
-      /* std_srvs::Trigger trigger_out; */
-      /* service_client_tunnel_flier.call(trigger_out); */
-
-      current_state = FINISHED_STATE;
+        changeState(FLYING_OUT_STATE);
+      }
 
       break;
     }
 
-    break;
+    case FLYING_OUT_STATE: {
+
+      if (dist2(mpc_diagnostics.setpoint.position.x, mpc_diagnostics.setpoint.position.y, start_x, start_y)) {
+
+        ROS_INFO("[AutomaticStartDarpa]: reached the starting point, landing");
+
+        changeState(LANDING_STATE);
+      }
+
+      break;
+    }
   }
-}
+
+}  // namespace automatic_start_darpa
 
 //}
 
@@ -432,6 +588,19 @@ void AutomaticStartDarpa::shutdownTimer([[maybe_unused]] const ros::TimerEvent& 
     ROS_INFO("[AutomaticStartDarpa]: calling for shutdown");
     [[maybe_unused]] int res = system((scripts_path_ + std::string("/shutdown.sh")).c_str());
   }
+}
+
+//}
+
+// --------------------------------------------------------------
+// |                       other routines                       |
+// --------------------------------------------------------------
+
+/* dist2() //{ */
+
+double AutomaticStartDarpa::dist2(const double x1, const double y1, const double x2, const double y2) {
+
+  return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 }
 
 //}

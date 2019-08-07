@@ -23,12 +23,12 @@
 
       <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />
-      <remap from="~gofcu_out" to="forest_flier/goto" />
+      <remap from="~goto_out" to="forest_flier/goto" />
       <remap from="~change_estimator_out" to="odometry/change_estimator_type_string" />
       <remap from="~change_hdg_estimator_out" to="odometry/change_hdg_estimator_type_string" />
       <remap from="~shutdown_in" to="~shutdown" />
-
-      <remap from="~tunel_out" to="tunnel_flier/start" />
+      <remap from="~land_out" to="control_manager/land" />
+      <remap from="~return_out" to="forest_flier/return" />
 
     </node>
 
