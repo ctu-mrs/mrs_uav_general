@@ -166,6 +166,7 @@ void AutomaticStartDarpa::onInit() {
 
   param_loader.load_param("scripts_path", scripts_path_);
   param_loader.load_param("shutdown_timeout", shutdown_timeout_);
+  param_loader.load_param("return_timer", return_time_);
 
   // --------------------------------------------------------------
   // |                         subscribers                        |
@@ -544,6 +545,8 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
           ROS_INFO("[AutomaticStartDarpa]: switching of lateral estimator succeeeeded");
         }
 
+        ros::Duration(1.0).sleep();
+
         changeState(FLYING_IN_STATE);
       }
 
@@ -552,7 +555,7 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
     case FLYING_IN_STATE: {
 
-      if ((ros::Time::now() - start_time).toSec() < return_time_) {
+      if ((ros::Time::now() - start_time).toSec() > return_time_) {
 
         ROS_INFO("[AutomaticStartDarpa]: flying over %.2f s, returning home", return_time_);
 
@@ -564,7 +567,9 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
     case FLYING_OUT_STATE: {
 
-      if (dist2(mpc_diagnostics.setpoint.position.x, mpc_diagnostics.setpoint.position.y, start_x, start_y) < 1.0) {
+      std::scoped_lock lock(mutex_odometry);
+
+      if (dist2(odometry.pose.pose.position.x, odometry.pose.pose.position.y, start_x, start_y) < 1.0) {
 
         ROS_INFO("[AutomaticStartDarpa]: reached the starting point, landing");
 
