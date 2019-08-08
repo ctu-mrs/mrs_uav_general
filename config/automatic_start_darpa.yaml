@@ -11,7 +11,7 @@ return_timer: 60 # [s]
 goto:
   x: 20.0
   y: -10.0
-  z: 0.3
+  z: 1.5
   yaw: 0.0
 
 main_timer_rate: 2 # [Hz]
