@@ -338,6 +338,9 @@ bool AutomaticStartDarpa::callbackShutdown([[maybe_unused]] std_srvs::Trigger::R
   shutdown_time = ros::Time::now();
   shutdown_timer.start();
 
+  res.success = true;
+  res.message = "shutting down";
+
   return true;
 }
 
@@ -448,6 +451,8 @@ void AutomaticStartDarpa::changeState(LandingStates_t new_state) {
 
         ROS_INFO("[AutomaticStartDarpa]: service call for landing suceeeded");
       }
+
+      shutdown_timer.stop();
 
       break;
     }
