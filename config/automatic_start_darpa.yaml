@@ -1,17 +1,17 @@
 # takeoff can be aborted by turning off the OFFBOARD mode
 safety_timeout: 5.0 # [s]
 
-# the computer will be shut down after this time
-shutdown_timeout: 600 # [s]
+# after landing and after this timeout, the computer will be shut down
+shutdown_timeout: 60 # [s]
 
 # service for returning will be called after
 # this number of seconds after starting
-return_timer: 30 # [s]
+return_timer: 60 # [s]
 
 goto:
   x: 20.0
-  y: 0.0
-  z: 2.0
+  y: -10.0
+  z: 0.3
   yaw: 0.0
 
 main_timer_rate: 2 # [Hz]
