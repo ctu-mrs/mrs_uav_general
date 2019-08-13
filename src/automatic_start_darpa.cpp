@@ -61,7 +61,8 @@ public:
 
 private:
   ros::NodeHandle nh_;
-  bool            is_initialized = false;
+  bool            is_initialized   = false;
+  bool            april_tag_killed = false;
   std::string     scripts_path_;
   double          shutdown_timeout_;
 
@@ -554,6 +555,12 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
     }
 
     case FLYING_IN_STATE: {
+
+      if (dist2(odometry.pose.pose.position.x, odometry.pose.pose.position.y, start_x, start_y) > 5.0 && !april_tag_killed) {
+        ROS_INFO("[AutomaticStartDarpa]: calling for apriltag node kill");
+        [[maybe_unused]] int res = system((scripts_path_ + std::string("/kill_apriltag.sh")).c_str());
+        april_tag_killed         = true;
+      }
 
       if ((ros::Time::now() - start_time).toSec() > return_time_) {
 
