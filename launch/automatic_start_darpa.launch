@@ -18,8 +18,7 @@
 
       <!-- Subscribers -->
       <remap from="~mavros_state_in" to="mavros/state" />
-      <remap from="~tracker_status_in" to="control_manager/tracker_status" />
-      <remap from="~mpc_diagnostics_in" to="control_manager/mpc_tracker/diagnostics" />
+      <remap from="~control_manager_diagnostics" to="control_manager/diagnostics" />
       <remap from="~odometry_in" to="odometry/odom_main" />
 
       <!-- services -->
