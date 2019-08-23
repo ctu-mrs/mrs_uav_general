@@ -16,7 +16,7 @@
 #include <mrs_msgs/String.h>
 
 #include <mrs_msgs/Vec4.h>
-#include <mrs_msgs/TrackerStatus.h>
+#include <mrs_msgs/ControlManagerDiagnostics.h>
 #include <mrs_msgs/TrackerDiagnostics.h>
 
 #include <mrs_lib/ParamLoader.h>
@@ -82,8 +82,7 @@ private:
 
 private:
   ros::Subscriber subscriber_mavros_state;
-  ros::Subscriber subscriber_tracker_status;
-  ros::Subscriber subscriber_mpc_diagnostics;
+  ros::Subscriber subscriber_control_manager_diagnostics;
   ros::Subscriber subscriber_odometry;
 
 private:
@@ -106,16 +105,10 @@ private:
   bool      offboard = false;
 
 private:
-  void                         callbackMpcDiagnostics(const mrs_msgs::TrackerDiagnosticsPtr& msg);
-  std::mutex                   mutex_mpc_diagnostics;
-  mrs_msgs::TrackerDiagnostics mpc_diagnostics;
-  bool                         got_mpc_diagnostics;
-
-private:
-  void                    callbackTrackerStatus(const mrs_msgs::TrackerStatusConstPtr& msg);
-  std::mutex              mutex_tracker_status;
-  mrs_msgs::TrackerStatus tracker_status;
-  bool                    got_tracker_status = false;
+  void                                callbackControlManagerDiagnostics(const mrs_msgs::ControlManagerDiagnosticsConstPtr& msg);
+  std::mutex                          mutex_control_manager_diagnostics;
+  mrs_msgs::ControlManagerDiagnostics control_manager_diagnostics;
+  bool                                got_control_manager_diagnostics = false;
 
 private:
   void               callbackOdometry(const nav_msgs::OdometryConstPtr& msg);
@@ -173,10 +166,10 @@ void AutomaticStartDarpa::onInit() {
   // |                         subscribers                        |
   // --------------------------------------------------------------
 
-  subscriber_mavros_state    = nh_.subscribe("mavros_state_in", 1, &AutomaticStartDarpa::callbackMavrosState, this, ros::TransportHints().tcpNoDelay());
-  subscriber_tracker_status  = nh_.subscribe("tracker_status_in", 1, &AutomaticStartDarpa::callbackTrackerStatus, this, ros::TransportHints().tcpNoDelay());
-  subscriber_mpc_diagnostics = nh_.subscribe("mpc_diagnostics_in", 1, &AutomaticStartDarpa::callbackMpcDiagnostics, this, ros::TransportHints().tcpNoDelay());
-  subscriber_odometry        = nh_.subscribe("odometry_in", 1, &AutomaticStartDarpa::callbackOdometry, this, ros::TransportHints().tcpNoDelay());
+  subscriber_mavros_state = nh_.subscribe("mavros_state_in", 1, &AutomaticStartDarpa::callbackMavrosState, this, ros::TransportHints().tcpNoDelay());
+  subscriber_control_manager_diagnostics =
+      nh_.subscribe("control_manager_diagnostics_in", 1, &AutomaticStartDarpa::callbackControlManagerDiagnostics, this, ros::TransportHints().tcpNoDelay());
+  subscriber_odometry = nh_.subscribe("odometry_in", 1, &AutomaticStartDarpa::callbackOdometry, this, ros::TransportHints().tcpNoDelay());
 
   // --------------------------------------------------------------
   // |                       service clients                      |
@@ -273,40 +266,21 @@ void AutomaticStartDarpa::callbackMavrosState(const mavros_msgs::StateConstPtr& 
 
 //}
 
-/* callbackTrackerStatus() //{ */
+/* callbackControlManagerDiagnostics() //{ */
 
-void AutomaticStartDarpa::callbackTrackerStatus(const mrs_msgs::TrackerStatusConstPtr& msg) {
-
-  if (!is_initialized) {
-    return;
-  }
-
-  std::scoped_lock lock(mutex_tracker_status);
-
-  ROS_INFO_ONCE("[AutomaticStartDarpa]: getting tracker status");
-
-  got_tracker_status = true;
-
-  tracker_status = *msg;
-}
-
-//}
-
-/* callbackMpcDiagnostics() //{ */
-
-void AutomaticStartDarpa::callbackMpcDiagnostics(const mrs_msgs::TrackerDiagnosticsPtr& msg) {
+void AutomaticStartDarpa::callbackControlManagerDiagnostics(const mrs_msgs::ControlManagerDiagnosticsConstPtr& msg) {
 
   if (!is_initialized) {
     return;
   }
 
-  std::scoped_lock lock(mutex_mpc_diagnostics);
+  std::scoped_lock lock(mutex_control_manager_diagnostics);
 
-  ROS_INFO_ONCE("[AutomaticStartDarpa]: getting mpc diagnostics");
+  ROS_INFO_ONCE("[AutomaticStartDarpa]: getting control manager diagnostics");
 
-  got_mpc_diagnostics = true;
+  got_control_manager_diagnostics = true;
 
-  mpc_diagnostics = *msg;
+  control_manager_diagnostics = *msg;
 }
 
 //}
@@ -508,10 +482,10 @@ void AutomaticStartDarpa::mainTimer([[maybe_unused]] const ros::TimerEvent& even
 
     case TAKEOFF_STATE: {
 
-      std::scoped_lock lock(mutex_tracker_status);
+      std::scoped_lock lock(mutex_control_manager_diagnostics);
 
       // if takeoff finished
-      if (mpc_diagnostics.tracker_active) {
+      if (control_manager_diagnostics.tracker_status.tracker.compare("MpcTracker") && control_manager_diagnostics.tracker_status.callbacks_enabled) {
 
         ROS_INFO("[AutomaticStartDarpa]: takeoff finished");
 

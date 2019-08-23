@@ -32,20 +32,6 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS})
 
-# automatic start MBZIRC
-
-add_executable(automatic_start_mbzirc
-  src/automatic_start_mbzirc.cpp)
-
-add_dependencies(automatic_start_mbzirc
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-  )
-
-target_link_libraries(automatic_start_mbzirc
-  ${catkin_LIBRARIES}
-  )
-
 # automatic start DARPA
 
 add_library(AutomaticStartDarpa
@@ -57,33 +43,5 @@ add_dependencies(AutomaticStartDarpa
   )
 
 target_link_libraries(AutomaticStartDarpa
-  ${catkin_LIBRARIES}
-  )
-
-# automatic start EAGLE
-
-add_library(AutomaticStartEagle
-  src/automatic_start_eagle.cpp)
-
-add_dependencies(AutomaticStartEagle
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-  )
-
-target_link_libraries(AutomaticStartEagle
-  ${catkin_LIBRARIES}
-  )
-
-# automatic start POINTER
-
-add_library(AutomaticStartPointer
-  src/automatic_start_pointer.cpp)
-
-add_dependencies(AutomaticStartPointer
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-  )
-
-target_link_libraries(AutomaticStartPointer
   ${catkin_LIBRARIES}
   )
