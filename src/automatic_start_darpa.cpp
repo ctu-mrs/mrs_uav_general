@@ -17,7 +17,7 @@
 
 #include <mrs_msgs/Vec4.h>
 #include <mrs_msgs/ControlManagerDiagnostics.h>
-#include <mrs_msgs/TrackerDiagnostics.h>
+#include <mrs_msgs/MpcTrackerDiagnostics.h>
 
 #include <mrs_lib/ParamLoader.h>
 
