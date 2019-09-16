@@ -1,12 +1,65 @@
 <launch>
 
-  <!-- Teraranger -->
-  <!-- <include file="$(find terarangerone)/launch/uav.launch" /> -->
+  <arg name="uav_name" default="$(optenv UAV_NAME uav1)"/>
+  <arg name="fcu_frame" default="fcu_$(arg uav_name)" />
+  <arg name="SENSORS" default="$(optenv SENSORS)" />
 
   <!-- Mavros -->
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
-  <!-- Garmin -->
-  <include file="$(find mrs_serial)/launch/uav.launch" />
+  <!-- Teraranger -->
+  <group if="$(eval 'teraranger' in arg('SENSORS'))">
+
+    <arg name="teraranger_frame" default="teraranger_frame" />
+
+    <include file="$(find terarangerone)/launch/uav.launch" />
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg teraranger_frame)_to_$(arg fcu_frame)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg teraranger_frame)" />
+
+  </group>
+
+  <!-- Garmin down -->
+  <group if="$(eval ('garmin_down' in arg('SENSORS')) or ('garmin_up' in arg('SENSORS')))">
+
+    <arg name="garmin_frame" default="garmin_frame" />
+    <arg name="garmin_frame_up" default="garmin_frame_up" />
+
+    <include file="$(find mrs_serial)/launch/uav.launch" />
+
+    <!-- TF for garmin down -->
+    <group ns="$(arg uav_name)" if="$(eval 'garmin_down' in arg('SENSORS'))">
+      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
+    </group>
+
+    <!-- TF for garmin up -->
+    <group ns="$(arg uav_name)" if="$(eval 'garmin_down' in arg('SENSORS'))">
+      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame_up)_to_$(arg fcu_frame)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
+    </group>
+
+  </group>
+
+  <!-- Rplidar -->
+  <group if="$(eval 'rplidar' in arg('SENSORS'))">
+
+    <arg name="rplidar_frame" default="rplidar_$(arg uav_name)" />
+
+    <include file="$(find rplidar_ros)/launch/uav.launch" />
+
+    <!-- TF -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
+
+  </group>
+
+  <!-- Realsense -->
+  <group if="$(eval ('realsense_front' in arg('SENSORS')))">
+
+    <arg name="realsense_frame" default="rs_d435_$(arg uav_name)_link" />
+
+    <include file="$(find realsense_d435)/launch/high_acc.launch" />
+
+    <!-- TF -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0.265 0 -0.077 0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
+
+  </group>
 
 </launch>
