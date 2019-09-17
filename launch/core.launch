@@ -23,10 +23,10 @@
   <arg name="PIXGARM" default="$(optenv PIXGARM false)" />
   <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
 
-  <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 't650')" name="UAV_MASS" type="float" default="5.0" />
-  <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 'f550')" name="UAV_MASS" type="float" default="3.0" />
-  <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 'f450')" name="UAV_MASS" type="float" default="2.3" />
-  <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="UAV_MASS" type="float" default="$(env UAV_MASS)" />
+  <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 't650')" name="UAV_MASS" default="5.0" />
+  <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 'f550')" name="UAV_MASS" default="3.0" />
+  <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 'f450')" name="UAV_MASS" default="2.3" />
+  <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="UAV_MASS" default="$(env UAV_MASS)" />
 
     <!-- Other params from env variables -->
   <arg name="BODY_DISTURBANCE_X" default="$(optenv INITIAL_DISTURBANCE_X 0.0)" />
@@ -52,6 +52,7 @@
     <arg name="STANDALONE" value="$(arg STANDALONE)" />
     <arg name="PIXGARM" value="$(arg PIXGARM)" />
     <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
+    <arg name="DEBUG" value="$(arg DEBUG)" />
 
   </include>
 
@@ -67,6 +68,7 @@
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
+    <arg name="DEBUG" value="$(arg DEBUG)" />
 
   </include>
 
@@ -84,6 +86,7 @@
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
+    <arg name="DEBUG" value="$(arg DEBUG)" />
 
   </include>
 
@@ -95,6 +98,7 @@
     <arg name="STANDALONE" value="$(arg STANDALONE)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
+    <arg name="DEBUG" value="$(arg DEBUG)" />
 
   </include>
 
@@ -106,6 +110,7 @@
     <arg name="STANDALONE" value="$(arg STANDALONE)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
+    <arg name="DEBUG" value="$(arg DEBUG)" />
 
   </include>
 
