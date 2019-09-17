@@ -1,16 +1,16 @@
 <launch>
 
-  <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
-  <arg name="debug" default="false" />
-  <arg name="standalone" default="$(optenv STANDALONE false)" />
+  <arg name="UAV_NAME" default="$(optenv UAV_NAME uav)"/>
+  <arg name="DEBUG" default="false" />
+  <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
 
-  <arg unless="$(arg debug)" name="launch_prefix" value=""/>
-  <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch"/>
+  <arg unless="$(arg DEBUG)" name="launch_prefix" value=""/>
+  <arg     if="$(arg DEBUG)" name="launch_prefix" value="debug_roslaunch"/>
 
-  <group ns="$(arg uav_name)" if="$(eval arg('standalone') == 0)">
+  <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
 
     <!-- Nodelet manager -->
-    <node pkg="nodelet" type="nodelet" name="$(arg uav_name)_nodelet_manager" args="manager" output="screen" launch-prefix="$(arg launch_prefix)">
+    <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_nodelet_manager" args="manager" output="screen" launch-prefix="$(arg launch_prefix)">
       <param name="num_worker_threads" value="16" />
     </node>
 
