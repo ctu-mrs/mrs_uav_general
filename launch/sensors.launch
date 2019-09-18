@@ -1,14 +1,17 @@
 <launch>
 
-  <arg name="uav_name" default="$(optenv UAV_NAME uav1)"/>
-  <arg name="fcu_frame" default="fcu_$(arg uav_name)" />
+  <arg name="UAV_NAME" default="$(optenv UAV_NAME uav)" />
+  <arg name="fcu_frame" default="fcu_$(arg UAV_NAME)" />
   <arg name="SENSORS" default="$(optenv SENSORS)" />
-  <arg name="PIXGARM" default="$(optenv PIXGARM)" />
+  <arg name="PIXGARM" default="$(optenv PIXGARM false)" />
+  <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
+  <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
 
-  <!-- Mavros -->
+    <!-- Mavros -->
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
-  <!-- Teraranger -->
+    <!-- Teraranger one //{ -->
+
   <group if="$(eval 'teraranger' in arg('SENSORS'))">
 
     <arg name="teraranger_frame" default="teraranger_frame" />
@@ -19,7 +22,10 @@
 
   </group>
 
-  <!-- Garmin down -->
+  <!-- //} -->
+
+  <!-- Garmin //{ -->
+
   <group if="$(eval ('garmin_down' in arg('SENSORS')) or ('garmin_up' in arg('SENSORS')))">
 
     <arg name="garmin_frame" default="garmin_frame" />
@@ -41,28 +47,213 @@
 
   </group>
 
-  <!-- Rplidar -->
+  <!-- //} -->
+
+  <!-- Rplidar //{ -->
+
   <group if="$(eval 'rplidar' in arg('SENSORS'))">
 
     <arg name="rplidar_frame" default="rplidar_$(arg uav_name)" />
 
     <include file="$(find rplidar_ros)/launch/uav.launch" />
 
-    <!-- TF -->
+      <!-- TF -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
 
   </group>
 
-  <!-- Realsense -->
+  <!-- //} -->
+
+  <!-- Realsense //{ -->
+
   <group if="$(eval ('realsense_front' in arg('SENSORS')))">
 
     <arg name="realsense_frame" default="rs_d435_$(arg uav_name)_link" />
 
     <include file="$(find realsense_d435)/launch/high_acc.launch" />
 
-    <!-- TF -->
+      <!-- TF -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0.265 0 -0.077 0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
 
   </group>
+
+  <!-- //} -->
+
+  <!-- Bluefox //{ -->
+
+  <group if="$(eval ('bluefox' in arg('SENSORS')))">
+
+    <!-- Bluefox optflow //{ -->
+
+    <group if="$(eval ('bluefox_optflow' in arg('SENSORS')))">
+
+      <arg name="camera_frame" default="optflow_cam_$(arg UAV_NAME)" />
+
+      <include file="$(find realsense_d435)/launch/high_acc.launch" />
+
+        <!-- TF -->
+      <arg name="cam_yaw" default="-1.57079632679" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="optflow_cam_tf" args="0 0 -0.1 $(arg cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
+
+      <arg     if="$(arg STANDALONE)" name="nodelet" value="STANDALONE"/>
+      <arg unless="$(arg STANDALONE)" name="nodelet" value="load"/>
+      <arg     if="$(arg STANDALONE)" name="nodelet_manager" value=""/>
+      <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_optflow_nodelet_manager"/>
+
+        <!-- Nodelet manager -->
+      <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
+
+        <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_optflow_nodelet_manager" args="manager" output="screen">
+          <param name="num_worker_threads" value="8" />
+        </node>
+
+      </group>
+
+      <arg name="cam_device" default="$(env BLUEFOX_OF)" />
+      <arg name="cam_rate" default="100" />
+      <arg name="cam_plugin" default="true" />
+      <arg name="cam_output" default="screen" />
+      <arg name="cam_proc" default="false" />
+      <arg name="cam_view" default="false" />
+      <arg name="cam_calib" default="false" />
+
+      <arg name="serial" default="$(arg cam_device)" />
+      <arg name="camera_name" default="bluefox" />
+      <arg name="camera" default="$(arg camera_name)" />
+      <arg name="frame_id" default="$(arg camera)" />
+      <arg name="calib_url" default="file://$(find mrs_general)/config/camera_calibrations/mv_$(arg cam_device).yaml" />
+      <arg name="fps" default="$(arg cam_rate)" />
+      <arg name="color" default="false" />
+      <arg name="idpf" default="0" />
+      <arg name="aec" default="true" />
+      <arg name="expose_upper_limit_us" default="7500" />
+
+      <arg name="expose_us" default="400" />
+      <arg name="agc" default="true" />
+      <arg name="boost" value="false" />
+      <arg name="gain_db" default="0.0" />
+      <arg name="cbm" default="0" />
+      <arg name="ctm" default="1" />
+      <arg name="dcfm" default="0" />
+      <arg name="hdr" default="false" />
+      <arg name="wbp" default="-1" />
+      <arg name="request" default="0" />
+      <arg name="mm" default="0" />
+
+        <!-- Arguments for theora quality, images being compressed into "stream" -->
+      <arg name="compressed_jpeg_quality" default="90" />
+      <arg name="theora_keyframe_frequency" default="60" />
+      <arg name="theora_target_bitrate" default="50000" />
+      <arg name="theora_quality" default="8" />
+      <arg name="theora_optimize_for" default="0" />
+
+        <!-- Nodeleted bluefox node //{ -->
+
+      <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
+
+        <include file="$(find bluefox2)/launch/single_nodelet.launch" >
+
+          <!-- Common Interface -->
+          <arg name="device" value="$(arg cam_device)" />
+          <arg name="rate" value="$(arg cam_rate)" />
+
+            <!-- Camera Settings -->
+          <arg name="serial" value="$(arg cam_device)" />
+          <arg name="camera_name" value="$(arg camera_name)" />
+          <arg name="camera" value="$(arg camera)" />
+          <arg name="frame_id" value="$(arg frame_id)" />
+          <arg name="calib_url" value="$(arg calib_url)" />
+          <arg name="fps" value="$(arg fps)" />
+          <arg name="color" value="$(arg color)" />
+          <arg name="aec" value="$(arg aec)" />
+          <arg name="expose_upper_limit_us" value="$(arg expose_upper_limit_us)" />
+          <arg name="cbm" value="$(arg cbm)" />
+          <arg name="ctm" value="$(arg ctm)" />
+          <arg name="dcfm" value="$(arg dcfm)" />
+          <arg name="hdr" value="$(arg hdr)" />
+          <arg name="wbp" value="$(arg wbp)" />
+          <arg name="expose_us" value="$(arg expose_us)" />
+          <arg name="gain_db" value="$(arg gain_db)" />
+          <arg name="boost" value="$(arg boost)" />
+          <arg name="mm" value="$(arg mm)" />
+
+            <!-- Node Settings -->
+          <arg name="plugin" value="$(arg cam_plugin)" />
+          <arg name="manager" value="$(arg UAV_NAME)_optflow_nodelet_manager" />
+          <arg name="output" value="$(arg cam_output)" />
+          <arg name="proc" value="$(arg cam_proc)" />
+          <arg name="view" value="$(arg cam_view)" />
+          <arg name="calib" value="$(arg cam_calib)" />
+
+            <!-- Arguments for theora quality, images being compressed into "stream" -->
+          <arg name="compressed_jpeg_quality" default="$(arg compressed_jpeg_quality)" />
+          <arg name="theora_keyframe_frequency" default="$(arg theora_keyframe_frequency)" />
+          <arg name="theora_target_bitrate" default="$(arg theora_target_bitrate)" />
+          <arg name="theora_quality" default="$(arg theora_quality)" />
+          <arg name="theora_optimize_for" default="$(arg theora_optimize_for)" />
+
+        </include>
+
+      </group>
+
+      <!-- //} -->
+
+      <!-- Standalone bluefox node //{ -->
+
+      <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 1)">
+
+        <include file="$(find bluefox2)/launch/single_node.launch" >
+
+          <!-- Common Interface -->
+          <arg name="device" value="$(arg cam_device)" />
+          <arg name="rate" value="$(arg cam_rate)" />
+
+            <!-- Camera Settings -->
+          <arg name="serial" value="$(arg cam_device)" />
+          <arg name="camera_name" value="$(arg camera_name)" />
+          <arg name="camera" value="$(arg camera)" />
+          <arg name="frame_id" value="$(arg frame_id)" />
+          <arg name="calib_url" value="$(arg calib_url)" />
+          <arg name="fps" value="$(arg fps)" />
+          <arg name="color" value="$(arg color)" />
+          <arg name="aec" value="$(arg aec)" />
+          <arg name="expose_upper_limit_us" value="$(arg expose_upper_limit_us)" />
+          <arg name="cbm" value="$(arg cbm)" />
+          <arg name="ctm" value="$(arg ctm)" />
+          <arg name="dcfm" value="$(arg dcfm)" />
+          <arg name="hdr" value="$(arg hdr)" />
+          <arg name="wbp" value="$(arg wbp)" />
+          <arg name="expose_us" value="$(arg expose_us)" />
+          <arg name="gain_db" value="$(arg gain_db)" />
+          <arg name="boost" value="$(arg boost)" />
+          <arg name="mm" value="$(arg mm)" />
+
+            <!-- Node Settings -->
+          <arg name="plugin" value="$(arg cam_plugin)" />
+          <arg name="output" value="$(arg cam_output)" />
+          <arg name="proc" value="$(arg cam_proc)" />
+          <arg name="view" value="$(arg cam_view)" />
+          <arg name="calib" value="$(arg cam_calib)" />
+
+            <!-- Arguments for theora quality, images being compressed into "stream" -->
+          <arg name="compressed_jpeg_quality" default="$(arg compressed_jpeg_quality)" />
+          <arg name="theora_keyframe_frequency" default="$(arg theora_keyframe_frequency)" />
+          <arg name="theora_target_bitrate" default="$(arg theora_target_bitrate)" />
+          <arg name="theora_quality" default="$(arg theora_quality)" />
+          <arg name="theora_optimize_for" default="$(arg theora_optimize_for)" />
+
+        </include>
+
+      </group>
+
+      <!-- //} -->
+
+    </group>
+
+    <!-- //} -->
+
+  </group>
+
+  <!-- //} -->
 
 </launch>
