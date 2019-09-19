@@ -1,11 +1,14 @@
 <launch>
 
+  <!-- args corresponding to environment variables -->
   <arg name="UAV_NAME" default="$(optenv UAV_NAME uav)" />
-  <arg name="fcu_frame" default="fcu_$(arg UAV_NAME)" />
   <arg name="SENSORS" default="$(optenv SENSORS)" />
   <arg name="PIXGARM" default="$(optenv PIXGARM false)" />
   <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
   <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
+
+    <!-- other args -->
+  <arg name="fcu_frame" default="fcu_$(arg UAV_NAME)" />
 
     <!-- Mavros -->
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
@@ -95,10 +98,10 @@
       <arg name="cam_yaw" default="-1.57079632679" />
       <node pkg="tf2_ros" type="static_transform_publisher" name="optflow_cam_tf" args="0 0 -0.1 $(arg cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
 
-      <arg     if="$(arg STANDALONE)" name="nodelet" value="STANDALONE"/>
-      <arg unless="$(arg STANDALONE)" name="nodelet" value="load"/>
-      <arg     if="$(arg STANDALONE)" name="nodelet_manager" value=""/>
-      <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_optflow_nodelet_manager"/>
+      <arg     if="$(arg STANDALONE)" name="nodelet" value="STANDALONE" />
+      <arg unless="$(arg STANDALONE)" name="nodelet" value="load" />
+      <arg     if="$(arg STANDALONE)" name="nodelet_manager" value="" />
+      <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_optflow_nodelet_manager" />
 
         <!-- Nodelet manager -->
       <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">

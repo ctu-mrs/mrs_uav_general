@@ -1,15 +1,17 @@
 <launch>
 
-  <arg name="UAV_NAME" default="$(env UAV_NAME)"/>
-  <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
+  <!-- args corresponding to environment variables -->
+  <arg name="UAV_NAME" default="$(env UAV_NAME)" />
 
+    <!-- other args -->
+  <arg name="standalone" default="false" />
   <arg name="debug" default="false" />
   <arg name="n_threads" default="16" />
 
-  <arg unless="$(arg debug)" name="launch_prefix" value=""/>
-  <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch"/>
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+  <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch" />
 
-  <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
+  <group ns="$(arg UAV_NAME)" if="$(eval arg('standalone') == 0)">
 
     <!-- Nodelet manager -->
     <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_nodelet_manager" args="manager" output="screen" launch-prefix="$(arg launch_prefix)">

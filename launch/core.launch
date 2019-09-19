@@ -1,5 +1,6 @@
 <launch>
 
+  <!-- args corresponding to environment variables -->
   <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
   <arg name="UAV_TYPE" default="$(env UAV_TYPE)" />
   <arg name="PROPULSION_TYPE" default="$(optenv PROPULSION_TYPE default)" />
@@ -12,6 +13,7 @@
   <arg name="BODY_DISTURBANCE_Y" default="$(optenv INITIAL_DISTURBANCE_Y 0.0)" />
   <arg name="DEBUG" default="$(optenv DEBUG false)" />
 
+    <!-- other args -->
   <arg name="config_constraint_manager" default="" />
   <arg name="config_gain_manager" default="" />
   <arg name="config_uav_manager" default="" />
@@ -30,8 +32,7 @@
     <!-- Nodelet Manager -->
   <include file="$(find mrs_general)/launch/nodelet_manager.launch">
 
-    <arg name="STANDALONE" value="$(arg STANDALONE)" />
-
+    <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="debug" value="$(arg DEBUG)" />
     <arg name="n_threads" value="$(arg n_threads)" />
 
@@ -42,10 +43,10 @@
 
     <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
-    <arg name="STANDALONE" value="$(arg STANDALONE)" />
     <arg name="PIXGARM" value="$(arg PIXGARM)" />
     <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
 
+    <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="custom_config" value="$(arg config_odometry)" />
 
   </include>
@@ -56,11 +57,11 @@
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
-    <arg name="STANDALONE" value="$(arg STANDALONE)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
 
+    <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="world_file" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_uav_manager)" />
@@ -75,11 +76,11 @@
     <arg name="PROFILER" value="$(arg PROFILER)" />
     <arg name="BODY_DISTURBANCE_X" value="$(arg BODY_DISTURBANCE_X)" />
     <arg name="BODY_DISTURBANCE_Y" value="$(arg BODY_DISTURBANCE_Y)" />
-    <arg name="STANDALONE" value="$(arg STANDALONE)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
 
+    <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="world_file" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_control_manager)" />
@@ -91,10 +92,10 @@
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
-    <arg name="STANDALONE" value="$(arg STANDALONE)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
 
+    <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="custom_config" value="$(arg config_gain_manager)" />
 
   </include>
@@ -104,10 +105,10 @@
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
-    <arg name="STANDALONE" value="$(arg STANDALONE)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
 
+    <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="custom_config" value="$(arg config_constraint_manager)" />
 
   </include>
