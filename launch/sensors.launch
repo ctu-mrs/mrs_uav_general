@@ -36,12 +36,12 @@
     </group>
 
     <!-- TF for garmin down -->
-    <group ns="$(arg uav_name)" if="$(eval 'garmin_down' in arg('SENSORS'))">
+    <group ns="$(arg UAV_NAME)" if="$(eval 'garmin_down' in arg('SENSORS'))">
       <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
     </group>
 
     <!-- TF for garmin up -->
-    <group ns="$(arg uav_name)" if="$(eval 'garmin_down' in arg('SENSORS'))">
+    <group ns="$(arg UAV_NAME)" if="$(eval 'garmin_down' in arg('SENSORS'))">
       <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame_up)_to_$(arg fcu_frame)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
     </group>
 
@@ -53,7 +53,7 @@
 
   <group if="$(eval 'rplidar' in arg('SENSORS'))">
 
-    <arg name="rplidar_frame" default="rplidar_$(arg uav_name)" />
+    <arg name="rplidar_frame" default="rplidar_$(arg UAV_NAME)" />
 
     <include file="$(find rplidar_ros)/launch/uav.launch" />
 
@@ -68,7 +68,7 @@
 
   <group if="$(eval ('realsense_front' in arg('SENSORS')))">
 
-    <arg name="realsense_frame" default="rs_d435_$(arg uav_name)_link" />
+    <arg name="realsense_frame" default="rs_d435_$(arg UAV_NAME)_link" />
 
     <include file="$(find realsense_d435)/launch/high_acc.launch" />
 
