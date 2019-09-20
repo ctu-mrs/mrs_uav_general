@@ -36,7 +36,7 @@
     <arg name="garmin_frame_up" default="garmin_frame_up" />
 
     <!-- TF for garmin down -->
-    <group ns="$(arg UAV_NAME)" if="$(eval 'garmin_down' in arg('SENSORS').replace(",", " ").split())">
+    <group ns="$(arg UAV_NAME)" if="$(eval 'garmin_down' in arg('SENSORS').replace(',', ' ').split())">
 
       <group if="$(eval arg('UAV_TYPE') == 'f450')">
         <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
@@ -53,7 +53,7 @@
     </group>
 
     <!-- TF for garmin up -->
-    <group ns="$(arg UAV_NAME)" if="$(eval 'garmin_up' in arg('SENSORS').replace(",", " ").split())">
+    <group ns="$(arg UAV_NAME)" if="$(eval 'garmin_up' in arg('SENSORS').replace(',', ' ').split())">
       <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame_up)_to_$(arg fcu_frame)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
     </group>
 
@@ -99,7 +99,7 @@
     <arg name="realsense_frame" default="rs_d435_$(arg UAV_NAME)_link" />
 
       <!-- TF -->
-    <group if="$(eval ('realsense_front' in arg('SENSORS').replace(",", " ").split()))">
+    <group if="$(eval ('realsense_front' in arg('SENSORS').replace(',', ' ').split()))">
 
       <group if="$(eval arg('UAV_TYPE') == 'f450')">
         <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0.16 0.0 -0.05 0.0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
@@ -127,7 +127,7 @@
 
     <!-- Bluefox optflow //{ -->
 
-    <group if="$(eval ('bluefox_optflow' in arg('SENSORS').replace(",", " ").split()))">
+    <group if="$(eval ('bluefox_optflow' in arg('SENSORS').replace(',', ' ').split()))">
 
       <arg name="camera_frame" default="optflow_cam_$(arg UAV_NAME)" />
 
