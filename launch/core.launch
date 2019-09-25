@@ -13,12 +13,29 @@
   <arg name="BODY_DISTURBANCE_Y" default="$(optenv INITIAL_DISTURBANCE_Y 0.0)" />
   <arg name="DEBUG" default="$(optenv DEBUG false)" />
 
-    <!-- other args -->
+    <!-- custom configs args -->
   <arg name="config_constraint_manager" default="" />
   <arg name="config_gain_manager" default="" />
   <arg name="config_uav_manager" default="" />
   <arg name="config_control_manager" default="" />
   <arg name="config_odometry" default="" />
+
+    <!-- custom configs for trackers -->
+  <arg name="config_csv_tracker" default="" />
+  <arg name="config_joy_bumper_tracker" default="" />
+  <arg name="config_joy_tracker" default="" />
+  <arg name="config_landoff_tracker" default="" />
+  <arg name="config_line_tracker" default="" />
+  <arg name="config_matlab_tracker" default="" />
+  <arg name="config_mpc_tracker" default="" />
+
+    <!-- custom configs for controllers -->
+  <arg name="config_acceleration_controller" default="" />
+  <arg name="config_attitude_controller" default="" />
+  <arg name="config_failsafe_controller" default="" />
+  <arg name="config_mpc_controller" default="" />
+  <arg name="config_nsf_controller" default="" />
+  <arg name="config_so3_controller" default="" />
 
   <arg name="world_file" default="$(find mrs_general)/config/world_simulation.yaml" />
   <arg name="g" default="9.8" />
@@ -84,6 +101,21 @@
     <arg name="world_file" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_control_manager)" />
+
+    <arg name="custom_config_csv_tracker" value="$(arg config_csv_tracker)" />
+    <arg name="custom_config_joy_bumper_tracker" value="$(arg config_joy_bumper_tracker)" />
+    <arg name="custom_config_joy_tracker" value="$(arg config_joy_tracker)" />
+    <arg name="custom_config_landoff_tracker" value="$(arg config_landoff_tracker)" />
+    <arg name="custom_config_line_tracker" value="$(arg config_line_tracker)" />
+    <arg name="custom_config_matlab_tracker" value="$(arg config_matlab_tracker)" />
+    <arg name="custom_config_mpc_tracker" value="$(arg config_mpc_tracker)" />
+
+    <arg name="custom_config_acceleration_controller" value="$(arg config_acceleration_controller)" />
+    <arg name="custom_config_attitude_controller" value="$(arg config_attitude_controller)" />
+    <arg name="custom_config_failsafe_controller" value="$(arg config_failsafe_controller)" />
+    <arg name="custom_config_mpc_controller" value="$(arg config_mpc_controller)" />
+    <arg name="custom_config_nsf_controller" value="$(arg config_nsf_controller)" />
+    <arg name="custom_config_so3_controller" value="$(arg config_so3_controller)" />
 
   </include>
 
