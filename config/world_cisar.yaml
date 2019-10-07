@@ -24,6 +24,25 @@ safety_area:
 
   use_safety_area: true
 
+  polygon_obstacles:
+    # loaded as a vector of matrices
+    # each matrix has polygon vertices in columns
+    # [[M1], [M2]]
+    not_used: true
+    data: [1, 10, 10, 1,    5, 8, 5,
+           1, 1, 10, 10,    5, 5, 8,]
+    rows: 2 # each matrix has two rows
+    cols: [4, 3] # nums of cols of each matrix
+
+  point_obstacles:
+    # loaded as a vector of matrices
+    # x, y, radius
+    not_used: true
+    data: [-5.0, -5.0, 2, # 1st point
+           -10.0, -10.0, 4] # 2nd point
+    rows: 1 # each matrix has a single row
+    cols: [3, 3] # nums of cols of each matrix
+
   # convex polygon CCW
   # race track
   safety_area: [30.9, 26.4,
