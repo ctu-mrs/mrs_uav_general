@@ -24,18 +24,24 @@ safety_area:
     # loaded as a vector of matrices
     # each matrix has polygon vertices in columns
     # [[M1], [M2]]
-    not_used: true
-    data: []
-    rows: 0 # each matrix has two rows
-    cols: [0] # nums of cols of each matrix
+    enabled: true
+    data: [8.6, 18.61, 20.35, 6.82, -3.14, 10.7,
+           -22.5, -22.71, 1.02, 17.68, 11.1, -4.1]
+    rows: 2 # each matrix has two rows
+    cols: [6] # nums of cols of each matrix
 
   point_obstacles:
     # loaded as a vector of matrices
     # x, y, radius
-    not_used: true
-    data: []
-    rows: 0 # each matrix has a single row
-    cols: [0] # nums of cols of each matrix
+    enabled: true
+    data: [-10, -15, 2.5,
+            -21, -7, 2.5,
+            -17, 7, 2.5,
+            -9, -2, 2.5,
+            -1, -7, 2.5,
+            2, -16, 2.5]
+    rows: 1 # each matrix has a single row
+    cols: [3, 3, 3, 3, 3, 3] # nums of cols of each matrix
 
   max_height: 10.0
   min_height: 0.5
