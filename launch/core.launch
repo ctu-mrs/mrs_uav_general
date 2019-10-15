@@ -39,7 +39,6 @@
   <arg name="config_nsf_controller" default="" />
   <arg name="config_so3_controller" default="" />
 
-  <arg name="world_file" default="$(find mrs_general)/config/world_simulation.yaml" />
   <arg name="g" default="9.8" />
   <arg name="n_threads" default="16" />
 
@@ -81,7 +80,6 @@
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
-    <arg name="world_file" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_uav_manager)" />
 
@@ -100,7 +98,6 @@
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
-    <arg name="world_file" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_control_manager)" />
 
