@@ -2,7 +2,7 @@
 # please use the radtan variant of this file for full ROS compatibility.
 image_width: 752
 image_height: 480
-camera_name: mv_25001954
+camera_name: bluefox_optflow
 camera_matrix:
   rows: 3
   cols: 3

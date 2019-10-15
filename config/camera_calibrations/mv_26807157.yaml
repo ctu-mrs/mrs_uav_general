@@ -1,6 +1,6 @@
 image_width: 752
 image_height: 480
-camera_name: mv_26807157
+camera_name: bluefox_optflow
 camera_matrix:
   rows: 3
   cols: 3
