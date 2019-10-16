@@ -35,11 +35,10 @@
   <arg name="config_attitude_controller" default="" />
   <arg name="config_failsafe_controller" default="" />
   <arg name="config_mpc_controller" default="" />
-  <arg name="config_emergancy_controller" default="" />
+  <arg name="config_emergency_controller" default="" />
   <arg name="config_nsf_controller" default="" />
   <arg name="config_so3_controller" default="" />
 
-  <arg name="world_file" default="$(find mrs_general)/config/world_simulation.yaml" />
   <arg name="g" default="9.8" />
   <arg name="n_threads" default="16" />
 
@@ -81,7 +80,6 @@
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
-    <arg name="world_file" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_uav_manager)" />
 
@@ -100,7 +98,6 @@
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
-    <arg name="world_file" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_control_manager)" />
 
@@ -117,7 +114,7 @@
     <arg name="custom_config_attitude_controller" value="$(arg config_attitude_controller)" />
     <arg name="custom_config_failsafe_controller" value="$(arg config_failsafe_controller)" />
     <arg name="custom_config_mpc_controller" value="$(arg config_mpc_controller)" />
-    <arg name="custom_config_emergancy_controller" value="$(arg config_emergancy_controller)" />
+    <arg name="custom_config_emergency_controller" value="$(arg config_emergency_controller)" />
     <arg name="custom_config_nsf_controller" value="$(arg config_nsf_controller)" />
     <arg name="custom_config_so3_controller" value="$(arg config_so3_controller)" />
 
