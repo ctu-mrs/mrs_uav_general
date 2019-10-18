@@ -1,6 +1,6 @@
 #!/bin/bash
 
-filename=`mktemp`
+path="/home/\$(optenv USER mrs)/bag_files/latest/"
 
 exclude=(
 # Image detect bluefox
@@ -21,11 +21,12 @@ exclude=(
 )
 
 # file's header
+filename=`mktemp`
 echo "<launch>" > "$filename"
 echo "<arg name=\"UAV_NAME\" default=\"\$(env UAV_NAME)\" />" >> "$filename"
 echo "<group ns=\"\$(arg UAV_NAME)\">" >> "$filename"
 
-echo -n "<node pkg=\"rosbag\" type=\"record\" name=\"rosbag_record\" args=\"-o /home/\$(optenv USER mrs)/bag_files/latest/ -a" >> "$filename"
+echo -n "<node pkg=\"rosbag\" type=\"record\" name=\"rosbag_record\" args=\"-o $path -a" >> "$filename"
 
 # if there is anything to exclude
 if [ "${#exclude[*]}" -gt 0 ]; then
