@@ -211,7 +211,7 @@
       <!-- Nodelet manager -->
       <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
 
-        <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_optflow_nodelet_manager" args="manager" output="screen">
+        <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_optflow_nodelet_manager" args="manager" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@'">
           <param name="num_worker_threads" value="8" />
         </node>
 
@@ -476,11 +476,14 @@
           <rosparam file="$(find brick_detection)/cfg/simulation.yaml" />
 
           <param name="uav_name" type="string" value="$(arg UAV_NAME)"/>
-          <param name="gui" type="bool" value="$(arg gui)"/>
-          <param name="debug" type="bool" value="$(arg debug)"/>
+          <!-- <param name="gui" type="bool" value="$(arg gui)"/> -->
+          <param name="gui" type="bool" value="false"/>
+          <!-- <param name="debug" type="bool" value="$(arg debug)"/> -->
+          <param name="debug" type="bool" value="false"/>
           <param name="simul" type="bool" value="false"/>
-          <param name="bag" type="bool" value="$(arg bag)"/>
-          <param name="frame_topic" type="string" value="/fcu_$(arg uav_name)"/>
+          <!-- <param name="bag" type="bool" value="$(arg bag)"/> -->
+          <param name="bag" type="bool" value="false"/>
+          <param name="frame_topic" type="string" value="/fcu_$(arg UAV_NAME)"/>
 
           Subscribed topics
           <remap from="~image" to="bluefox_brick/image_raw" />
