@@ -8,13 +8,13 @@
   <arg name="PIXGARM" default="$(optenv PIXGARM false)" />
   <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
 
-  <!-- other args -->
+    <!-- other args -->
   <arg name="fcu_frame" default="fcu_$(arg UAV_NAME)" />
 
-  <!-- Mavros -->
+    <!-- Mavros -->
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
-  <!-- Teraranger one //{ -->
+    <!-- Teraranger one //{ -->
 
   <group if="$(eval 'teraranger' in arg('SENSORS'))">
 
@@ -35,7 +35,7 @@
     <arg name="garmin_frame" default="garmin_frame" />
     <arg name="garmin_frame_up" default="garmin_frame_up" />
 
-    <!-- TF for garmin down -->
+      <!-- TF for garmin down -->
     <group ns="$(arg UAV_NAME)" if="$(eval 'garmin_down' in arg('SENSORS').replace(',', ' ').split())">
 
       <group if="$(eval arg('UAV_TYPE') == 'f450')">
@@ -90,7 +90,7 @@
 
     <arg name="rplidar_frame" default="rplidar_$(arg UAV_NAME)" />
 
-    <!-- TF -->
+      <!-- TF -->
     <group if="$(eval arg('UAV_TYPE') == 'f450')">
       <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
     </group>
@@ -120,7 +120,7 @@
 
     <arg name="realsense_frame" default="rs_d435_$(arg UAV_NAME)_link" />
 
-    <!-- TF -->
+      <!-- TF -->
     <group if="$(eval ('realsense_front' in arg('SENSORS').replace(',', ' ').split()))">
 
       <group if="$(eval arg('UAV_TYPE') == 'f450')">
@@ -181,7 +181,7 @@
 
       <arg name="camera_frame" default="bluefox_optflow_frame_$(arg UAV_NAME)" />
 
-      <!-- TF -->
+        <!-- TF -->
 
       <group if="$(eval arg('UAV_TYPE') == 'f450')">
         <arg name="cam_yaw" default="-1.57079632679" />
@@ -208,7 +208,7 @@
       <arg     if="$(arg STANDALONE)" name="nodelet_manager" value="" />
       <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_optflow_nodelet_manager" />
 
-      <!-- Nodelet manager -->
+        <!-- Nodelet manager -->
       <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
 
         <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_optflow_nodelet_manager" args="manager" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@'">
@@ -248,14 +248,14 @@
       <arg name="request" default="0" />
       <arg name="mm" default="0" />
 
-      <!-- Arguments for theora quality, images being compressed into "stream" -->
+        <!-- Arguments for theora quality, images being compressed into "stream" -->
       <arg name="compressed_jpeg_quality" default="90" />
       <arg name="theora_keyframe_frequency" default="60" />
       <arg name="theora_target_bitrate" default="50000" />
       <arg name="theora_quality" default="8" />
       <arg name="theora_optimize_for" default="0" />
 
-      <!-- Nodeleted bluefox node //{ -->
+        <!-- Nodeleted bluefox node //{ -->
 
       <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
 
@@ -265,7 +265,7 @@
           <arg name="device" value="$(arg cam_device)" />
           <arg name="rate" value="$(arg cam_rate)" />
 
-          <!-- Camera Settings -->
+            <!-- Camera Settings -->
           <arg name="serial" value="$(arg cam_device)" />
           <arg name="camera_name" value="$(arg camera_name)" />
           <arg name="camera" value="$(arg camera)" />
@@ -285,7 +285,7 @@
           <arg name="boost" value="$(arg boost)" />
           <arg name="mm" value="$(arg mm)" />
 
-          <!-- Node Settings -->
+            <!-- Node Settings -->
           <arg name="plugin" value="$(arg cam_plugin)" />
           <arg name="manager" value="$(arg UAV_NAME)_optflow_nodelet_manager" />
           <arg name="output" value="$(arg cam_output)" />
@@ -293,7 +293,7 @@
           <arg name="view" value="$(arg cam_view)" />
           <arg name="calib" value="$(arg cam_calib)" />
 
-          <!-- Arguments for theora quality, images being compressed into "stream" -->
+            <!-- Arguments for theora quality, images being compressed into "stream" -->
           <arg name="compressed_jpeg_quality" default="$(arg compressed_jpeg_quality)" />
           <arg name="theora_keyframe_frequency" default="$(arg theora_keyframe_frequency)" />
           <arg name="theora_target_bitrate" default="$(arg theora_target_bitrate)" />
@@ -316,7 +316,7 @@
           <arg name="device" value="$(arg cam_device)" />
           <arg name="rate" value="$(arg cam_rate)" />
 
-          <!-- Camera Settings -->
+            <!-- Camera Settings -->
           <arg name="serial" value="$(arg cam_device)" />
           <arg name="camera_name" value="$(arg camera_name)" />
           <arg name="camera" value="$(arg camera)" />
@@ -336,14 +336,14 @@
           <arg name="boost" value="$(arg boost)" />
           <arg name="mm" value="$(arg mm)" />
 
-          <!-- Node Settings -->
+            <!-- Node Settings -->
           <arg name="plugin" value="$(arg cam_plugin)" />
           <arg name="output" value="$(arg cam_output)" />
           <arg name="proc" value="$(arg cam_proc)" />
           <arg name="view" value="$(arg cam_view)" />
           <arg name="calib" value="$(arg cam_calib)" />
 
-          <!-- Arguments for theora quality, images being compressed into "stream" -->
+            <!-- Arguments for theora quality, images being compressed into "stream" -->
           <arg name="compressed_jpeg_quality" default="$(arg compressed_jpeg_quality)" />
           <arg name="theora_keyframe_frequency" default="$(arg theora_keyframe_frequency)" />
           <arg name="theora_target_bitrate" default="$(arg theora_target_bitrate)" />
@@ -366,7 +366,7 @@
 
       <arg name="camera_frame" default="brick_cam_$(arg UAV_NAME)" />
 
-      <!-- TF -->
+        <!-- TF -->
 
       <arg name="brick_cam_yaw" default="3.14159265359" />
       <node pkg="tf2_ros" type="static_transform_publisher" name="brick_cam_tf" args="0 0.19 -0.06 $(arg brick_cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
@@ -376,7 +376,7 @@
       <arg     if="$(arg STANDALONE)" name="nodelet_manager" value="" />
       <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_brick_nodelet_manager" />
 
-      <!-- Nodelet manager -->
+        <!-- Nodelet manager -->
       <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
 
         <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_brick_nodelet_manager" args="manager" output="screen">
@@ -416,14 +416,14 @@
       <arg name="request" default="0" />
       <arg name="mm" default="0" />
 
-      <!-- Arguments for theora quality, images being compressed into "stream" -->
+        <!-- Arguments for theora quality, images being compressed into "stream" -->
       <arg name="compressed_jpeg_quality" default="90" />
       <arg name="theora_keyframe_frequency" default="60" />
       <arg name="theora_target_bitrate" default="50000" />
       <arg name="theora_quality" default="8" />
       <arg name="theora_optimize_for" default="0" />
 
-      <!-- Nodeleted bluefox node //{ -->
+        <!-- Nodeleted bluefox node //{ -->
 
       <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
 
@@ -433,7 +433,7 @@
           <arg name="device" value="$(arg cam_device)" />
           <arg name="rate" value="$(arg cam_rate)" />
 
-          <!-- Camera Settings -->
+            <!-- Camera Settings -->
           <arg name="serial" value="$(arg cam_device)" />
           <arg name="camera_name" value="$(arg camera_name)" />
           <arg name="camera" value="$(arg camera)" />
@@ -443,7 +443,7 @@
           <arg name="color" value="$(arg color)" />
           <arg name="aec" value="$(arg aec)" />
           <arg name="expose_upper_limit_us" value="$(arg expose_upper_limit_us)" />
-          <arg name="des_grey_value" value="$(arg des_grey_value)"/> 
+          <arg name="des_grey_value" value="$(arg des_grey_value)"/>
           <arg name="cbm" value="$(arg cbm)" />
           <arg name="ctm" value="$(arg ctm)" />
           <arg name="dcfm" value="$(arg dcfm)" />
@@ -454,7 +454,7 @@
           <arg name="boost" value="$(arg boost)" />
           <arg name="mm" value="$(arg mm)" />
 
-          <!-- Node Settings -->
+            <!-- Node Settings -->
           <arg name="plugin" value="$(arg cam_plugin)" />
           <arg name="manager" value="$(arg UAV_NAME)_brick_nodelet_manager" />
           <arg name="output" value="$(arg cam_output)" />
@@ -462,7 +462,7 @@
           <arg name="view" value="$(arg cam_view)" />
           <arg name="calib" value="$(arg cam_calib)" />
 
-          <!-- Arguments for theora quality, images being compressed into "stream" -->
+            <!-- Arguments for theora quality, images being compressed into "stream" -->
           <arg name="compressed_jpeg_quality" default="$(arg compressed_jpeg_quality)" />
           <arg name="theora_keyframe_frequency" default="$(arg theora_keyframe_frequency)" />
           <arg name="theora_target_bitrate" default="$(arg theora_target_bitrate)" />
@@ -470,6 +470,8 @@
           <arg name="theora_optimize_for" default="$(arg theora_optimize_for)" />
 
         </include>
+
+      </group>
 
       <!-- //} -->
 
