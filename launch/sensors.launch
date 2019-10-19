@@ -138,7 +138,7 @@
       <group if="$(eval arg('UAV_TYPE') == 'naki')">
         <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
-  
+
       <include file="$(find realsense_d435)/launch/high_acc.launch" />
 
     </group>
@@ -161,7 +161,7 @@
       <group if="$(eval arg('UAV_TYPE') == 'naki')">
         <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
-  
+
       <include file="$(find realsense_d435)/launch/uav_brick.launch" />
 
     </group>
@@ -179,7 +179,7 @@
 
     <group if="$(eval ('bluefox_optflow' in arg('SENSORS').replace(',', ' ').split()))">
 
-      <arg name="camera_frame" default="optflow_cam_$(arg UAV_NAME)" />
+      <arg name="camera_frame" default="bluefox_optflow_frame_$(arg UAV_NAME)" />
 
       <!-- TF -->
 
@@ -470,40 +470,8 @@
           <arg name="theora_optimize_for" default="$(arg theora_optimize_for)" />
 
         </include>
-        <!-- Brick detection nodelet -->
-        <node pkg="nodelet" type="nodelet" name="brick_detection" args="$(arg nodelet) brick_detection/BrickDetectionNodelet $(arg UAV_NAME)_brick_nodelet_manager" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@'">
-
-          <rosparam file="$(find brick_detection)/cfg/simulation.yaml" />
-
-          <param name="uav_name" type="string" value="$(arg UAV_NAME)"/>
-          <!-- <param name="gui" type="bool" value="$(arg gui)"/> -->
-          <param name="gui" type="bool" value="false"/>
-          <!-- <param name="debug" type="bool" value="$(arg debug)"/> -->
-          <param name="debug" type="bool" value="false"/>
-          <param name="simul" type="bool" value="false"/>
-          <!-- <param name="bag" type="bool" value="$(arg bag)"/> -->
-          <param name="bag" type="bool" value="false"/>
-          <param name="frame_topic" type="string" value="/fcu_$(arg UAV_NAME)"/>
-
-          Subscribed topics
-          <remap from="~image" to="bluefox_brick/image_raw" />
-          <remap from="~cam_info" to="bluefox_brick/camera_info" />
-          <remap from="~uav_odometry" to="mbzirc_odom/new_odom" />
-          <remap from="~grasping_result" to="landing_object_controller/grasping_result" />
-
-          Published topics
-          <remap from="~objectRelative" to="~objectRelative" />
-          <remap from="~objectPositions" to="~objectPositions" />
-          <remap from="~objects" to="~objects" />
-          <remap from="~object_array" to="~object_array" />
-          <remap from="~processedimage" to="~processedimage" />
-          <remap from="~objectImages" to="~objectImages" />
-        </node> 
-
-      </group>
 
       <!-- //} -->
-
 
     </group>
 
