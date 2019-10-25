@@ -2,8 +2,8 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.3 (2019-10-25)
+------------------
 * new record.sh shells scripts
 * removed old sensor and record launch files
 * created new core.launch and sensors.launch
