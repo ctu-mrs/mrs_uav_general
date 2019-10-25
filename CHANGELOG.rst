@@ -2,6 +2,13 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* new record.sh shells scripts
+* removed old sensor and record launch files
+* created new core.launch and sensors.launch
+* + calbration files
+
 0.0.2 (2019-07-01)
 ------------------
 * updated world configs
