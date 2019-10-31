@@ -155,7 +155,7 @@
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 't650')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0 -0.19 -0.06 0 1,308996939 0 $(arg fcu_frame) $(arg realsense_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame)_to_$(arg fcu_frame)" args="0 0.19 -0.06 0.0 0.2617993878 -3.14159265359 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'naki')">
@@ -195,7 +195,7 @@
 
       <group if="$(eval arg('UAV_TYPE') == 't650')">
         <arg name="cam_yaw" default="-1.57079632679" />
-        <node pkg="tf2_ros" type="static_transform_publisher" name="optflow_cam_tf" args="0 0 -0.1 $(arg cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="optflow_cam_tf" args="0 -0.19 -0.06 $(arg cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'naki')">
@@ -368,8 +368,8 @@
 
         <!-- TF -->
 
-      <arg name="brick_cam_yaw" default="3.14159265359" />
-      <node pkg="tf2_ros" type="static_transform_publisher" name="brick_cam_tf" args="0 0.19 -0.06 $(arg brick_cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
+      <arg name="brick_cam_yaw" default="0.0" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="brick_cam_tf" args="0 -0.19 -0.06 $(arg brick_cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
 
       <arg     if="$(arg STANDALONE)" name="nodelet" value="STANDALONE" />
       <arg unless="$(arg STANDALONE)" name="nodelet" value="load" />
