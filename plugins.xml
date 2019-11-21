@@ -4,14 +4,8 @@
   </class>
 </library>
 
-<library path="lib/libAutomaticStartEagle">
-  <class name="mrs_general/AutomaticStartEagle" type="mrs_general::automatic_start_eagle::AutomaticStartEagle" base_class_type="nodelet::Nodelet">
-    <description>AutomaticStartEagle nodelet</description>
-  </class>
-</library>
-
-<library path="lib/libAutomaticStartPointer">
-  <class name="mrs_general/AutomaticStartPointer" type="mrs_general::automatic_start_pointer::AutomaticStartPointer" base_class_type="nodelet::Nodelet">
-    <description>AutomaticStartPointer nodelet</description>
+<library path="lib/libTomasuvTfPublisher">
+  <class name="mrs_general/TomasuvTfPublisher" type="mrs_general::tomasuv_tf_publisher::TomasuvTfPublisher" base_class_type="nodelet::Nodelet">
+    <description>TomasuvTfPublisher nodelet</description>
   </class>
 </library>

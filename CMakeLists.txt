@@ -13,12 +13,13 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
   std_msgs
   mavros_msgs
+  tf2_geometry_msgs
   )
 
 catkin_package(
   #  INCLUDE_DIRS include
-  LIBRARIES AutomaticStartDarpa AutomaticStartEagle AutomaticStartPointer
-  CATKIN_DEPENDS std_msgs mrs_msgs mavros_msgs mrs_lib
+  LIBRARIES AutomaticStartDarpa TomasuvTfPublisher
+  CATKIN_DEPENDS std_msgs mrs_msgs mavros_msgs mrs_lib tf2_geometry_msgs
   #  DEPENDS system_lib
   )
 
@@ -43,5 +44,19 @@ add_dependencies(AutomaticStartDarpa
   )
 
 target_link_libraries(AutomaticStartDarpa
+  ${catkin_LIBRARIES}
+  )
+
+# tomasuv tf publisher
+
+add_library(TomasuvTfPublisher
+  src/tomasuv_tf_publisher.cpp)
+
+add_dependencies(TomasuvTfPublisher
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+target_link_libraries(TomasuvTfPublisher
   ${catkin_LIBRARIES}
   )
