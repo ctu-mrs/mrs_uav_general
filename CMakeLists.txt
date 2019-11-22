@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   #  INCLUDE_DIRS include
-  LIBRARIES AutomaticStartDarpa AutomaticStartEagle AutomaticStartPointer
+  LIBRARIES AutomaticStartDarpa
   CATKIN_DEPENDS std_msgs mrs_msgs mavros_msgs mrs_lib
   #  DEPENDS system_lib
   )
