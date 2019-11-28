@@ -3,9 +3,3 @@
     <description>AutomaticStartDarpa nodelet</description>
   </class>
 </library>
-
-<library path="lib/libTomasuvTfPublisher">
-  <class name="mrs_general/TomasuvTfPublisher" type="mrs_general::tomasuv_tf_publisher::TomasuvTfPublisher" base_class_type="nodelet::Nodelet">
-    <description>TomasuvTfPublisher nodelet</description>
-  </class>
-</library>

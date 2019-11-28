@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   #  INCLUDE_DIRS include
-  LIBRARIES AutomaticStartDarpa TomasuvTfPublisher
+  LIBRARIES AutomaticStartDarpa
   CATKIN_DEPENDS std_msgs mrs_msgs mavros_msgs mrs_lib tf2_geometry_msgs
   #  DEPENDS system_lib
   )
