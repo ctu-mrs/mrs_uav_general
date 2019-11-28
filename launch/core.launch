@@ -78,6 +78,7 @@
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
+    <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="g" value="$(arg g)" />
@@ -96,6 +97,7 @@
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
+    <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="g" value="$(arg g)" />

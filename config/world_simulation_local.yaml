@@ -12,9 +12,9 @@ local_origin_y: 0.0
 
 safety_area:
 
-  use_safety_area: false
+  use_safety_area: true
 
-  frame_name: "gps_origin"
+  frame_name: "local_origin"
 
   polygon_obstacles:
     # loaded as a vector of matrices
