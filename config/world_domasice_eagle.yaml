@@ -14,6 +14,8 @@ safety_area:
 
   use_safety_area: true
 
+  frame_name: "gps_origin"
+
   polygon_obstacles:
     # loaded as a vector of matrices
     # each matrix has polygon vertices in columns
