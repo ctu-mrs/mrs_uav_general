@@ -371,7 +371,6 @@
         <!-- TF -->
 
       <arg name="brick_cam_yaw" default="3.14159265359" />
-
       <group if="$(eval arg('NATO_NAME') == 'echo')">
         <node pkg="tf2_ros" type="static_transform_publisher" name="brick_cam_tf" args="0 -0.15 -0.06 $(arg brick_cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
       </group>
