@@ -375,7 +375,7 @@
 
       <arg name="brick_cam_yaw" default="3.14159265359" />
       <group if="$(eval arg('NATO_NAME') == 'echo')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="brick_cam_tf" args="0 -0.15 -0.06 $(arg brick_cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="brick_cam_tf" args="0 -0.19 -0.06 $(arg brick_cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
       </group>
 
       <arg     if="$(arg STANDALONE)" name="nodelet" value="STANDALONE" />
@@ -409,8 +409,8 @@
       <arg name="color" default="true" />
       <arg name="idpf" default="0" />
       <arg name="aec" default="true" />
-      <arg name="expose_upper_limit_us" default="7500" />
-      <arg name="des_grey_value" default="50" />
+      <arg name="expose_upper_limit_us" default="20000" />
+      <arg name="des_grey_value" default="80" />
       <arg name="expose_us" default="100" />
       <arg name="agc" default="true" />
       <arg name="boost" value="false" />
