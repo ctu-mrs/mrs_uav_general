@@ -1,8 +1,9 @@
 <launch>
 
-  <param name="dev" value="/dev/input/js0" />
+  <arg name="js" default="js0" />
 
   <node name="joystick" pkg="joy" type="joy_node" output="screen">
+    <param name="dev" type="string" value="/dev/input/$(arg js)" />
   </node>
 
 </launch>
