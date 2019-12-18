@@ -24,7 +24,7 @@
 
     <include file="$(find terarangerone)/launch/uav.launch" />
 
-    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg teraranger_frame)_to_$(arg fcu_frame_slashless)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg teraranger_frame)" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg teraranger_frame)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg teraranger_frame)" />
 
   </group>
 
@@ -34,26 +34,29 @@
 
   <group if="$(eval 'garmin' in arg('SENSORS'))">
 
-    <arg name="garmin_frame" default="garmin_frame" />
-    <arg name="garmin_frame_up" default="garmin_frame_up" />
+    <arg name="garmin_frame" default="$(arg UAV_NAME)/garmin" />
+    <arg name="garmin_frame_up" default="$(arg UAV_NAME)/garmin_up" />
+
+    <arg name="garmin_frame_slashless" default="garmin_$(arg UAV_NAME)" />
+    <arg name="garmin_frame_up_slashless" default="garmin_up_$(arg UAV_NAME)" />
 
       <!-- TF for garmin down -->
     <group ns="$(arg UAV_NAME)" if="$(eval 'garmin_down' in arg('SENSORS').replace(',', ' ').split())">
 
       <group if="$(eval arg('UAV_TYPE') == 'f450')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame_slashless)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg garmin_frame_slashless)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'f550')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame_slashless)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg garmin_frame_slashless)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 't650')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame_slashless)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg garmin_frame_slashless)" args="0.0 0.1 -0.03 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'naki')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame_slashless)" args="0.19918 -0.115 -0.025 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg garmin_frame_slashless)" args="0.19918 -0.115 -0.025 0 1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame)" />
       </group>
 
     </group>
@@ -61,19 +64,19 @@
     <!-- TF for garmin up -->
     <group ns="$(arg UAV_NAME)" if="$(eval 'garmin_up' in arg('SENSORS').replace(',', ' ').split())">
       <group if="$(eval arg('UAV_TYPE') == 'f450')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame_up)_to_$(arg fcu_frame_slashless)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg garmin_frame_up_slashless)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'f550')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame)_to_$(arg fcu_frame_slashless)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg garmin_frame_up_slashless)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 't650')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame_up)_to_$(arg fcu_frame_slashless)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg garmin_frame_up_slashless)" args="0.0 0.13 0.02 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'naki')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg garmin_frame_up)_to_$(arg fcu_frame_slashless)" args="0.09 -0.039 -0.01 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg garmin_frame_up_slashless)" args="0.09 -0.039 -0.01 0 -1.57079632679 0.0 $(arg fcu_frame) $(arg garmin_frame_up)" />
       </group>
     </group>
 
@@ -90,23 +93,24 @@
 
   <group if="$(eval 'rplidar' in arg('SENSORS'))">
 
-    <arg name="rplidar_frame" default="rplidar_$(arg UAV_NAME)" />
+    <arg name="rplidar_frame" default="$(arg UAV_NAME)/rplidar" />
+    <arg name="rplidar_frame_slashless" default="rplidar_$(arg UAV_NAME)" />
 
       <!-- TF -->
     <group if="$(eval arg('UAV_TYPE') == 'f450')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame_slashless)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg rplidar_frame_slashless)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
     </group>
 
     <group if="$(eval arg('UAV_TYPE') == 'f550')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame_slashless)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg rplidar_frame_slashless)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
     </group>
 
     <group if="$(eval arg('UAV_TYPE') == 't650')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame_slashless)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg rplidar_frame_slashless)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
     </group>
 
     <group if="$(eval arg('UAV_TYPE') == 'naki')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg rplidar_frame)_to_$(arg fcu_frame_slashless)" args="0.0 0.0 0.205 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg rplidar_frame_slashless)" args="0.0 0.0 0.205 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
     </group>
 
     <!-- The node -->
@@ -122,25 +126,25 @@
 
     <arg name="realsense_frame" default="$(arg UAV_NAME)/rs_d435/link" />
     <arg name="realsense_frame_tmp" default="$(arg UAV_NAME)/rs_d435/tmp_optical" />
-    <arg name="realsense_frame_unslashed" default="$(arg UAV_NAME)_rs_d435_link" />
+    <arg name="realsense_frame_slashless" default="$(arg UAV_NAME)_rs_d435_link" />
 
       <!-- TF -->
     <group if="$(eval ('realsense_front' in arg('SENSORS').replace(',', ' ').split()))">
 
       <group if="$(eval arg('UAV_TYPE') == 'f450')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_unslashed)_to_$(arg fcu_frame_slashless)" args="0.16 0.0 -0.05 0.0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.16 0.0 -0.05 0.0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'f550')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_unslashed)_to_$(arg fcu_frame_slashless)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 't650')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_unslashed)_to_$(arg fcu_frame_slashless)" args="0.158 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.158 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'naki')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_unslashed)_to_$(arg fcu_frame_slashless)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
 
       <include file="$(find realsense_d435)/launch/high_acc.launch" />
@@ -151,20 +155,20 @@
     <group if="$(eval ('realsense_brick' in arg('SENSORS').replace(',', ' ').split()))">
 
       <group if="$(eval arg('UAV_TYPE') == 'f450')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_unslashed)_to_$(arg fcu_frame_slashless)" args="0.16 0.0 -0.05 0.0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.16 0.0 -0.05 0.0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'f550')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_unslashed)_to_$(arg fcu_frame_slashless)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 't650')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_unslashed)_tmp" args="0 0.19 -0.04  3.14159265359 -0.2617993878 -3.14159265359 $(arg fcu_frame) $(arg realsense_frame_tmp)" />
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_unslashed)_to_$(arg fcu_frame_slashless)" args="0 0 0  1.57079632679 -1.57079632679 0  $(arg realsense_frame_tmp)  $(arg realsense_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_slashless)_tmp" args="0 0.19 -0.04  3.14159265359 -0.2617993878 -3.14159265359 $(arg fcu_frame) $(arg realsense_frame_tmp)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0 0 0  1.57079632679 -1.57079632679 0  $(arg realsense_frame_tmp)  $(arg realsense_frame)" />
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'naki')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg realsense_frame_unslashed)_to_$(arg fcu_frame_slashless)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
 
       <include file="$(find realsense_d435)/launch/uav_brick.launch" />
