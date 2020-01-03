@@ -494,4 +494,23 @@
 
   <!-- //} -->
 
+  <!-- Ouster //{ -->
+
+  <group if="$(eval 'ouster' in arg('SENSORS'))">
+
+    <arg name="ouster_frame" default="$(arg UAV_NAME)/os1_sensor" />
+    <arg name="ouster_frame_slashless" default="os1_sensor_$(arg UAV_NAME)" />
+
+      <!-- TF -->
+    <group if="$(eval arg('UAV_TYPE') == 'f450')">
+      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg ouster_frame_slashless)" args="0.0 0.0 0.09 0 0.0 0.0 $(arg fcu_frame) $(arg ouster_frame)" />
+    </group>
+
+    <!-- The node -->
+    <include file="$(find ouster_ros)/launch/uav.launch" />
+
+  </group>
+
+  <!-- //} -->
+
 </launch>
