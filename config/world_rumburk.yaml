@@ -3,8 +3,11 @@
 #
 
 use_utm_origin: true
+utm_origin_units: 0 # 0 - UTM, 1 - Latitude Longitude
 utm_origin_x: 468303.89
 utm_origin_y: 5646761.2
+utm_origin_lat: 0.0
+utm_origin_lon: 0.0
 
 use_local_origin: false
 local_origin_x: 0.0

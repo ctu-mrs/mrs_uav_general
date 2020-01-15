@@ -1,23 +1,23 @@
 #
 ## DEFINITION OF THE ARENA
 #
-
-use_utm_origin: false
-utm_origin_units: 0 # 0 - UTM, 1 - Latitude Longitude
-utm_origin_lat: 0.0
-utm_origin_lon: 0.0
+ 
+use_utm_origin: true
+utm_origin_units: 1 # 0 - UTM, 1 - Latitude Longitude
+utm_origin_lat: 24.132261
+utm_origin_lon: 55.332986
 utm_origin_x: 0
 utm_origin_y: 0
 
-use_local_origin: true
+use_local_origin: false
 local_origin_x: 0.0
 local_origin_y: 0.0
 
 safety_area:
 
-  use_safety_area: false
+  use_safety_area: true
 
-  frame_name: "gps_origin"
+  frame_name: "latlon_origin"
 
   polygon_obstacles:
     # loaded as a vector of matrices
@@ -39,10 +39,17 @@ safety_area:
     cols: [3, 3] # nums of cols of each matrix
 
   # convex polygon CCW
-  safety_area: [-50, -50,
-  50, -50,
-  50, 50,
-  -50, 50]
+  # race track
+  safety_area: [24.132490, 55.332486,
+24.132539, 55.332787,
+24.132567, 55.332861,
+24.132346, 55.333350,
+24.132265, 55.333379,
+24.131982, 55.333048,
+24.131948, 55.332769,
+24.132264, 55.332671,
+24.132352, 55.332637,
+24.132367, 55.332540]
 
-  max_height: 4.0
-  min_height: 0.0
+  max_height: 8.0
+  min_height: 1.0
