@@ -13,6 +13,9 @@
   <arg name="BODY_DISTURBANCE_Y" default="$(optenv INITIAL_DISTURBANCE_Y 0.0)" />
   <arg name="DEBUG" default="$(optenv DEBUG false)" />
 
+  <arg name="WORLD_FILE" type="string" default="$(optenv WORLD_FILE)" />
+  <arg name="WORLD_NAME" type="string" default="$(optenv WORLD_NAME)" />
+
     <!-- custom configs args -->
   <arg name="config_constraint_manager" default="" />
   <arg name="config_gain_manager" default="" />
@@ -42,10 +45,14 @@
   <arg name="g" default="9.8" />
   <arg name="n_threads" default="16" />
 
-  <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 't650')" name="UAV_MASS" default="5.0" />
+  <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 't650')" name="UAV_MASS" default="3.5" />
   <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 'f550')" name="UAV_MASS" default="3.0" />
   <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 'f450')" name="UAV_MASS" default="2.3" />
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="UAV_MASS" default="$(env UAV_MASS)" />
+
+  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') != '')" name="world_file" value="$(find mrs_general)/config/world_$(env WORLD_NAME).yaml" />
+  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') == '' and arg('RUN_TYPE') == 'simulation')" name="world_file" value="$(find mrs_general)/config/world_simulation.yaml" />
+  <arg if="$(eval arg('WORLD_FILE') != '')" name="world_file" value="$(arg WORLD_FILE)" />
 
     <!-- Nodelet Manager -->
   <include file="$(find mrs_general)/launch/nodelet_manager.launch">
@@ -65,11 +72,12 @@
     <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="WORLD_FILE" value="$(arg world_file)" />
     <arg name="custom_config" value="$(arg config_odometry)" />
 
   </include>
 
-  <!-- Uav Manager -->
+  <!-- UAV Manager -->
   <include file="$(find mrs_uav_manager)/launch/uav_manager.launch">
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
@@ -81,6 +89,7 @@
     <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="WORLD_FILE" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_uav_manager)" />
 
@@ -100,6 +109,7 @@
     <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="WORLD_FILE" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_control_manager)" />
 
