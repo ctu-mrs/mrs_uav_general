@@ -13,8 +13,8 @@
   <arg name="BODY_DISTURBANCE_Y" default="$(optenv INITIAL_DISTURBANCE_Y 0.0)" />
   <arg name="DEBUG" default="$(optenv DEBUG false)" />
 
-  <arg name="WORLD_FILE" type="string" default="$(optenv WORLD_FILE)" />
-  <arg name="WORLD_NAME" type="string" default="$(optenv WORLD_NAME)" />
+  <arg name="WORLD_FILE" default="$(optenv WORLD_FILE)" />
+  <arg name="WORLD_NAME" default="$(optenv WORLD_NAME)" />
 
     <!-- custom configs args -->
   <arg name="config_constraint_manager" default="" />
