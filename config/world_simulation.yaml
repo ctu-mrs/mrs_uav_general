@@ -48,5 +48,5 @@ safety_area:
     rows: 1 # each matrix has a single row
     cols: [3, 3, 3, 3, 3, 3] # nums of cols of each matrix
 
-  max_height: 10.0
+  max_height: 15.0
   min_height: 0.5
