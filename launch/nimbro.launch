@@ -10,7 +10,7 @@
   <arg name="service_call_repeats" default="3" />
   <arg name="service_server_port" default="6000" />
   <arg name="topic_server_port" default="17001" />
-  <arg name="broadcast_addr" default="192.168.0.255" />
+  <arg name="broadcast_addr" default="192.168.69.255" />
 
   <arg name="custom_config_uav_names" default="" />
 
