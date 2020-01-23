@@ -17,7 +17,7 @@ network:
   #     
   #     config_uav_names:=~/custom_configs/uav_names.yaml
   #
-  #    to the core.launch.
+  #    to the core.launch and nimbro.launch.
 
   robot_names: [
 
