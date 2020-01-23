@@ -2,6 +2,7 @@
 
   <!-- args corresponding to environment variables -->
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
+  <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
 
     <!-- other args -->
   <arg name="service_response_timeout" default="3" />
@@ -10,6 +11,8 @@
   <arg name="service_server_port" default="6000" />
   <arg name="topic_server_port" default="17001" />
   <arg name="broadcast_addr" default="192.168.0.255" />
+
+  <arg name="custom_config_uav_names" default="" />
 
   <group ns="$(arg UAV_NAME)">
 
@@ -22,7 +25,10 @@
       <param name="topic_prefix" value="$(arg UAV_NAME)" />
 
         <!-- Load a config YAML file -->
-      <rosparam command="load" file="$(find mrs_general)/config/uav_names.yaml" />
+      <rosparam if="$(eval arg('RUN_TYPE') == 'uav')" ns="mpc_tracker" file="$(find mrs_general)/config/uav_names.yaml" />
+      <rosparam if="$(eval arg('RUN_TYPE') == 'simulation')" ns="mpc_tracker" file="$(find mrs_general)/config/uav_names_simulation.yaml" />
+      <rosparam if="$(eval not arg('custom_config_mpc_tracker') == '')" ns="mpc_tracker" file="$(arg custom_config_mpc_tracker)" />
+      <rosparam if="$(eval not arg('custom_config_uav_names') == '')" ns="mpc_tracker" file="$(arg custom_config_uav_names)" />
       <rosparam command="load" file="$(find mrs_general)/config/communication_config.yaml" />
     </node>
 
