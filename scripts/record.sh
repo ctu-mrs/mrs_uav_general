@@ -7,14 +7,14 @@ exclude=(
 '/$(arg UAV_NAME)/bluefox/image_raw'
 '/$(arg UAV_NAME)/bluefox/image_raw/compressed/(.*)'
 '/$(arg UAV_NAME)/bluefox/image_raw/compressedDepth(.*)'
-'/$(arg UAV_NAME)/bluefox/image_raw/theora(.*)'
-'/$(arg UAV_NAME)/bluefox/image_raw/h264(.*)'
 # bluefox_optflow
 '/$(arg UAV_NAME)/bluefox_optflow/image_raw'
 '/$(arg UAV_NAME)/bluefox_optflow/image_raw/compressed/(.*)'
 '/$(arg UAV_NAME)/bluefox_optflow/image_raw/compressedDepth(.*)'
-'/$(arg UAV_NAME)/bluefox_optflow/image_raw/theora(.*)'
-'/$(arg UAV_NAME)/bluefox_optflow/image_raw/h264(.*)'
+# bluefox3_front
+'/$(arg UAV_NAME)/bluefox3_front/image_raw'
+'/$(arg UAV_NAME)/bluefox3_front/image_raw/compressed/(.*)'
+'/$(arg UAV_NAME)/bluefox3_front/image_raw/compressedDepth(.*)'
 # Realsense t265
 '/$(arg UAV_NAME)/rs_t265/fisheye(.*)'
 # Realsesne d435
@@ -22,12 +22,16 @@ exclude=(
 '(.*)rs_d435(.*)depth_to_color/image_raw'
 '(.*)rs_d435(.*)depth_to_color(.*)compressed'
 '(.*)rs_d435(.*)depth_to_color(.*)compressed/(.*)'
+'(.*)rs_d435(.*)depth_to_color(.*)compressedDepth/(.*)'
 '(.*)rs_d435(.*)color/image_raw'
-'(.*)rs_d435(.*)/depth/(.*)'
-'(.*)rs_d435(.*)/infra(.*)'
-'(.*)rs_d435(.*)/color/image_rect_color'
+'(.*)rs_d435(.*)color/image_rect_color'
+'(.*)rs_d435(.*)color(.*)compressed/(.*)'
+'(.*)rs_d435(.*)depth/(.*)'
+'(.*)rs_d435(.*)infra(.*)'
 # Every theora message
 '(.*)theora(.*)'
+# Every h264 message
+'(.*)h264(.*)'
 )
 
 # file's header
