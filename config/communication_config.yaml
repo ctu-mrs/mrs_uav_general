@@ -17,6 +17,3 @@ services:
     type: std_srvs/Trigger 
   - name: "/*/control_manager/mpc_tracker/set_trajectory"
     type: mrs_msgs/TrackerTrajectorySrv 
-
-
-
