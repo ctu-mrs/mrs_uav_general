@@ -140,7 +140,12 @@
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 't650')">
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.158 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
+        <group if="$(eval arg('NATO_NAME') == 'charlie')">
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.32 -0.01 -0.03 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
+        </group>
+        <group unless="$(eval arg('NATO_NAME') == 'charlie')">
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.158 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
+        </group>
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 'naki')">
@@ -479,6 +484,70 @@
           <arg name="theora_target_bitrate" default="$(arg theora_target_bitrate)" />
           <arg name="theora_quality" default="$(arg theora_quality)" />
           <arg name="theora_optimize_for" default="$(arg theora_optimize_for)" />
+
+        </include>
+
+      </group>
+
+      <!-- //} -->
+
+    </group>
+
+    <!-- //} -->
+
+  </group>
+
+  <!-- //} -->
+
+  <!-- Bluefox3 //{ -->
+
+  <group if="$(eval ('bluefox3' in arg('SENSORS')))">
+
+    <!-- Bluefox3 front //{ -->
+
+    <group if="$(eval ('bluefox3_front' in arg('SENSORS').replace(',', ' ').split()))">
+
+      <arg name="camera_name" default="bluefox3_front" />
+      <arg name="camera_frame" default="$(arg UAV_NAME)/$(arg camera_name)" />
+
+      <!-- TF -->
+      <node pkg="tf2_ros" type="static_transform_publisher" name="blufox3_front_tf" args="0.32 0.0 0.0 1.5707963 3.1415927 1.5707963 $(arg fcu_frame) $(arg camera_frame)" />
+
+      <arg     if="$(arg STANDALONE)" name="nodelet_manager" value="" />
+      <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_bfx3_nodelet_manager" />
+      <arg     if="$(arg STANDALONE)" name="cam_plugin" value="false" />
+      <arg unless="$(arg STANDALONE)" name="cam_plugin" value="true" />
+
+      <!-- Nodelet manager -->
+      <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
+
+        <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen">
+          <param name="num_worker_threads" value="5" />
+        </node>
+
+      </group>
+
+      <arg name="camera_serial" default="$(env BLUEFOX3_FRONT)" />
+      <arg name="frame_id" default="$(arg camera_frame)" />
+      <arg name="calib_url" default="file://$(find mrs_general)/config/camera_calibrations/mv_$(arg camera_serial).yaml" />
+
+      <arg name="cam_output" default="screen" />
+
+      <!-- bluefox3 nodelet //{ -->
+      <group ns="$(arg UAV_NAME)" >
+
+        <include file="$(find bluefox3)/launch/bluefox3.launch" >
+
+          <!-- Camera Settings -->
+          <arg name="serial" value="$(arg camera_serial)" />
+          <arg name="camera_name" value="$(arg camera_name)" />
+          <arg name="frame_id" value="$(arg frame_id)" />
+          <arg name="calib_url" value="$(arg calib_url)" />
+
+            <!-- Node Settings -->
+          <arg name="plugin" value="$(arg cam_plugin)" />
+          <arg name="manager" value="$(arg nodelet_manager)" />
+          <arg name="output" value="$(arg cam_output)" />
 
         </include>
 
