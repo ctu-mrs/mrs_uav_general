@@ -120,6 +120,18 @@
 
   <!-- //} -->
 
+  <!-- Teraranger thermal //{ -->
+
+  <group if="$(eval 'trinocular_thermal' in arg('SENSORS'))">
+
+    <!-- TODO: Add Tfs -->
+    <!-- The node -->
+    <include file="$(find teraranger)/launch/trinocular_thermal.launch" />
+
+  </group>
+
+  <!-- //} -->
+
   <!-- Realsense //{ -->
 
   <group if="$(eval ('realsense' in arg('SENSORS')))">
