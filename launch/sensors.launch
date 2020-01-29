@@ -9,12 +9,12 @@
   <arg name="PIXGARM" default="$(optenv PIXGARM false)" />
   <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
 
-    <!-- other args -->
+  <!-- other args -->
   <arg name="fcu_frame" default="$(arg UAV_NAME)/fcu" />
   <arg name="fcu_frame_slashless" default="fcu_$(arg UAV_NAME)" />
 
-    <!-- Mavros -->
-  <!-- <include file="$(find mrs_general)/launch/mavros_uav.launch" /> -->
+  <!-- Mavros -->
+  <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
     <!-- Teraranger one //{ -->
 
