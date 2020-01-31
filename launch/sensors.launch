@@ -103,6 +103,12 @@
     <arg name="rplidar_frame" default="$(arg UAV_NAME)/rplidar" />
     <arg name="rplidar_frame_slashless" default="rplidar_$(arg UAV_NAME)" />
 
+    <arg name="mode" if="$(eval ('rplidar_indoor' in arg('SENSORS').replace(',', ' ').split()))" value="indoor" />
+    <arg name="mode" if="$(eval ('rplidar_outdoor' in arg('SENSORS').replace(',', ' ').split()))" value="outdoor" />
+
+      <!-- if no mode is specified, assume outdoor -->
+    <arg name="mode" if="$(eval (not ('rplidar_indoor' in arg('SENSORS').replace(',', ' ').split())) and (not ('rplidar_outdoor' in arg('SENSORS').replace(',', ' ').split())))" value="outdoor" />
+
       <!-- TF -->
     <group if="$(eval arg('UAV_TYPE') == 'f450')">
       <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg rplidar_frame_slashless)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
@@ -121,7 +127,11 @@
     </group>
 
     <!-- The node -->
-    <include file="$(find rplidar_ros)/launch/uav.launch" />
+    <include file="$(find rplidar_ros)/launch/uav.launch">
+
+      <arg name="mode" value="$(arg mode)" />
+
+    </include>
 
   </group>
 
