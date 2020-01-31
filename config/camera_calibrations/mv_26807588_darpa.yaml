@@ -1,6 +1,6 @@
 image_width: 752
 image_height: 480
-camera_name: bluefox_left
+camera_name: bluefox_right
 camera_matrix:
   rows: 3
   cols: 3
@@ -14,7 +14,8 @@ distortion_coefficients:
 rectification_matrix:
   rows: 3
   cols: 3
-  data: []
+  data: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000]
+
 projection_matrix:
   rows: 3
   cols: 4
