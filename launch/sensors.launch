@@ -9,11 +9,11 @@
   <arg name="PIXGARM" default="$(optenv PIXGARM false)" />
   <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
 
-  <!-- other args -->
+    <!-- other args -->
   <arg name="fcu_frame" default="$(arg UAV_NAME)/fcu" />
   <arg name="fcu_frame_slashless" default="fcu_$(arg UAV_NAME)" />
 
-  <!-- Mavros -->
+    <!-- Mavros -->
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
     <!-- Teraranger one //{ -->
@@ -81,8 +81,15 @@
     </group>
 
     <!-- The node -->
-    <group if="$(eval not arg('PIXGARM'))">
-      <include file="$(find mrs_serial)/launch/uav.launch" />
+    <group if="$(eval not arg('PIXGARM') and not ('datapodavac' in arg('SENSORS')))">
+
+      <include file="$(find mrs_serial)/launch/uav.launch">
+
+        <arg name="name" value="_arduino" />
+        <arg name="portname" value="/dev/arduino" />
+
+      </include>
+
     </group>
 
   </group>
@@ -636,7 +643,7 @@
     </group>
 
     <!-- //} -->
-    
+
     <!-- Bluefox right //{-->
     <group if="$(eval ('bluefox_darpa_right' in arg('SENSORS').replace(',', ' ').split()))">
 
@@ -837,7 +844,7 @@
     <arg name="ouster_lidar_slashless" default="os1_lidar_$(arg UAV_NAME)" />
     <arg name="ouster_imu_slashless" default="os1_imu_$(arg UAV_NAME)" />
 
-    <!-- Platform specific TF -->
+      <!-- Platform specific TF -->
     <group if="$(eval arg('UAV_TYPE') == 'f450')">
       <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg ouster_frame_slashless)" args="0.0 0.0 0.078 0 0.0 0.0 $(arg fcu_frame) $(arg ouster_frame)" />
     </group>
@@ -846,8 +853,26 @@
     <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg ouster_frame_slashless)_to_$(arg ouster_lidar_slashless)" args="0.0 0.0 0.03618 3.14159265359 0.0 0.0 $(arg ouster_frame) $(arg ouster_lidar_frame)" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg ouster_frame_slashless)_to_$(arg ouster_imu_slashless)" args="0.006253 -0.011775 0.007645 0 0 0 $(arg ouster_frame) $(arg ouster_imu_frame)" />
 
-    <!-- The node -->
+      <!-- The node -->
     <include file="$(find ouster_ros)/launch/uav.launch" />
+
+  </group>
+
+  <!-- //} -->
+
+  <!-- Datapodavac //{ -->
+
+  <group if="$(eval ('datapodavac' in arg('SENSORS')))">
+
+    <arg name="portname" default="/dev/datapodavac" />
+
+    <include file="$(find mrs_serial)/launch/uav.launch">
+
+      <!-- Common Interface -->
+      <arg name="name" value="_datapodavac" />
+      <arg name="portname" value="$(arg portname)" />
+
+    </include>
 
   </group>
 
