@@ -141,7 +141,19 @@
 
   <group if="$(eval 'trinocular_thermal' in arg('SENSORS'))">
 
-    <!-- TODO: Add Tfs -->
+    <arg name="thermal_top_frame" default="$(arg UAV_NAME)/thermal/top" />
+    <arg name="thermal_middle_frame" default="$(arg UAV_NAME)/thermal/middle" />
+    <arg name="thermal_bottom_frame" default="$(arg UAV_NAME)/thermal/bottom" />
+    <arg name="thermal_top_frame_slashless" default="$(arg UAV_NAME)_thermal_top" />
+    <arg name="thermal_middle_frame_slashless" default="$(arg UAV_NAME)_thermal_middle" />
+    <arg name="thermal_bottom_frame_slashless" default="$(arg UAV_NAME)_thermal_bottom" />
+
+      <group if="$(eval arg('UAV_TYPE') == 't650')">
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg thermal_top_frame_slashless)"     args="0.158 -0.0 -0.05 0 -0.523599 0 $(arg fcu_frame) $(arg thermal_top_frame)" />
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg thermal_middle_frame_slashless)"  args="0.158 -0.0 -0.05 0  0 0 $(arg fcu_frame) $(arg thermal_middle_frame)" />
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg thermal_bottom_frame_slashless)"  args="0.158 -0.0 -0.05 0  0.523599 0 $(arg fcu_frame) $(arg thermal_bottom_frame)" />
+        <!-- </group> -->
+      </group>
     <!-- The node -->
     <include file="$(find teraranger)/launch/trinocular_thermal.launch" />
 
