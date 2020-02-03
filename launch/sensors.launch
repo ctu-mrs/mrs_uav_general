@@ -119,7 +119,12 @@
     </group>
 
     <group if="$(eval arg('UAV_TYPE') == 't650')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg rplidar_frame_slashless)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
+      <group if="$(eval arg('NATO_NAME') == 'mike')">
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg rplidar_frame_slashless)" args="0.04 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
+      </group>
+      <group unless="$(eval arg('NATO_NAME') == 'mike')">
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg rplidar_frame_slashless)" args="0.0 0.0 0.15 0 0.0 0.0 $(arg fcu_frame) $(arg rplidar_frame)" />
+      </group>
     </group>
 
     <group if="$(eval arg('UAV_TYPE') == 'naki')">

@@ -41,10 +41,10 @@ safety_area:
     cols: [4, 4] # nums of cols of each matrix
 
   # convex polygon CCW
-  safety_area: [-5, -5,
-  5, -5,
-  5, 5,
-  -5, 5]
+  safety_area: [-10, -10,
+  10, -10,
+  10, 10,
+  -10, 10]
 
   max_height: 2.0
   min_height: 0.0
