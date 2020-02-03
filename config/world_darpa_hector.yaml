@@ -17,7 +17,7 @@ safety_area:
 
   use_safety_area: false
 
-  frame_name: "aloam_origin"
+  frame_name: "hector_origin"
 
   polygon_obstacles:
     # loaded as a vector of matrices
@@ -46,5 +46,5 @@ safety_area:
   50, 50,
   -50, 50]
 
-  max_height: 40.0
-  min_height: -40.0
+  max_height: 100.0
+  min_height: -100.0
