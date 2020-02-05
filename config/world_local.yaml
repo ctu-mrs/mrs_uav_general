@@ -17,7 +17,7 @@ safety_area:
 
   use_safety_area: true
 
-  frame_name: "optflow_origin"
+  frame_name: "local_origin"
 
   polygon_obstacles:
     # loaded as a vector of matrices
