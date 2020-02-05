@@ -217,7 +217,7 @@
 
         <group if="$(eval arg('NATO_NAME') == 'echo')">
 
-          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.21 0.21 -0.07 -2.566 1.257 -0.972 $(arg fcu_frame) $(arg realsense_frame)" />
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.23 0.23 -0.07 -2.566 1.257 -0.972 $(arg fcu_frame) $(arg realsense_frame)" />
 
         </group>
 
