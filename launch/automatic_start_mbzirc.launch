@@ -6,10 +6,10 @@
 
   <arg name="challenge" default="" />
 
-  <arg if="$(eval arg('challenge') == 'balloons')" name="CHALLENGE" value="0" />
-  <arg if="$(eval arg('challenge') == 'ball')" name="CHALLENGE" value="1" />
-  <arg if="$(eval arg('challenge') == 'fire')" name="CHALLENGE" value="2" />
-  <arg if="$(eval arg('challenge') == 'wall')" name="CHALLENGE" value="3" />
+  <arg if="$(eval arg('challenge') == 'balloons')" name="CHALLENGE" value="balloons" />
+  <arg if="$(eval arg('challenge') == 'ball')" name="CHALLENGE" value="ball" />
+  <arg if="$(eval arg('challenge') == 'fire')" name="CHALLENGE" value="fire" />
+  <arg if="$(eval arg('challenge') == 'wall')" name="CHALLENGE" value="wall" />
 
   <arg if="$(eval arg('RUN_TYPE') == 'simulation')" name="simulation" default="true" />
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="simulation" default="false" />

@@ -25,7 +25,8 @@
 
 /* defines //{ */
 
-#define STRING_EQUAL 0
+#define PWM_LOW_THIRD 1250
+#define PWM_HIGH_THIRD 1750
 
 //}
 
@@ -59,7 +60,8 @@ public:
 private:
   ros::NodeHandle nh_;
   bool            is_initialized_ = false;
-  bool            simulation_     = false;
+  bool            _simulation_    = false;
+  std::string     _challenge_     = "";
 
 private:
   double _safety_timeout_;
@@ -67,6 +69,7 @@ private:
 private:
   ros::ServiceClient service_client_motors_;
   ros::ServiceClient service_client_takeoff_;
+
   ros::ServiceClient service_client_start_;
 
 private:
@@ -80,10 +83,11 @@ private:
   double     main_timer_rate_;
 
 private:
-  void              callbackRC(const mavros_msgs::RCInConstPtr& msg);
-  mavros_msgs::RCIn rc_channels_;
-  std::mutex        mutex_rc_channels_;
-  bool              got_rc_channels_ = false;
+  void       callbackRC(const mavros_msgs::RCInConstPtr& msg);
+  std::mutex mutex_rc_channels_;
+  bool       got_rc_channels_ = false;
+  int        rc_mode_         = -1;
+  int        _channel_number_;
 
 private:
   void       callbackMavrosState(const mavros_msgs::StateConstPtr& msg);
@@ -132,7 +136,9 @@ void AutomaticStartMbzirc::onInit() {
 
   param_loader.load_param("safety_timeout", _safety_timeout_);
   param_loader.load_param("main_timer_rate", main_timer_rate_);
-  param_loader.load_param("simulation", simulation_);
+  param_loader.load_param("simulation", _simulation_);
+  param_loader.load_param("CHALLENGE", _challenge_);
+  param_loader.load_param("channel_number", _channel_number_);
 
   if (!param_loader.loaded_successfully()) {
     ROS_ERROR("[MavrosInterface]: Could not load all parameters!");
@@ -154,7 +160,27 @@ void AutomaticStartMbzirc::onInit() {
 
   service_client_takeoff_ = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
   service_client_motors_  = nh_.serviceClient<std_srvs::SetBool>("motors_out");
-  service_client_start_   = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
+
+  if (_challenge_ == "balloons") {
+
+    service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
+
+  } else if (_challenge_ == "ball") {
+
+    service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
+
+  } else if (_challenge_ == "fire") {
+
+    service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
+
+  } else if (_challenge_ == "wall") {
+
+    service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
+  } else {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: FATAL in onInit(): the challenge name is probably wrong");
+    ros::shutdown();
+  }
 
   // --------------------------------------------------------------
   // |                           timers                           |
@@ -259,15 +285,37 @@ void AutomaticStartMbzirc::callbackRC(const mavros_msgs::RCInConstPtr& msg) {
     return;
   }
 
-  ROS_INFO_ONCE("[ControlManager]: getting RC channels");
+  ROS_INFO_ONCE("[AutomaticStartMbzirc]: getting RC channels");
 
-  {
-    std::scoped_lock lock(mutex_rc_channels_);
+  std::scoped_lock lock(mutex_rc_channels_);
 
-    rc_channels_ = *msg;
+  if (uint(_channel_number_) >= msg->channels.size()) {
 
-    got_rc_channels_ = true;
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: RC joystick activation channel number (%d) is out of range [0-%d]", uint(_channel_number_),
+                       uint(msg->channels.size()));
+
+  } else {
+
+    // detect the switch of a switch on the RC
+    if (msg->channels[_channel_number_] < PWM_LOW_THIRD) {
+
+      rc_mode_ = 0;
+
+    } else if ((msg->channels[_channel_number_] >= PWM_LOW_THIRD) && (msg->channels[_channel_number_] <= PWM_HIGH_THIRD)) {
+
+      rc_mode_ = 1;
+
+    } else if (msg->channels[_channel_number_] > PWM_HIGH_THIRD) {
+
+      rc_mode_ = 2;
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: the RC channel value is outside of the set of possible values");
+    }
   }
+
+  got_rc_channels_ = true;
 }
 
 //}
@@ -284,7 +332,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
     return;
   }
 
-  if (!got_control_manager_diagnostics_ || !got_mavros_state_ || !(got_rc_channels_ || simulation_)) {
+  if (!got_control_manager_diagnostics_ || !got_mavros_state_ || !(got_rc_channels_ || _simulation_)) {
     ROS_WARN_THROTTLE(5.0, "[AutomaticStartMbzirc]: waiting for data: ControManager=%s, Mavros=%s, RC=%s", got_control_manager_diagnostics_ ? "true" : "FALSE",
                       got_mavros_state_ ? "true" : "FALSE", got_rc_channels_ ? "true" : "FALSE");
     return;
@@ -292,7 +340,6 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
   auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_mavros_state_, armed_, offboard_, armed_time_, offboard_time_);
   auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
-  auto rc_channels                                  = mrs_lib::get_mutexed(mutex_rc_channels_, rc_channels_);
 
   bool motors = control_manager_diagnostics.motors;
 
@@ -364,6 +411,8 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
 void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
 
+  auto rc_mode = mrs_lib::get_mutexed(mutex_rc_channels_, rc_mode_);
+
   ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: switching states %s -> %s", state_names[current_state], state_names[new_state]);
 
   switch (new_state) {
@@ -386,7 +435,7 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
 
     case FINISHED_STATE: {
 
-      bool res = start(0);
+      bool res = start(rc_mode);
 
       if (!res) {
         return;
@@ -470,27 +519,103 @@ bool AutomaticStartMbzirc::setMotors(const bool value) {
 
 bool AutomaticStartMbzirc::start(const int value) {
 
-  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action");
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action, mode %d", value);
 
-  mrs_msgs::SetInt srv;
-  srv.request.value = value;
+  if (_challenge_ == "balloons") {
 
-  bool res = service_client_start_.call(srv);
+    mrs_msgs::SetInt srv;
+    srv.request.value = value;
 
-  if (res) {
+    bool res = service_client_start_.call(srv);
 
-    if (srv.response.success) {
+    if (res) {
 
-      return true;
+      if (srv.response.success) {
 
-    } else {
+        return true;
 
-      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
+      } else {
+
+        ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
+      }
+
+    } else if (!srv.response.success) {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
     }
 
-  } else if (!srv.response.success) {
+  } else if (_challenge_ == "ball") {
 
-    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
+    mrs_msgs::SetInt srv;
+    srv.request.value = value;
+
+    bool res = service_client_start_.call(srv);
+
+    if (res) {
+
+      if (srv.response.success) {
+
+        return true;
+
+      } else {
+
+        ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
+      }
+
+    } else if (!srv.response.success) {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
+    }
+
+  } else if (_challenge_ == "fire") {
+
+    mrs_msgs::SetInt srv;
+    srv.request.value = value;
+
+    bool res = service_client_start_.call(srv);
+
+    if (res) {
+
+      if (srv.response.success) {
+
+        return true;
+
+      } else {
+
+        ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
+      }
+
+    } else if (!srv.response.success) {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
+    }
+
+  } else if (_challenge_ == "wall") {
+
+    mrs_msgs::SetInt srv;
+    srv.request.value = value;
+
+    bool res = service_client_start_.call(srv);
+
+    if (res) {
+
+      if (srv.response.success) {
+
+        return true;
+
+      } else {
+
+        ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
+      }
+
+    } else if (!srv.response.success) {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
+    }
+
+  } else {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: FATAL in start(): the challenge name is wrong");
   }
 
   return false;
