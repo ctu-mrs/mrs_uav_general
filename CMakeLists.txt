@@ -45,3 +45,17 @@ add_dependencies(AutomaticStartDarpa
 target_link_libraries(AutomaticStartDarpa
   ${catkin_LIBRARIES}
   )
+
+# automatic start MBZIRC
+
+add_library(AutomaticStartMbzirc
+  src/automatic_start_mbzirc.cpp)
+
+add_dependencies(AutomaticStartMbzirc
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+target_link_libraries(AutomaticStartMbzirc
+  ${catkin_LIBRARIES}
+  )
