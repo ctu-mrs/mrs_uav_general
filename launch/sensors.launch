@@ -149,9 +149,9 @@
     <arg name="thermal_bottom_frame_slashless" default="$(arg UAV_NAME)_thermal_bottom" />
 
       <group if="$(eval arg('UAV_TYPE') == 't650')">
-          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg thermal_top_frame_slashless)"     args="0.158 -0.0 -0.05 0 -0.523599 0 $(arg fcu_frame) $(arg thermal_top_frame)" />
-          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg thermal_middle_frame_slashless)"  args="0.158 -0.0 -0.05 0  0 0 $(arg fcu_frame) $(arg thermal_middle_frame)" />
-          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg thermal_bottom_frame_slashless)"  args="0.158 -0.0 -0.05 0  0.523599 0 $(arg fcu_frame) $(arg thermal_bottom_frame)" />
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg thermal_top_frame_slashless)"     args="0.158 0.08 -0.05 0 -0.523599  0 $(arg fcu_frame) $(arg thermal_top_frame)" />
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg thermal_middle_frame_slashless)"  args="0.158 0.08 -0.05 0  0         0 $(arg fcu_frame) $(arg thermal_middle_frame)" />
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg thermal_bottom_frame_slashless)"  args="0.158 0.08 -0.05 0  0.523599  0 $(arg fcu_frame) $(arg thermal_bottom_frame)" />
         <!-- </group> -->
       </group>
     <!-- The node -->
