@@ -6,6 +6,9 @@ topics: # topics published out of this machine to receivers specified above
  - name: "control_manager/mpc_tracker/diagnostics"
    compress: false # enable bz2 compression
    rate: 1.0
+ - name: "control_manager/diagnostics"
+   compress: false # enable bz2 compression
+   rate: 1.0
  - name: "odometry/slow_odom"
    compress: false # enable bz2 compression
    rate: 1.0
@@ -17,6 +20,3 @@ services:
     type: std_srvs/Trigger 
   - name: "/*/control_manager/mpc_tracker/set_trajectory"
     type: mrs_msgs/TrackerTrajectorySrv 
-
-
-

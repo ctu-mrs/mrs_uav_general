@@ -39,14 +39,12 @@ safety_area:
     # loaded as a vector of matrices
     # x, y, radius
     enabled: false
-    data: [-10, -15, 2.5,
-            -21, -7, 2.5,
-            -17, 7, 2.5,
-            -9, -2, 2.5,
-            -1, -7, 2.5,
-            2, -16, 2.5]
+    # [x1, y1, radisu1, height1,
+    #  x2, y2, radius2, height2]
+    data: [-5.0, -5.0, 2, 2,
+           -10.0, -10.0, 4, 2]
     rows: 1 # each matrix has a single row
-    cols: [3, 3, 3, 3, 3, 3] # nums of cols of each matrix
+    cols: [4, 4] # nums of cols of each matrix
 
   max_height: 15.0
   min_height: 0.5

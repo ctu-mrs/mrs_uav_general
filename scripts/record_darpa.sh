@@ -18,6 +18,18 @@ exclude=(
 '(.*)compressedDepth(.*)'
 # every theora
 '(.*)/theora(.*)'
+# ouster data
+'(.*)/os1_cloud_node/points_processed'
+'(.*)/os1_cloud_node/scan'
+# aloam
+'(.*)/aloam_registration/(.*)'
+'(.*)/aloam_odometry/(.*)cloud(.*)'
+'(.*)/aloam_mapping/(.*)cloud(.*)'
+'(.*)/aloam_mapping/aft_mapped_path'
+# mapping
+'(.*)/octomap_(.*)'
+'(.*)/free_cells_vis_array'
+'(.*)/projected_map'
 )
 
 # file's header

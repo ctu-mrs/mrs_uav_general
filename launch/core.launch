@@ -53,7 +53,8 @@
   <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') == '' and arg('RUN_TYPE') == 'simulation')" name="world_file" value="$(find mrs_general)/config/world_simulation.yaml" />
   <arg if="$(eval arg('WORLD_FILE') != '')" name="world_file" value="$(arg WORLD_FILE)" />
 
-    <!-- Nodelet Manager -->
+    <!-- NodeletManager //{ -->
+
   <include file="$(find mrs_general)/launch/nodelet_manager.launch">
 
     <arg name="standalone" value="$(arg STANDALONE)" />
@@ -62,39 +63,10 @@
 
   </include>
 
-  <!-- Odometry -->
-  <include file="$(find mrs_odometry)/launch/odometry.launch">
+  <!-- //} -->
 
-    <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
-    <arg name="PROFILER" value="$(arg PROFILER)" />
-    <arg name="PIXGARM" value="$(arg PIXGARM)" />
-    <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
+  <!-- ControlManager //{ -->
 
-    <arg name="standalone" value="$(arg STANDALONE)" />
-    <arg name="WORLD_FILE" value="$(arg world_file)" />
-    <arg name="custom_config" value="$(arg config_odometry)" />
-
-  </include>
-
-  <!-- UAV Manager -->
-  <include file="$(find mrs_uav_manager)/launch/uav_manager.launch">
-
-    <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
-    <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
-    <arg name="PROFILER" value="$(arg PROFILER)" />
-    <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
-    <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
-    <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
-    <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
-
-    <arg name="standalone" value="$(arg STANDALONE)" />
-    <arg name="WORLD_FILE" value="$(arg world_file)" />
-    <arg name="g" value="$(arg g)" />
-    <arg name="custom_config" value="$(arg config_uav_manager)" />
-
-  </include>
-
-  <!-- Control Manager -->
   <include file="$(find mrs_uav_manager)/launch/control_manager.launch">
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
@@ -131,7 +103,43 @@
 
   </include>
 
-  <!-- Gain Manager -->
+  <!-- //} -->
+
+  <!-- Odometry //{ -->
+
+  <include file="$(find mrs_odometry)/launch/odometry.launch">
+
+    <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
+    <arg name="PROFILER" value="$(arg PROFILER)" />
+    <arg name="PIXGARM" value="$(arg PIXGARM)" />
+    <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
+
+    <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="WORLD_FILE" value="$(arg world_file)" />
+    <arg name="custom_config" value="$(arg config_odometry)" />
+
+  </include>
+
+  <!-- //} -->
+
+  <!-- ConstraintManager //{ -->
+
+  <include file="$(find mrs_uav_manager)/launch/constraint_manager.launch">
+
+    <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
+    <arg name="PROFILER" value="$(arg PROFILER)" />
+    <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
+    <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
+
+    <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="custom_config" value="$(arg config_constraint_manager)" />
+
+  </include>
+
+  <!-- //} -->
+
+  <!-- GainManger //{ -->
+
   <include file="$(find mrs_uav_manager)/launch/gain_manager.launch">
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
@@ -144,17 +152,27 @@
 
   </include>
 
-  <!-- Constraint Manager -->
-  <include file="$(find mrs_uav_manager)/launch/constraint_manager.launch">
+  <!-- //} -->
+
+  <!-- UavManager //{ -->
+
+  <include file="$(find mrs_uav_manager)/launch/uav_manager.launch">
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
+    <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
+    <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
+    <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
-    <arg name="custom_config" value="$(arg config_constraint_manager)" />
+    <arg name="WORLD_FILE" value="$(arg world_file)" />
+    <arg name="g" value="$(arg g)" />
+    <arg name="custom_config" value="$(arg config_uav_manager)" />
 
   </include>
+
+  <!-- //} -->
 
 </launch>
