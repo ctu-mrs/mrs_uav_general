@@ -43,7 +43,7 @@
       <remap if="$(eval arg('challenge') == 'balloons')" from="~start_out" to="~start" />
       <remap if="$(eval arg('challenge') == 'ball')" from="~start_out" to="~start" />
       <remap if="$(eval arg('challenge') == 'fire')" from="~start_out" to="~start" />
-      <remap if="$(eval arg('challenge') == 'wall')" from="~start_out" to="~start" />
+      <remap if="$(eval arg('challenge') == 'wall')" from="~start_out" to="start_wall" />
 
     </node>
 
