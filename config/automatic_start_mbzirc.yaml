@@ -1,0 +1,6 @@
+# takeoff can be aborted by turning off the OFFBOARD mode
+safety_timeout: 5.0 # [s]
+
+main_timer_rate: 30 # [Hz]
+
+channel_number: 6
