@@ -389,7 +389,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
     case STATE_IDLE: {
 
       // turn on motors
-      if (!motors) {
+      if (armed && !motors) {
         setMotors(true);
       }
 

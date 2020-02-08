@@ -31,7 +31,7 @@
 
       <param name="CHALLENGE" value="$(arg CHALLENGE)" />
       <param name="simulation" value="$(arg simulation)" />
-      <param if="$(eval arg('RUN_TYPE') == 'simulation')" name="rc_mode" value="$(arg rc_mode)" />
+      <param name="rc_mode" value="$(arg rc_mode)" />
 
         <!-- Subscribers -->
       <remap from="~mavros_state_in" to="mavros/state" />
@@ -45,7 +45,7 @@
       <remap from="~eland_out" to="control_manager/eland" />
       <remap from="~motors_out" to="control_manager/motors" />
 
-      <remap if="$(eval arg('challenge') == 'balloons')" from="~start_out" to="~start" />
+      <remap if="$(eval arg('challenge') == 'balloons')" from="~start_out" to="balloon_circle_destroy/auto_start" />
       <remap if="$(eval arg('challenge') == 'ball')" from="~start_out" to="~start" />
       <remap if="$(eval arg('challenge') == 'fire')" from="~start_out" to="~start" />
       <remap if="$(eval arg('challenge') == 'wall')" from="~start_out" to="start_wall" />
