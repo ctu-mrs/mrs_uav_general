@@ -243,7 +243,11 @@
         <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.3 0 -0.05 0 0 0 $(arg fcu_frame) $(arg realsense_frame)" />
       </group>
 
-      <include file="$(find realsense_d435)/launch/uav_brick.launch" />
+      <include file="$(find realsense_d435)/launch/uav_brick.launch" >
+        <arg name="external_manager"   value="true" />
+        <arg name="manager"            value="$(arg UAV_NAME)_brick_nodelet_manager" />
+        <arg name="respawn"            value="true" />
+      </include>
 
     </group>
 
