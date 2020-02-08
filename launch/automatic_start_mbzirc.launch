@@ -31,7 +31,7 @@
 
       <param name="CHALLENGE" value="$(arg CHALLENGE)" />
       <param name="simulation" value="$(arg simulation)" />
-      <param if="$(eval arg('RUN_TYPE') == 'simulation')" name="rc_mode" value="$(arg rc_mode)" />
+      <param name="rc_mode" value="$(arg rc_mode)" />
 
         <!-- Subscribers -->
       <remap from="~mavros_state_in" to="mavros/state" />
