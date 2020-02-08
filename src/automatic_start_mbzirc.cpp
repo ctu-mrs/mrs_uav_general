@@ -13,6 +13,7 @@
 
 #include <mavros_msgs/State.h>
 #include <mavros_msgs/RCIn.h>
+#include <mavros_msgs/CommandBool.h>
 
 #include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
@@ -70,6 +71,7 @@ private:
 
 private:
   ros::ServiceClient service_client_motors_;
+  ros::ServiceClient service_client_arm_;
   ros::ServiceClient service_client_takeoff_;
   ros::ServiceClient service_client_land_home_;
   ros::ServiceClient service_client_land_;
@@ -125,6 +127,7 @@ private:
   bool land();
 
   bool setMotors(const bool value);
+  bool disarm();
   bool start(const int value);
   bool stop();
 
@@ -207,6 +210,7 @@ void AutomaticStartMbzirc::onInit() {
   service_client_land_      = nh_.serviceClient<std_srvs::Trigger>("land_out");
   service_client_eland_     = nh_.serviceClient<std_srvs::Trigger>("eland_out");
   service_client_motors_    = nh_.serviceClient<std_srvs::SetBool>("motors_out");
+  service_client_arm_       = nh_.serviceClient<mavros_msgs::CommandBool>("arm_out");
 
   if (_challenge_ == "balloons") {
 
@@ -397,9 +401,19 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
     case STATE_IDLE: {
 
+      double time_from_arming = (ros::Time::now() - armed_time).toSec();
+
       // turn on motors
-      if (armed && !motors) {
-        setMotors(true);
+      if (armed && !motors && time_from_arming > 2.0) {
+
+        double res = setMotors(true);
+
+        if (!res) {
+
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON, disarming");
+
+          disarm();
+        }
       }
 
       // when armed and in offboard, takeoff
@@ -762,6 +776,55 @@ bool AutomaticStartMbzirc::setMotors(const bool value) {
   } else if (!srv.response.success) {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for setting motors failed");
+  }
+
+  return false;
+}
+
+//}
+
+/* disarm() //{ */
+
+bool AutomaticStartMbzirc::disarm() {
+
+  if (!got_mavros_state_) {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: cannot not disarm, missing mavros state!");
+
+    return false;
+  }
+
+  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_mavros_state_, armed_, offboard_, armed_time_, offboard_time_);
+  auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
+
+  if (offboard) {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: cannot not disarm, not in offboard mode!");
+
+    return false;
+  }
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: disarming");
+
+  mavros_msgs::CommandBool srv;
+  srv.request.value = 0;
+
+  bool res = service_client_arm_.call(srv);
+
+  if (res) {
+
+    if (srv.response.success) {
+
+      return true;
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: disarming failed");
+    }
+
+  } else if (!srv.response.success) {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for disarming failed");
   }
 
   return false;

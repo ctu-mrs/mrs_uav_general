@@ -44,6 +44,7 @@
       <remap from="~land_out" to="uav_manager/land" />
       <remap from="~eland_out" to="control_manager/eland" />
       <remap from="~motors_out" to="control_manager/motors" />
+      <remap from="~arm_out" to="mavros/cmd/arming" />
 
       <remap if="$(eval arg('challenge') == 'balloons')" from="~start_out" to="balloon_circle_destroy/auto_start" />
       <remap if="$(eval arg('challenge') == 'ball')" from="~start_out" to="~start" />
