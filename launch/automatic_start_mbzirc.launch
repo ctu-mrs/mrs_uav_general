@@ -5,6 +5,7 @@
   <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
 
   <arg name="challenge" default="" />
+  <arg name="rc_mode" default="0" />
 
   <arg if="$(eval arg('challenge') == 'balloons')" name="CHALLENGE" value="balloons" />
   <arg if="$(eval arg('challenge') == 'ball')" name="CHALLENGE" value="ball" />
@@ -30,6 +31,7 @@
 
       <param name="CHALLENGE" value="$(arg CHALLENGE)" />
       <param name="simulation" value="$(arg simulation)" />
+      <param if="$(eval arg('RUN_TYPE') == 'simulation')" name="rc_mode" value="$(arg rc_mode)" />
 
         <!-- Subscribers -->
       <remap from="~mavros_state_in" to="mavros/state" />
@@ -38,6 +40,9 @@
 
         <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />
+      <remap from="~land_home_out" to="uav_manager/land_home" />
+      <remap from="~land_out" to="uav_manager/land" />
+      <remap from="~eland_out" to="control_manager/eland" />
       <remap from="~motors_out" to="control_manager/motors" />
 
       <remap if="$(eval arg('challenge') == 'balloons')" from="~start_out" to="~start" />

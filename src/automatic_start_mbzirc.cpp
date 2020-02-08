@@ -42,15 +42,17 @@ namespace automatic_start_mbzirc
 typedef enum
 {
 
-  IDLE_STATE,
-  TAKEOFF_STATE,
-  FINISHED_STATE
+  STATE_IDLE,
+  STATE_TAKEOFF,
+  STATE_IN_ACTION,
+  STATE_LAND,
+  STATE_FINISHED
 
 } LandingStates_t;
 
-const char* state_names[3] = {
+const char* state_names[5] = {
 
-    "IDLING", "TAKING OFF", "FINISHED"};
+    "IDLING", "TAKING OFF", "IN ACTION", "LANDING", "FINISHED"};
 
 class AutomaticStartMbzirc : public nodelet::Nodelet {
 
@@ -69,6 +71,9 @@ private:
 private:
   ros::ServiceClient service_client_motors_;
   ros::ServiceClient service_client_takeoff_;
+  ros::ServiceClient service_client_land_home_;
+  ros::ServiceClient service_client_land_;
+  ros::ServiceClient service_client_eland_;
 
   ros::ServiceClient service_client_start_;
 
@@ -108,11 +113,28 @@ private:
 
 private:
   bool takeoff();
+
+  bool landImpl();
+  bool elandImpl();
+  bool landHomeImpl();
+  bool land();
+
   bool setMotors(const bool value);
   bool start(const int value);
 
 private:
-  uint current_state = IDLE_STATE;
+  ros::Time start_time_;
+
+  double      _action_duration_;
+  bool        _handle_landing_ = false;
+  std::string _land_mode_;
+
+private:
+  int _start_n_attempts_;
+  int start_attempt_counter_ = 0;
+
+private:
+  uint current_state = STATE_IDLE;
   void changeState(LandingStates_t new_state);
 };
 
@@ -139,6 +161,22 @@ void AutomaticStartMbzirc::onInit() {
   param_loader.load_param("simulation", _simulation_);
   param_loader.load_param("CHALLENGE", _challenge_);
   param_loader.load_param("channel_number", _channel_number_);
+  param_loader.load_param("start_n_attempts", _start_n_attempts_);
+
+  param_loader.load_param("challenges/" + _challenge_ + "/land_mode", _land_mode_);
+  param_loader.load_param("challenges/" + _challenge_ + "/handle_landing", _handle_landing_);
+  param_loader.load_param("challenges/" + _challenge_ + "/action_duration", _action_duration_);
+
+  // recaltulate the acion duration to seconds
+  _action_duration_ *= 60;
+
+  // applies only in simulation
+  param_loader.load_param("rc_mode", rc_mode_);
+
+  if (!(_land_mode_ == "land_home" || _land_mode_ == "land" || _land_mode_ == "eland")) {
+
+    ROS_ERROR("[MavrosInterface]: land_mode (\"%s\") was specified wrongly, will eland by default!!!", _land_mode_.c_str());
+  }
 
   if (!param_loader.loaded_successfully()) {
     ROS_ERROR("[MavrosInterface]: Could not load all parameters!");
@@ -158,8 +196,11 @@ void AutomaticStartMbzirc::onInit() {
   // |                       service clients                      |
   // --------------------------------------------------------------
 
-  service_client_takeoff_ = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
-  service_client_motors_  = nh_.serviceClient<std_srvs::SetBool>("motors_out");
+  service_client_takeoff_   = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
+  service_client_land_home_ = nh_.serviceClient<std_srvs::Trigger>("land_home_out");
+  service_client_land_      = nh_.serviceClient<std_srvs::Trigger>("land_out");
+  service_client_eland_     = nh_.serviceClient<std_srvs::Trigger>("eland_out");
+  service_client_motors_    = nh_.serviceClient<std_srvs::SetBool>("motors_out");
 
   if (_challenge_ == "balloons") {
 
@@ -345,7 +386,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
   switch (current_state) {
 
-    case IDLE_STATE: {
+    case STATE_IDLE: {
 
       // turn on motors
       if (!motors) {
@@ -360,7 +401,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
         if ((armed_time_diff > _safety_timeout_) && (offboard_time_diff > _safety_timeout_)) {
 
-          changeState(TAKEOFF_STATE);
+          changeState(STATE_TAKEOFF);
 
         } else {
 
@@ -373,7 +414,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
       break;
     }
 
-    case TAKEOFF_STATE: {
+    case STATE_TAKEOFF: {
 
       std::scoped_lock lock(mutex_control_manager_diagnostics_);
 
@@ -382,13 +423,48 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
         ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: takeoff finished");
 
-        changeState(FINISHED_STATE);
+        changeState(STATE_IN_ACTION);
       }
 
       break;
     }
 
-    case FINISHED_STATE: {
+    case STATE_IN_ACTION: {
+
+      if (_handle_landing_) {
+
+        double in_action_time = (ros::Time::now() - start_time_).toSec();
+
+        ROS_INFO_THROTTLE(5.0, "[AutomaticStartMbzirc]: in action for %.0f second out of %.0f", in_action_time, _action_duration_);
+
+        if (in_action_time > _action_duration_) {
+
+          ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: the action duration time has passed, landing");
+
+          changeState(STATE_LAND);
+        }
+
+      } else {
+
+        changeState(STATE_FINISHED);
+      }
+
+      break;
+    }
+
+    case STATE_LAND: {
+
+      if (!armed || !offboard || !motors) {
+
+        ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: the UAV has probably landed");
+
+        changeState(STATE_FINISHED);
+      }
+
+      break;
+    }
+
+    case STATE_FINISHED: {
 
       ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: we are done here");
 
@@ -417,12 +493,12 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
 
   switch (new_state) {
 
-    case IDLE_STATE: {
+    case STATE_IDLE: {
 
       break;
     }
 
-    case TAKEOFF_STATE: {
+    case STATE_TAKEOFF: {
 
       bool res = takeoff();
 
@@ -433,13 +509,39 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
       break;
     }
 
-    case FINISHED_STATE: {
+    case STATE_IN_ACTION: {
 
       bool res = start(rc_mode);
+
+      if (++start_attempt_counter_ < _start_n_attempts_) {
+
+        ROS_WARN("[AutomaticStartMbzirc]: failed to call start, attempting again");
+
+        if (!res) {
+          return;
+        }
+      } else {
+
+        ROS_ERROR("[AutomaticStartMbzirc]: failed to call start for the %dth time, giving up", start_attempt_counter_);
+      }
+
+      start_time_ = ros::Time::now();
+
+      break;
+    }
+
+    case STATE_LAND: {
+
+      bool res = land();
 
       if (!res) {
         return;
       }
+
+      break;
+    }
+
+    case STATE_FINISHED: {
 
       break;
     }
@@ -479,6 +581,123 @@ bool AutomaticStartMbzirc::takeoff() {
   }
 
   return false;
+}
+
+//}
+
+/* landHomeImpl() //{ */
+
+bool AutomaticStartMbzirc::landHomeImpl() {
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing home");
+
+  std_srvs::Trigger srv;
+
+  bool res = service_client_land_home_.call(srv);
+
+  if (res) {
+
+    if (srv.response.success) {
+
+      return true;
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing home failed: %s", srv.response.message.c_str());
+    }
+
+  } else if (!srv.response.success) {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for landing home failed");
+  }
+
+  return false;
+}
+
+//}
+
+/* landImpl() //{ */
+
+bool AutomaticStartMbzirc::landImpl() {
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing");
+
+  std_srvs::Trigger srv;
+
+  bool res = service_client_land_.call(srv);
+
+  if (res) {
+
+    if (srv.response.success) {
+
+      return true;
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing failed: %s", srv.response.message.c_str());
+    }
+
+  } else if (!srv.response.success) {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for landing failed");
+  }
+
+  return false;
+}
+
+//}
+
+/* elandImpl() //{ */
+
+bool AutomaticStartMbzirc::elandImpl() {
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: elanding");
+
+  std_srvs::Trigger srv;
+
+  bool res = service_client_eland_.call(srv);
+
+  if (res) {
+
+    if (srv.response.success) {
+
+      return true;
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: elanding failed: %s", srv.response.message.c_str());
+    }
+
+  } else if (!srv.response.success) {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for elanding failed");
+  }
+
+  return false;
+}
+
+//}
+
+/* land() //{ */
+
+bool AutomaticStartMbzirc::land() {
+
+  bool res;
+
+  if (_land_mode_ == "land") {
+
+    res = landImpl();
+
+  } else if (_land_mode_ == "land_home") {
+
+    res = landHomeImpl();
+
+  } else {
+
+    res = elandImpl();
+  }
+
+  return res;
 }
 
 //}
