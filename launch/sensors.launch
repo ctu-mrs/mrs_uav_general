@@ -477,7 +477,7 @@
       <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
 
         <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_brick_nodelet_manager" args="manager" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@'">
-          <param name="num_worker_threads" value="5" />
+          <param name="num_worker_threads" value="20" />
         </node>
 
       </group>
