@@ -2,7 +2,7 @@
 
   <!-- args corresponding to environment variables -->
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
-  <arg name="LOGGER_DEBUG" default="$(env LOGGER_DEBUG)" />
+  <arg name="LOGGER_DEBUG" default="$(optenv LOGGER_DEBUG false)" />
 
   <!-- other args -->
   <arg name="standalone" default="false" />
