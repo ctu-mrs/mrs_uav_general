@@ -14,7 +14,7 @@
   <group ns="$(arg UAV_NAME)" if="$(eval arg('standalone') == 0)">
 
     <!-- Nodelet manager -->
-    <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_nodelet_manager" args="manager" output="screen" launch-prefix="$(arg launch_prefix)">
+    <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_nodelet_manager" args="manager" output="screen" launch-prefix="$(arg launch_prefix) nice -n -10">
       <param name="num_worker_threads" value="$(arg n_threads)" />
     </node>
 
