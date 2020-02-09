@@ -421,7 +421,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
       if (armed && offboard && motors) {
 
         // sae the current rc mode, so it can be later used for start()
-        mrs_lib::set_mutexed(mutex_start_mode_, rc_mode, rc_mode_);
+        mrs_lib::set_mutexed(mutex_start_mode_, rc_mode, start_mode_);
 
         double armed_time_diff    = (ros::Time::now() - armed_time).toSec();
         double offboard_time_diff = (ros::Time::now() - offboard_time).toSec();
