@@ -395,23 +395,24 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
   auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
   auto rc_mode                                      = mrs_lib::get_mutexed(mutex_rc_mode_, rc_mode_);
 
-  bool motors = control_manager_diagnostics.motors;
+  bool   motors           = control_manager_diagnostics.motors;
+  double time_from_arming = (ros::Time::now() - armed_time).toSec();
 
   switch (current_state) {
 
     case STATE_IDLE: {
 
-      double time_from_arming = (ros::Time::now() - armed_time).toSec();
-
-      // turn on motors
-      if (armed && !motors && time_from_arming > 2.0) {
+      if (armed && !motors) {
 
         double res = setMotors(true);
 
         if (!res) {
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON");
+        }
 
-          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON, disarming");
+        if (time_from_arming > 1.5) {
 
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON for 1.5 secs, disarming");
           disarm();
         }
       }
@@ -420,7 +421,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
       if (armed && offboard && motors) {
 
         // sae the current rc mode, so it can be later used for start()
-        mrs_lib::set_mutexed(mutex_start_mode_, rc_mode, rc_mode_);
+        mrs_lib::set_mutexed(mutex_start_mode_, rc_mode, start_mode_);
 
         double armed_time_diff    = (ros::Time::now() - armed_time).toSec();
         double offboard_time_diff = (ros::Time::now() - offboard_time).toSec();

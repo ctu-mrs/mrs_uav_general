@@ -12,12 +12,12 @@ challenges:
   balloons:
 
     handle_landing: true
-    action_duration: 3.0 # [min]
+    action_duration: 5.0 # [min]
     land_mode: "land_home" # {land_home, land, eland}
 
   ball:
 
-    handle_landing: true
+    handle_landing: false
     action_duration: 10.0 # [min]
     land_mode: "land_home" # {land_home, land, eland}
 
