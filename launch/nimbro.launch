@@ -1,5 +1,8 @@
 <launch>
 
+  <!-- set broadcast ip -->
+  <node name="set_broadcast" pkg="mrs_general" type="set_broadcast_rc_variable.sh" output='screen' />
+
   <!-- args corresponding to environment variables -->
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
   <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
@@ -19,7 +22,7 @@
   <group ns="$(arg UAV_NAME)">
 
     <!-- Service client -->
-    <node name="service_udp_client" pkg="nimbro_service_transport" type="udp_client" output="screen">
+    <node name="service_udp_client" pkg="nimbro_service_transport" type="udp_client" output="screen" launch-prefix="bash -c 'sleep 5.0; $0 $@' "> 
       <param name="destination_port" value="$(arg service_server_port)" />
       <param name="response_timeout" value="$(arg service_response_timeout)" />
       <param name="call_timeout" value="$(arg service_call_timeout)" />
@@ -35,21 +38,21 @@
     </node>
 
     <!-- Service server -->
-    <node name="service_udp_server" pkg="nimbro_service_transport" type="udp_server" output="screen">
+    <node name="service_udp_server" pkg="nimbro_service_transport" type="udp_server" output="screen" launch-prefix="bash -c 'sleep 5.0; $0 $@' ">
       <param name="port" value="$(arg service_server_port)" />
       <param name="call_timeout" value="$(arg service_call_timeout)" />
       <param name="call_repeats" value="$(arg service_call_repeats)" />
     </node>
 
     <!-- Topic receiver -->
-    <node name="topic_udp_receiver" pkg="nimbro_topic_transport" type="udp_receiver" output="screen">
+    <node name="topic_udp_receiver" pkg="nimbro_topic_transport" type="udp_receiver" output="screen" launch-prefix="bash -c 'sleep 5.0; $0 $@' ">
       <!-- The port to receive packets on -->
       <param name="port" value="$(arg topic_server_port)" />
       <param name="topic_prefix" value="$(arg UAV_NAME)" />
     </node>
 
     <!-- Topic sender -->
-    <node name="topic_udp_sender" pkg="nimbro_topic_transport" type="udp_sender" output="screen">
+    <node name="topic_udp_sender" pkg="nimbro_topic_transport" type="udp_sender" output="screen" launch-prefix="bash -c 'sleep 5.0; $0 $@' ">
 
       <!-- The destination host name or IP address -->
       <param name="destination_addr" value="$(arg broadcast_addr)" />
