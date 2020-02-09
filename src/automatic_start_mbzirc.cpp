@@ -13,6 +13,7 @@
 
 #include <mavros_msgs/State.h>
 #include <mavros_msgs/RCIn.h>
+#include <mavros_msgs/CommandBool.h>
 
 #include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
@@ -70,12 +71,14 @@ private:
 
 private:
   ros::ServiceClient service_client_motors_;
+  ros::ServiceClient service_client_arm_;
   ros::ServiceClient service_client_takeoff_;
   ros::ServiceClient service_client_land_home_;
   ros::ServiceClient service_client_land_;
   ros::ServiceClient service_client_eland_;
 
   ros::ServiceClient service_client_start_;
+  ros::ServiceClient service_client_stop_;
 
 private:
   ros::Subscriber subscriber_mavros_state_;
@@ -88,11 +91,15 @@ private:
   double     main_timer_rate_;
 
 private:
-  void       callbackRC(const mavros_msgs::RCInConstPtr& msg);
-  std::mutex mutex_rc_channels_;
-  bool       got_rc_channels_ = false;
-  int        rc_mode_         = -1;
-  int        _channel_number_;
+  void callbackRC(const mavros_msgs::RCInConstPtr& msg);
+  bool got_rc_channels_ = false;
+  int  _channel_number_;
+
+  int        rc_mode_ = -1;
+  std::mutex mutex_rc_mode_;
+
+  int        start_mode_ = -1;
+  std::mutex mutex_start_mode_;
 
 private:
   void       callbackMavrosState(const mavros_msgs::StateConstPtr& msg);
@@ -120,7 +127,9 @@ private:
   bool land();
 
   bool setMotors(const bool value);
+  bool disarm();
   bool start(const int value);
+  bool stop();
 
 private:
   ros::Time start_time_;
@@ -131,7 +140,7 @@ private:
 
 private:
   int _start_n_attempts_;
-  int start_attempt_counter_ = 0;
+  int call_attempt_counter_ = 0;
 
 private:
   uint current_state = STATE_IDLE;
@@ -161,7 +170,7 @@ void AutomaticStartMbzirc::onInit() {
   param_loader.load_param("simulation", _simulation_);
   param_loader.load_param("CHALLENGE", _challenge_);
   param_loader.load_param("channel_number", _channel_number_);
-  param_loader.load_param("start_n_attempts", _start_n_attempts_);
+  param_loader.load_param("call_n_attempts", _start_n_attempts_);
 
   param_loader.load_param("challenges/" + _challenge_ + "/land_mode", _land_mode_);
   param_loader.load_param("challenges/" + _challenge_ + "/handle_landing", _handle_landing_);
@@ -201,6 +210,7 @@ void AutomaticStartMbzirc::onInit() {
   service_client_land_      = nh_.serviceClient<std_srvs::Trigger>("land_out");
   service_client_eland_     = nh_.serviceClient<std_srvs::Trigger>("eland_out");
   service_client_motors_    = nh_.serviceClient<std_srvs::SetBool>("motors_out");
+  service_client_arm_       = nh_.serviceClient<mavros_msgs::CommandBool>("arm_out");
 
   if (_challenge_ == "balloons") {
 
@@ -222,6 +232,8 @@ void AutomaticStartMbzirc::onInit() {
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: FATAL in onInit(): the challenge name is probably wrong");
     ros::shutdown();
   }
+
+  service_client_stop_ = nh_.serviceClient<std_srvs::Trigger>("stop_out");
 
   // --------------------------------------------------------------
   // |                           timers                           |
@@ -328,7 +340,7 @@ void AutomaticStartMbzirc::callbackRC(const mavros_msgs::RCInConstPtr& msg) {
 
   ROS_INFO_ONCE("[AutomaticStartMbzirc]: getting RC channels");
 
-  std::scoped_lock lock(mutex_rc_channels_);
+  std::scoped_lock lock(mutex_rc_mode_);
 
   if (uint(_channel_number_) >= msg->channels.size()) {
 
@@ -381,20 +393,35 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
   auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_mavros_state_, armed_, offboard_, armed_time_, offboard_time_);
   auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
+  auto rc_mode                                      = mrs_lib::get_mutexed(mutex_rc_mode_, rc_mode_);
 
-  bool motors = control_manager_diagnostics.motors;
+  bool   motors           = control_manager_diagnostics.motors;
+  double time_from_arming = (ros::Time::now() - armed_time).toSec();
 
   switch (current_state) {
 
     case STATE_IDLE: {
 
-      // turn on motors
-      if (!motors) {
-        setMotors(true);
+      if (armed && !motors) {
+
+        double res = setMotors(true);
+
+        if (!res) {
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON");
+        }
+
+        if (time_from_arming > 1.5) {
+
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON for 1.5 secs, disarming");
+          disarm();
+        }
       }
 
       // when armed and in offboard, takeoff
       if (armed && offboard && motors) {
+
+        // sae the current rc mode, so it can be later used for start()
+        mrs_lib::set_mutexed(mutex_start_mode_, rc_mode, start_mode_);
 
         double armed_time_diff    = (ros::Time::now() - armed_time).toSec();
         double offboard_time_diff = (ros::Time::now() - offboard_time).toSec();
@@ -487,7 +514,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
 void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
 
-  auto rc_mode = mrs_lib::get_mutexed(mutex_rc_channels_, rc_mode_);
+  auto start_mode = mrs_lib::get_mutexed(mutex_start_mode_, start_mode_);
 
   ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: switching states %s -> %s", state_names[current_state], state_names[new_state]);
 
@@ -511,9 +538,9 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
 
     case STATE_IN_ACTION: {
 
-      bool res = start(rc_mode);
+      bool res = start(start_mode);
 
-      if (++start_attempt_counter_ < _start_n_attempts_) {
+      if (++call_attempt_counter_ < _start_n_attempts_) {
 
         ROS_WARN("[AutomaticStartMbzirc]: failed to call start, attempting again");
 
@@ -522,8 +549,10 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
         }
       } else {
 
-        ROS_ERROR("[AutomaticStartMbzirc]: failed to call start for the %dth time, giving up", start_attempt_counter_);
+        ROS_ERROR("[AutomaticStartMbzirc]: failed to call start for the %dth time, giving up", call_attempt_counter_);
       }
+
+      call_attempt_counter_ = 0;
 
       start_time_ = ros::Time::now();
 
@@ -532,10 +561,31 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
 
     case STATE_LAND: {
 
-      bool res = land();
+      {
+        bool res = stop();
 
-      if (!res) {
-        return;
+        if (++call_attempt_counter_ < _start_n_attempts_) {
+
+          ROS_WARN("[AutomaticStartMbzirc]: failed to call stop, attempting again");
+
+          if (!res) {
+            return;
+          }
+
+        } else {
+
+          ROS_ERROR("[AutomaticStartMbzirc]: failed to call stop for the %dth time, giving up", call_attempt_counter_);
+        }
+      }
+
+      call_attempt_counter_ = 0;
+
+      {
+        bool res = land();
+
+        if (!res) {
+          return;
+        }
       }
 
       break;
@@ -734,6 +784,55 @@ bool AutomaticStartMbzirc::setMotors(const bool value) {
 
 //}
 
+/* disarm() //{ */
+
+bool AutomaticStartMbzirc::disarm() {
+
+  if (!got_mavros_state_) {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: cannot not disarm, missing mavros state!");
+
+    return false;
+  }
+
+  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_mavros_state_, armed_, offboard_, armed_time_, offboard_time_);
+  auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
+
+  if (offboard) {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: cannot not disarm, not in offboard mode!");
+
+    return false;
+  }
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: disarming");
+
+  mavros_msgs::CommandBool srv;
+  srv.request.value = 0;
+
+  bool res = service_client_arm_.call(srv);
+
+  if (res) {
+
+    if (srv.response.success) {
+
+      return true;
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: disarming failed");
+    }
+
+  } else if (!srv.response.success) {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for disarming failed");
+  }
+
+  return false;
+}
+
+//}
+
 /* start() //{ */
 
 bool AutomaticStartMbzirc::start(const int value) {
@@ -835,6 +934,37 @@ bool AutomaticStartMbzirc::start(const int value) {
   } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: FATAL in start(): the challenge name is wrong");
+  }
+
+  return false;
+}
+
+//}
+
+/* stop() //{ */
+
+bool AutomaticStartMbzirc::stop() {
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: stopping action");
+
+  std_srvs::Trigger srv;
+
+  bool res = service_client_stop_.call(srv);
+
+  if (res) {
+
+    if (srv.response.success) {
+
+      return true;
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: stopping action failed failed: %s", srv.response.message.c_str());
+    }
+
+  } else if (!srv.response.success) {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for stopping action failed");
   }
 
   return false;

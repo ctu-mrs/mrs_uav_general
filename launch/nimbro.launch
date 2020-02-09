@@ -14,6 +14,7 @@
   <arg name="broadcast_addr" default="$(arg BROADCAST_IP)" />
 
   <arg name="custom_config_uav_names" default="" />
+  <arg name="custom_config" default="" />
 
   <group ns="$(arg UAV_NAME)">
 
@@ -30,6 +31,7 @@
       <rosparam if="$(eval arg('RUN_TYPE') == 'simulation')" file="$(find mrs_general)/config/uav_names_simulation.yaml" />
       <rosparam if="$(eval not arg('custom_config_uav_names') == '')" file="$(arg custom_config_uav_names)" />
       <rosparam command="load" file="$(find mrs_general)/config/communication_config.yaml" />
+      <rosparam command="load" if="$(eval arg('custom_config') != '')" file="$(arg custom_config)" />
     </node>
 
     <!-- Service server -->
