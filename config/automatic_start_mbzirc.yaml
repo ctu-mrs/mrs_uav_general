@@ -1,6 +1,34 @@
-# takeoff can be aborted by turning off the OFFBOARD mode
 safety_timeout: 5.0 # [s]
 
 main_timer_rate: 30 # [Hz]
 
 channel_number: 6
+
+# how many times it will try to call the start/stop services if it fails
+call_n_attempts: 10
+
+challenges:
+
+  balloons:
+
+    handle_landing: true
+    action_duration: 3.0 # [min]
+    land_mode: "land_home" # {land_home, land, eland}
+
+  ball:
+
+    handle_landing: true
+    action_duration: 10.0 # [min]
+    land_mode: "land_home" # {land_home, land, eland}
+
+  wall:
+
+    handle_landing: false
+    action_duration: 15.0 # [min]
+    land_mode: "eland" # {land_home, land, eland}
+
+  fire:
+
+    handle_landing: false
+    action_duration: 15.0 # [min]
+    land_mode: "eland" # {land_home, land, eland}
