@@ -31,4 +31,4 @@ echo "Setting BROADCAST_IP variable in .bashrc"
 
 source ~/.bashrc
 
-echo "BROADCAST_IP set"
+echo "BROADCAST_IP set to $var2"
