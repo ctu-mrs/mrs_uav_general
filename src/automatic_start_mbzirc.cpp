@@ -395,26 +395,26 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
   auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
   auto rc_mode                                      = mrs_lib::get_mutexed(mutex_rc_mode_, rc_mode_);
 
-  bool motors = control_manager_diagnostics.motors;
+  bool   motors           = control_manager_diagnostics.motors;
+  double time_from_arming = (ros::Time::now() - armed_time).toSec();
 
   switch (current_state) {
 
     case STATE_IDLE: {
 
-      double time_from_arming = (ros::Time::now() - armed_time).toSec();
+      if (armed && !motors) {
 
-      double res = setMotors(true);
+        double res = setMotors(true);
 
-      if (!res) {
+        if (!res) {
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON");
+        }
 
-        ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON");
-      }
+        if (time_from_arming > 1.5) {
 
-      // disarm if motors are not 
-      if (armed && !motors && time_from_arming > 2.0) {
-
-        ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON for 2 secs, disarming");
-        disarm();
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON for 1.5 secs, disarming");
+          disarm();
+        }
       }
 
       // when armed and in offboard, takeoff
