@@ -403,17 +403,18 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
       double time_from_arming = (ros::Time::now() - armed_time).toSec();
 
-      // turn on motors
+      double res = setMotors(true);
+
+      if (!res) {
+
+        ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON");
+      }
+
+      // disarm if motors are not 
       if (armed && !motors && time_from_arming > 2.0) {
 
-        double res = setMotors(true);
-
-        if (!res) {
-
-          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON, disarming");
-
-          disarm();
-        }
+        ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON for 2 secs, disarming");
+        disarm();
       }
 
       // when armed and in offboard, takeoff
