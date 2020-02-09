@@ -9,15 +9,15 @@ cd $MY_PATH
 echo "Determining broadcast IP address"
 if var1=$(ifconfig | grep -A1 wlan0:); then
 
-  var2=$(echo $var1 |sed -n -e 's/^.*broadcast //p')
+  ip=$(echo $var1 |sed -n -e 's/^.*broadcast //p')
 
-  if [ -z "$var2" ]; then
+  if [ -z "$ip" ]; then
     success=false
     echo "Could not determine the broadcast IP address"
   else
     success=true
     echo "Broadcast address:"
-    echo "$var2"
+    echo "$ip"
   fi
 
 else
@@ -27,8 +27,8 @@ fi
 
 echo "Setting BROADCAST_IP variable in .bashrc"
 
-~/git/uav_core/miscellaneous/scripts/get_set_rc_variable.sh "$HOME/.bashrc" "BROADCAST_IP" "$var2" "The broadcast IP address used for Nimbro network transport"
+~/git/uav_core/miscellaneous/scripts/get_set_rc_variable.sh "$HOME/.bashrc" "BROADCAST_IP" "$ip" "The broadcast IP address used for Nimbro network transport"
 
 source ~/.bashrc
 
-echo "BROADCAST_IP set to $var2"
+echo "BROADCAST_IP set to $ip"
