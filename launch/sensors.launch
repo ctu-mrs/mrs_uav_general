@@ -9,11 +9,11 @@
   <arg name="PIXGARM" default="$(optenv PIXGARM false)" />
   <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
 
-    <!-- other args -->
+  <!-- other args -->
   <arg name="fcu_frame" default="$(arg UAV_NAME)/fcu" />
   <arg name="fcu_frame_slashless" default="fcu_$(arg UAV_NAME)" />
 
-    <!-- Mavros -->
+  <!-- Mavros -->
   <include file="$(find mrs_general)/launch/mavros_uav.launch" />
 
     <!-- Teraranger one //{ -->
@@ -578,6 +578,15 @@
 
     <!-- Bluefox darpa //{ -->
 
+    <!-- Nodelet manager -->
+    <group if="$(eval ('bluefox_darpa_left' in arg('SENSORS').replace(',', ' ').split()) or ('bluefox_darpa_darpa' in arg('SENSORS').replace(',', ' ').split()))">
+      <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
+        <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_bluefox_nodelet_manager" args="manager" output="screen" launch-prefix="bash -c 'sleep 2; $0 $@'">
+          <param name="num_worker_threads" value="8" />
+        </node>
+      </group>
+    </group>
+
     <!-- Bluefox left //{-->
     <group if="$(eval ('bluefox_darpa_left' in arg('SENSORS').replace(',', ' ').split()))">
 
@@ -588,20 +597,8 @@
         <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_bluefox_left" args="0.170 0.184 -0.034 0.785398163 0.34906585 3.1415927 $(arg fcu_frame) $(arg camera_frame)" />
       </group>
 
-      <arg     if="$(arg STANDALONE)" name="nodelet" value="STANDALONE" />
-      <arg unless="$(arg STANDALONE)" name="nodelet" value="load" />
-      <arg     if="$(arg STANDALONE)" name="nodelet_manager" value="" />
-      <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_bluefox_left_nodelet_manager" />
-
-        <!-- Nodelet manager -->
-      <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
-
-        <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_bluefox_left_nodelet_manager" args="manager" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@'">
-          <param name="num_worker_threads" value="8" />
-        </node>
-
-      </group>
-
+      <!-- Nodelet manager -->
+      <arg name="start_delay" default="5" />
       <arg name="cam_device" default="$(env BLUEFOX_DARPA_LEFT)" />
       <arg name="cam_rate" default="20" />
       <arg name="cam_plugin" default="true" />
@@ -646,6 +643,8 @@
 
         <include file="$(find bluefox2)/launch/single_nodelet.launch" >
 
+          <arg name="node_start_delay" default="$(arg start_delay)" />
+
           <!-- Common Interface -->
           <arg name="device" value="$(arg cam_device)" />
           <arg name="rate" value="$(arg cam_rate)" />
@@ -673,7 +672,7 @@
 
             <!-- Node Settings -->
           <arg name="plugin" value="$(arg cam_plugin)" />
-          <arg name="manager" value="$(arg UAV_NAME)_bluefox_left_nodelet_manager" />
+          <arg name="manager" value="$(arg UAV_NAME)_bluefox_nodelet_manager" />
           <arg name="output" value="$(arg cam_output)" />
           <arg name="proc" value="$(arg cam_proc)" />
           <arg name="view" value="$(arg cam_view)" />
@@ -707,20 +706,7 @@
         <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_bluefox_right" args="0.180 -0.170 -0.034 -0.785398163 0.34906585 3.1415927 $(arg fcu_frame) $(arg camera_frame)" />
       </group>
 
-      <arg     if="$(arg STANDALONE)" name="nodelet" value="STANDALONE" />
-      <arg unless="$(arg STANDALONE)" name="nodelet" value="load" />
-      <arg     if="$(arg STANDALONE)" name="nodelet_manager" value="" />
-      <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_bluefox_right_nodelet_manager" />
-
-        <!-- Nodelet manager -->
-      <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
-
-        <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_bluefox_right_nodelet_manager" args="manager" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@'">
-          <param name="num_worker_threads" value="8" />
-        </node>
-
-      </group>
-
+      <arg name="start_delay" default="5" />
       <arg name="cam_device" default="$(env BLUEFOX_DARPA_RIGHT)" />
       <arg name="cam_rate" default="20" />
       <arg name="cam_plugin" default="true" />
@@ -764,6 +750,8 @@
       <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
 
         <include file="$(find bluefox2)/launch/single_nodelet.launch" >
+          
+          <arg name="node_start_delay" default="$(arg start_delay)" />
 
           <!-- Common Interface -->
           <arg name="device" value="$(arg cam_device)" />
@@ -792,7 +780,7 @@
 
             <!-- Node Settings -->
           <arg name="plugin" value="$(arg cam_plugin)" />
-          <arg name="manager" value="$(arg UAV_NAME)_bluefox_right_nodelet_manager" />
+          <arg name="manager" value="$(arg UAV_NAME)_bluefox_nodelet_manager" />
           <arg name="output" value="$(arg cam_output)" />
           <arg name="proc" value="$(arg cam_proc)" />
           <arg name="view" value="$(arg cam_view)" />
