@@ -23,6 +23,8 @@ exclude=(
 '(.*)/os1_cloud_node/points_processed'
 '(.*)/os1_cloud_node/points_over_max_range'
 '(.*)/os1_cloud_node/scan'
+'(.*)/imu_packets'
+'(.*)/lidar_packets'
 # aloam
 '(.*)/aloam_registration/(.*)'
 '(.*)/aloam_odometry/(.*)cloud(.*)'
