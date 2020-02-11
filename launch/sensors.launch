@@ -309,7 +309,7 @@
       </group>
 
       <arg name="cam_device" default="$(env BLUEFOX_OF)" />
-      <arg name="node_start_delay" default="10" />
+      <arg name="node_start_delay" default="15" />
       <arg name="cam_rate" default="100" />
       <arg name="cam_plugin" default="true" />
       <arg name="cam_output" default="screen" />
