@@ -6,7 +6,10 @@ exclude=(
 # Image detect bluefox
 '/mv(.*)/compressed(.*)'
 # Bluefox
-'(.*)bluefox/image_raw'
+'(.*)bluefox_left/image_raw'
+'(.*)bluefox_right/image_raw'
+'(.*)bluefox_left/image_raw/h264'
+'(.*)bluefox_right/image_raw/h264'
 # Realsense d435
 '(.*)/rs_d435/aligned_depth_to_color/(.*)compressed(.*)'
 '(.*)/rs_d435/aligned_depth_to_infra(.*)'
