@@ -231,7 +231,7 @@
           <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.23 0.23 -0.07 -2.56613 1.25747 -0.972314 $(arg fcu_frame) $(arg realsense_frame)" />
         </group>
 
-        <group if="$(eval arg('NATO_NAME') == 'delta')">
+        <group if="$(eval arg('NATO_NAME') == 'delta' or arg('NATO_NAME') == 'foxtrot')">
           <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.23 0.23 -0.07 -2.0375 1.37586 -0.459057 $(arg fcu_frame) $(arg realsense_frame)" />
         </group>
 
