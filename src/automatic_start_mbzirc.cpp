@@ -428,7 +428,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
         if ((armed_time_diff > _safety_timeout_) && (offboard_time_diff > _safety_timeout_)) {
 
-          if (_challenge_ == "balloons" || _challenge_ == "ball") {
+          if (_challenge_ == "balloons" || _challenge_ == "ball" || _challenge_ == "fire") {
             changeState(STATE_TAKEOFF);
           } else {
             changeState(STATE_IN_ACTION);
