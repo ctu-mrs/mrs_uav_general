@@ -1,3 +1,5 @@
+#define VERSION "0.0.3.0"
+
 /* includes //{ */
 
 #include <stdio.h>
@@ -59,6 +61,7 @@ class AutomaticStartMbzirc : public nodelet::Nodelet {
 
 public:
   virtual void onInit();
+  std::string  _version_;
 
 private:
   ros::NodeHandle nh_;
@@ -166,6 +169,14 @@ void AutomaticStartMbzirc::onInit() {
 
   mrs_lib::ParamLoader param_loader(nh_, "AutomaticStartMbzirc");
 
+  param_loader.load_param("version", _version_);
+
+  if (_version_ != VERSION) {
+
+    ROS_ERROR("[AutomaticStartMbzirc]: the version of the binary (%s) does not match the config file (%s), please build me!", VERSION, _version_.c_str());
+    ros::shutdown();
+  }
+
   param_loader.load_param("safety_timeout", _safety_timeout_);
   param_loader.load_param("main_timer_rate", main_timer_rate_);
   param_loader.load_param("simulation", _simulation_);
@@ -245,7 +256,7 @@ void AutomaticStartMbzirc::onInit() {
 
   is_initialized_ = true;
 
-  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: initialized");
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: initialized, version %s", VERSION);
 }
 
 //}
