@@ -11,24 +11,28 @@ challenges:
 
   balloons:
 
+    handle_takeoff: true
     handle_landing: true
     action_duration: 12.0 # [min]
     land_mode: "land_home" # {land_home, land, eland}
 
   ball:
 
+    handle_takeoff: true
     handle_landing: true
     action_duration: 12.0 # [min]
     land_mode: "land_home" # {land_home, land, eland}
 
   wall:
 
+    handle_takeoff: false
     handle_landing: false
     action_duration: 15.0 # [min]
     land_mode: "eland" # {land_home, land, eland}
 
   fire:
 
+    handle_takeoff: false
     handle_landing: false
     action_duration: 15.0 # [min]
     land_mode: "eland" # {land_home, land, eland}

@@ -136,6 +136,7 @@ private:
 
   double      _action_duration_;
   bool        _handle_landing_ = false;
+  bool        _handle_takeoff_ = false;
   std::string _land_mode_;
 
 private:
@@ -174,6 +175,7 @@ void AutomaticStartMbzirc::onInit() {
 
   param_loader.load_param("challenges/" + _challenge_ + "/land_mode", _land_mode_);
   param_loader.load_param("challenges/" + _challenge_ + "/handle_landing", _handle_landing_);
+  param_loader.load_param("challenges/" + _challenge_ + "/handle_takeoff", _handle_takeoff_);
   param_loader.load_param("challenges/" + _challenge_ + "/action_duration", _action_duration_);
 
   // recaltulate the acion duration to seconds
@@ -428,7 +430,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
         if ((armed_time_diff > _safety_timeout_) && (offboard_time_diff > _safety_timeout_)) {
 
-          if (_challenge_ == "balloons" || _challenge_ == "ball") {
+          if (_handle_takeoff_) {
             changeState(STATE_TAKEOFF);
           } else {
             changeState(STATE_IN_ACTION);
