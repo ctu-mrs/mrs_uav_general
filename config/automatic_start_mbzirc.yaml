@@ -1,4 +1,4 @@
-version: "0.0.3.0"
+version: "0.0.3.1"
 
 safety_timeout: 5.0 # [s]
 

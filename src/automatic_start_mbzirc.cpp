@@ -1,4 +1,4 @@
-#define VERSION "0.0.3.0"
+#define VERSION "0.0.3.1"
 
 /* includes //{ */
 
@@ -23,6 +23,8 @@
 #include <mrs_msgs/SetInt.h>
 #include <mrs_msgs/ControlManagerDiagnostics.h>
 #include <mrs_msgs/MpcTrackerDiagnostics.h>
+
+#include <sensor_msgs/CameraInfo.h>
 
 //}
 
@@ -71,6 +73,30 @@ private:
 
 private:
   double _safety_timeout_;
+
+private:
+  bool gotSensors(void);
+
+  bool            _check_bluefox_1_;
+  ros::Subscriber subscriber_bluefox_1_;
+  ros::Time       bluefox_1_last_time_;
+  std::mutex      mutex_bluefox_1_;
+  void            callbackBluefox1(const sensor_msgs::CameraInfoConstPtr& msg);
+  bool            gotBluefox1(void);
+
+  bool            _check_bluefox_2_;
+  ros::Subscriber subscriber_bluefox_2_;
+  ros::Time       bluefox_2_last_time_;
+  std::mutex      mutex_bluefox_2_;
+  void            callbackBluefox2(const sensor_msgs::CameraInfoConstPtr& msg);
+  bool            gotBluefox2(void);
+
+  bool            _check_realsense_;
+  ros::Subscriber subscriber_realsense_;
+  ros::Time       realsense_last_time_;
+  std::mutex      mutex_realsense_;
+  void            callbackRealsense(const sensor_msgs::CameraInfoConstPtr& msg);
+  bool            gotRealsense(void);
 
 private:
   ros::ServiceClient service_client_motors_;
@@ -161,6 +187,10 @@ void AutomaticStartMbzirc::onInit() {
 
   ros::Time::waitForValid();
 
+  bluefox_1_last_time_ = ros::Time(0);
+  bluefox_2_last_time_ = ros::Time(0);
+  realsense_last_time_ = ros::Time(0);
+
   armed_      = false;
   armed_time_ = ros::Time(0);
 
@@ -204,6 +234,19 @@ void AutomaticStartMbzirc::onInit() {
     ROS_ERROR("[MavrosInterface]: Could not load all parameters!");
     ros::shutdown();
   }
+
+  // --------------------------------------------------------------
+  // |                     sensors subscriber                     |
+  // --------------------------------------------------------------
+
+  param_loader.load_param("check_bluefox1", _check_bluefox_1_);
+  subscriber_bluefox_1_ = nh_.subscribe("bluefox1_in", 1, &AutomaticStartMbzirc::callbackBluefox1, this, ros::TransportHints().tcpNoDelay());
+
+  param_loader.load_param("check_bluefox2", _check_bluefox_2_);
+  subscriber_bluefox_2_ = nh_.subscribe("bluefox2_in", 1, &AutomaticStartMbzirc::callbackBluefox2, this, ros::TransportHints().tcpNoDelay());
+
+  param_loader.load_param("check_realsense", _check_realsense_);
+  subscriber_realsense_ = nh_.subscribe("realsense_in", 1, &AutomaticStartMbzirc::callbackRealsense, this, ros::TransportHints().tcpNoDelay());
 
   // --------------------------------------------------------------
   // |                         subscribers                        |
@@ -386,6 +429,57 @@ void AutomaticStartMbzirc::callbackRC(const mavros_msgs::RCInConstPtr& msg) {
 
 //}
 
+/* callbackBluefox1() //{ */
+
+void AutomaticStartMbzirc::callbackBluefox1([[maybe_unused]] const sensor_msgs::CameraInfoConstPtr& msg) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  ROS_INFO_ONCE("[AutomaticStartMbzirc]: getting bluefox 1");
+
+  std::scoped_lock lock(mutex_bluefox_1_);
+
+  bluefox_1_last_time_ = ros::Time::now();
+}
+
+//}
+
+/* callbackBluefox2() //{ */
+
+void AutomaticStartMbzirc::callbackBluefox2([[maybe_unused]] const sensor_msgs::CameraInfoConstPtr& msg) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  ROS_INFO_ONCE("[AutomaticStartMbzirc]: getting bluefox 2");
+
+  std::scoped_lock lock(mutex_bluefox_2_);
+
+  bluefox_2_last_time_ = ros::Time::now();
+}
+
+//}
+
+/* callbackRealsense() //{ */
+
+void AutomaticStartMbzirc::callbackRealsense([[maybe_unused]] const sensor_msgs::CameraInfoConstPtr& msg) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  ROS_INFO_ONCE("[AutomaticStartMbzirc]: getting realsense");
+
+  std::scoped_lock lock(mutex_realsense_);
+
+  realsense_last_time_ = ros::Time::now();
+}
+
+//}
+
 // --------------------------------------------------------------
 // |                           timers                           |
 // --------------------------------------------------------------
@@ -417,10 +511,17 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
       if (armed && !motors) {
 
-        double res = setMotors(true);
+        if (!gotSensors()) {
 
-        if (!res) {
-          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON");
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: cannot set motors ON, missing sensors!");
+
+        } else {
+
+          double res = setMotors(true);
+
+          if (!res) {
+            ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON");
+          }
         }
 
         if (time_from_arming > 1.5) {
@@ -986,6 +1087,88 @@ bool AutomaticStartMbzirc::stop() {
   }
 
   return false;
+}
+
+//}
+
+/* gotBluefox1() //{ */
+
+bool AutomaticStartMbzirc::gotBluefox1(void) {
+
+  if (!_check_bluefox_1_) {
+    return true;
+  }
+
+  if ((ros::Time::now() - bluefox_1_last_time_).toSec() < 1.0) {
+
+    return true;
+
+  } else {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: missing bluefox 1");
+    return false;
+  }
+}
+
+//}
+
+/* gotBluefox2() //{ */
+
+bool AutomaticStartMbzirc::gotBluefox2(void) {
+
+  if (!_check_bluefox_2_) {
+    return true;
+  }
+
+  if ((ros::Time::now() - bluefox_2_last_time_).toSec() < 1.0) {
+
+    return true;
+  } else {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: missing bluefox 2");
+    return false;
+  }
+}
+
+//}
+
+/* gotRealsense() //{ */
+
+bool AutomaticStartMbzirc::gotRealsense(void) {
+
+  if (!_check_realsense_) {
+    return true;
+  }
+
+  if ((ros::Time::now() - realsense_last_time_).toSec() < 1.0) {
+
+    return true;
+  } else {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: missing realsense");
+    return false;
+  }
+}
+
+//}
+
+/* gotSensors() //{ */
+
+bool AutomaticStartMbzirc::gotSensors(void) {
+
+  if (!gotBluefox1()) {
+    return false;
+  }
+
+  if (!gotBluefox2()) {
+    return false;
+  }
+
+  if (!gotRealsense()) {
+    return false;
+  }
+
+  return true;
 }
 
 //}
