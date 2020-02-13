@@ -1,3 +1,5 @@
+#define VERSION "0.0.3.0"
+
 /* includes //{ */
 
 #include <stdio.h>
@@ -59,6 +61,7 @@ class AutomaticStartMbzirc : public nodelet::Nodelet {
 
 public:
   virtual void onInit();
+  std::string  _version_;
 
 private:
   ros::NodeHandle nh_;
@@ -136,6 +139,7 @@ private:
 
   double      _action_duration_;
   bool        _handle_landing_ = false;
+  bool        _handle_takeoff_ = false;
   std::string _land_mode_;
 
 private:
@@ -165,6 +169,14 @@ void AutomaticStartMbzirc::onInit() {
 
   mrs_lib::ParamLoader param_loader(nh_, "AutomaticStartMbzirc");
 
+  param_loader.load_param("version", _version_);
+
+  if (_version_ != VERSION) {
+
+    ROS_ERROR("[AutomaticStartMbzirc]: the version of the binary (%s) does not match the config file (%s), please build me!", VERSION, _version_.c_str());
+    ros::shutdown();
+  }
+
   param_loader.load_param("safety_timeout", _safety_timeout_);
   param_loader.load_param("main_timer_rate", main_timer_rate_);
   param_loader.load_param("simulation", _simulation_);
@@ -174,6 +186,7 @@ void AutomaticStartMbzirc::onInit() {
 
   param_loader.load_param("challenges/" + _challenge_ + "/land_mode", _land_mode_);
   param_loader.load_param("challenges/" + _challenge_ + "/handle_landing", _handle_landing_);
+  param_loader.load_param("challenges/" + _challenge_ + "/handle_takeoff", _handle_takeoff_);
   param_loader.load_param("challenges/" + _challenge_ + "/action_duration", _action_duration_);
 
   // recaltulate the acion duration to seconds
@@ -243,7 +256,7 @@ void AutomaticStartMbzirc::onInit() {
 
   is_initialized_ = true;
 
-  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: initialized");
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: initialized, version %s", VERSION);
 }
 
 //}
@@ -428,7 +441,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
         if ((armed_time_diff > _safety_timeout_) && (offboard_time_diff > _safety_timeout_)) {
 
-          if (_challenge_ == "balloons" || _challenge_ == "ball") {
+          if (_handle_takeoff_) {
             changeState(STATE_TAKEOFF);
           } else {
             changeState(STATE_IN_ACTION);
