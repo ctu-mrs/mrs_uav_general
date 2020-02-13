@@ -263,7 +263,7 @@
         <include file="$(find realsense_d435)/launch/uav_ewok.launch" >
 
           <arg name="external_manager"   value="true" />
-          <arg name="manager"            value="$(arg nodelet_manager)" />
+          <arg name="manager"            value="$(arg UAV_NAME)_ewok_nodelet_manager" />
           <arg name="respawn"            value="true" />
 
         </include>
