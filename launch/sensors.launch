@@ -262,8 +262,8 @@
         <!-- <include file="$(find realsense_d435)/launch/uav_window_15fps.launch" /> -->
         <include file="$(find realsense_d435)/launch/uav_ewok.launch" >
 
-          <arg name="external_manager"   value="true" />
-          <arg name="manager"            value="$(arg nodelet_manager)" />
+          <arg name="external_manager"   value="false" />
+          <!-- <arg name="manager"            value="$(arg nodelet_manager)" /> -->
           <arg name="respawn"            value="true" />
 
         </include>
