@@ -1,8 +1,7 @@
-
 topics: # topics published out of this machine to receivers specified above
  - name: "control_manager/mpc_tracker/predicted_trajectory"
    compress: false # enable bz2 compression
-   rate: 2.0 # rate limit at 5Hz
+   rate: 2.0
  - name: "control_manager/mpc_tracker/diagnostics"
    compress: false # enable bz2 compression
    rate: 1.0
@@ -15,8 +14,8 @@ topics: # topics published out of this machine to receivers specified above
 
 services:
   - name: "/*/control_manager/mpc_tracker/fly_to_trajectory_start"
-    type: std_srvs/Trigger 
+    type: std_srvs/Trigger
   - name: "/*/control_manager/mpc_tracker/start_trajectory_following"
-    type: std_srvs/Trigger 
+    type: std_srvs/Trigger
   - name: "/*/control_manager/mpc_tracker/set_trajectory"
-    type: mrs_msgs/TrackerTrajectorySrv 
+    type: mrs_msgs/TrackerTrajectorySrv
