@@ -90,12 +90,12 @@
       <remap from="~arm_out" to="mavros/cmd/arming" />
 
       <remap if="$(eval arg('challenge') == 'balloons')" from="~start_out" to="balloon_circle_destroy/auto_start" />
-      <remap if="$(eval arg('challenge') == 'ball')" from="~start_out" to="~start" />
+      <remap if="$(eval arg('challenge') == 'ball')" from="~start_out" to="balloon_planner/start_state_machine" />
       <remap if="$(eval arg('challenge') == 'fire')" from="~start_out" to="~start" />
       <remap if="$(eval arg('challenge') == 'wall')" from="~start_out" to="start_wall" />
 
       <remap if="$(eval arg('challenge') == 'balloons')" from="~stop_out" to="balloon_circle_destroy/stop_state_machine" />
-      <remap if="$(eval arg('challenge') == 'ball')" from="~stop_out" to="~stop" />
+      <remap if="$(eval arg('challenge') == 'ball')" from="~stop_out" to="balloon_planner/stop_state_machine" />
       <remap if="$(eval arg('challenge') == 'fire')" from="~stop_out" to="~stop" />
       <remap if="$(eval arg('challenge') == 'wall')" from="~stop_out" to="~stop" />
 
