@@ -505,6 +505,10 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
   bool   motors           = control_manager_diagnostics.motors;
   double time_from_arming = (ros::Time::now() - armed_time).toSec();
 
+  if (gotSensors()) {
+    ROS_INFO_ONCE("[AutomaticStartMbzirc]: GOT ALL SENSORS, I AM HAPPY!");
+  }
+
   switch (current_state) {
 
     case STATE_IDLE: {
