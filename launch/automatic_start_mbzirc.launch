@@ -38,6 +38,12 @@
       <remap from="~rc_in" to="mavros/rc/in" />
       <remap from="~control_manager_diagnostics_in" to="control_manager/diagnostics" />
 
+        <!-- Wall subscribers -->
+      <remap from="~bluefox_brick" to="bluefox_brick/image_raw" />
+      <remap from="~bluefox_optflow" to="bluefox_optflow/image_raw" />
+      <remap if="$(eval arg('RUN_TYPE') == 'simulation')" from="~realsense" to="rs_d435/aligned_depth_to_color/image_raw" />
+      <remap if="$(eval arg('RUN_TYPE') == 'uav')" from="~realsense" to="rs_d435/depth/image_rect_raw" />
+
         <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />
       <remap from="~land_home_out" to="uav_manager/land_home" />
