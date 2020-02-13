@@ -544,16 +544,17 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
 
       bool res = start(start_mode);
 
-      if (++call_attempt_counter_ < _start_n_attempts_) {
+      if (!res) {
 
-        ROS_WARN("[AutomaticStartMbzirc]: failed to call start, attempting again");
+        if (++call_attempt_counter_ < _start_n_attempts_) {
 
-        if (!res) {
+          ROS_WARN("[AutomaticStartMbzirc]: failed to call start, attempting again");
           return;
-        }
-      } else {
 
-        ROS_ERROR("[AutomaticStartMbzirc]: failed to call start for the %dth time, giving up", call_attempt_counter_);
+        } else {
+
+          ROS_ERROR("[AutomaticStartMbzirc]: failed to call start for the %dth time, giving up", call_attempt_counter_);
+        }
       }
 
       call_attempt_counter_ = 0;
@@ -629,7 +630,7 @@ bool AutomaticStartMbzirc::takeoff() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: taking off failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for taking off failed");
   }
@@ -660,7 +661,7 @@ bool AutomaticStartMbzirc::landHomeImpl() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing home failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for landing home failed");
   }
@@ -691,7 +692,7 @@ bool AutomaticStartMbzirc::landImpl() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for landing failed");
   }
@@ -722,7 +723,7 @@ bool AutomaticStartMbzirc::elandImpl() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: elanding failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for elanding failed");
   }
@@ -778,7 +779,7 @@ bool AutomaticStartMbzirc::setMotors(const bool value) {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: setting motors failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for setting motors failed");
   }
@@ -827,7 +828,7 @@ bool AutomaticStartMbzirc::disarm() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: disarming failed");
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for disarming failed");
   }
@@ -861,7 +862,7 @@ bool AutomaticStartMbzirc::start(const int value) {
         ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
       }
 
-    } else if (!srv.response.success) {
+    } else {
 
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
     }
@@ -884,7 +885,7 @@ bool AutomaticStartMbzirc::start(const int value) {
         ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
       }
 
-    } else if (!srv.response.success) {
+    } else {
 
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
     }
@@ -907,7 +908,7 @@ bool AutomaticStartMbzirc::start(const int value) {
         ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
       }
 
-    } else if (!srv.response.success) {
+    } else {
 
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
     }
@@ -930,7 +931,7 @@ bool AutomaticStartMbzirc::start(const int value) {
         ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
       }
 
-    } else if (!srv.response.success) {
+    } else {
 
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
     }
@@ -966,7 +967,7 @@ bool AutomaticStartMbzirc::stop() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: stopping action failed failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for stopping action failed");
   }
