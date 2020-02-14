@@ -600,7 +600,7 @@
       <!-- Nodelet manager -->
       <arg name="start_delay" default="5" />
       <arg name="cam_device" default="$(env BLUEFOX_DARPA_LEFT)" />
-      <arg name="cam_rate" default="20" />
+      <arg name="cam_rate" default="5" />
       <arg name="cam_plugin" default="true" />
       <arg name="cam_output" default="screen" />
       <arg name="cam_proc" default="false" />
@@ -616,13 +616,13 @@
       <arg name="color" default="true" />
       <arg name="idpf" default="0" />
       <arg name="aec" default="true" />
-      <arg name="expose_upper_limit_us" default="20000" />
+      <arg name="expose_upper_limit_us" default="100000" />
       <arg name="des_grey_value" default="128" />
 
-      <arg name="expose_us" default="15000" />
+      <arg name="expose_us" default="70000" />
       <arg name="agc" default="true" />
-      <arg name="boost" value="false" />
-      <arg name="gain_db" default="5.0" />
+      <arg name="boost" value="true" />
+      <arg name="gain_db" default="12.0" />
       <arg name="cbm" default="0" />
       <arg name="ctm" default="1" />
       <arg name="dcfm" default="0" />
@@ -707,7 +707,7 @@
 
       <arg name="start_delay" default="5" />
       <arg name="cam_device" default="$(env BLUEFOX_DARPA_RIGHT)" />
-      <arg name="cam_rate" default="20" />
+      <arg name="cam_rate" default="5" />
       <arg name="cam_plugin" default="true" />
       <arg name="cam_output" default="screen" />
       <arg name="cam_proc" default="false" />
@@ -723,13 +723,13 @@
       <arg name="color" default="true" />
       <arg name="idpf" default="0" />
       <arg name="aec" default="true" />
-      <arg name="expose_upper_limit_us" default="20000" />
+      <arg name="expose_upper_limit_us" default="100000" />
       <arg name="des_grey_value" default="128" />
 
-      <arg name="expose_us" default="15000" />
+      <arg name="expose_us" default="70000" />
       <arg name="agc" default="true" />
-      <arg name="boost" value="false" />
-      <arg name="gain_db" default="5.0" />
+      <arg name="boost" value="true" />
+      <arg name="gain_db" default="12.0" />
       <arg name="cbm" default="0" />
       <arg name="ctm" default="1" />
       <arg name="dcfm" default="0" />
