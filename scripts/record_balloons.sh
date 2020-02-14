@@ -12,13 +12,12 @@ exclude=(
 '(.*)rs_d435(.*)/depth/(.*)'
 '(.*)rs_d435(.*)/image_rect(.*)'
 '(.*)rs_d435(.*)/infra(.*)'
+'(.*)rs_d435(.*)/color/image_raw'
 # object detect
 '(.*)object_detect(.*)debug_image'
 # every theora
 '(.*)theora(.*)'
 # every compressed
-'(.*)compressed(.*)'
-'(.*)compressedDepth(.*)'
 )
 
 # file's header

@@ -4,8 +4,8 @@
  
 use_utm_origin: true
 utm_origin_units: 1 # 0 - UTM, 1 - Latitude Longitude
-utm_origin_lat: 24.132579
-utm_origin_lon: 55.332417
+utm_origin_lat: 24.13295
+utm_origin_lon: 55.33312
 utm_origin_x: 0
 utm_origin_y: 0
 
@@ -33,19 +33,21 @@ safety_area:
     # loaded as a vector of matrices
     # x, y, radius
     enabled: false
-    data: [-5.0, -5.0, 2, # 1st point
-           -10.0, -10.0, 4] # 2nd point
+    # [x1, y1, radisu1, height1,
+    #  x2, y2, radius2, height2]
+    data: [-5.0, -5.0, 2, 2,
+           -10.0, -10.0, 4, 2]
     rows: 1 # each matrix has a single row
-    cols: [3, 3] # nums of cols of each matrix
+    cols: [4, 4] # nums of cols of each matrix
 
   # convex polygon CCW
   # race track
   safety_area: [
-    24.1326959, 55.3323907,
-    24.1325850, 55.3324238,
-    24.1326409, 55.3325683,
-    24.1327444, 55.3325021,
+    24.13295, 55.33312,
+    24.13268, 55.33246,
+    24.13287, 55.33238,
+    24.13312, 55.33302,
     ]
 
-  max_height: 8.0
-  min_height: 1.0
+  max_height: 2.0
+  min_height: 0.1

@@ -3,31 +3,20 @@
 path="/home/\$(optenv USER mrs)/bag_files/latest/"
 
 exclude=(
-# bluefox
-'/$(arg UAV_NAME)/bluefox/image_raw'
-'/$(arg UAV_NAME)/bluefox/image_raw/compressed/(.*)'
-'/$(arg UAV_NAME)/bluefox/image_raw/compressedDepth(.*)'
-'/$(arg UAV_NAME)/bluefox/image_raw/theora(.*)'
-'/$(arg UAV_NAME)/bluefox/image_raw/h264(.*)'
-# bluefox_optflow
-'/$(arg UAV_NAME)/bluefox_optflow/image_raw'
-'/$(arg UAV_NAME)/bluefox_optflow/image_raw/compressed/(.*)'
-'/$(arg UAV_NAME)/bluefox_optflow/image_raw/compressedDepth(.*)'
-'/$(arg UAV_NAME)/bluefox_optflow/image_raw/theora(.*)'
-'/$(arg UAV_NAME)/bluefox_optflow/image_raw/h264(.*)'
-# Realsense t265
-'/$(arg UAV_NAME)/rs_t265/fisheye(.*)'
-# Realsesne d435
-'(.*)rs_d435(.*)depth_to_infra(.*)'
-'(.*)rs_d435(.*)depth_to_color/image_raw'
-'(.*)rs_d435(.*)depth_to_color(.*)compressed'
-'(.*)rs_d435(.*)depth_to_color(.*)compressed/(.*)'
-'(.*)rs_d435(.*)color/image_raw'
-'(.*)rs_d435(.*)/depth/(.*)'
-'(.*)rs_d435(.*)/infra(.*)'
-'(.*)rs_d435(.*)/color/image_rect_color'
+
+# IN GENERAL, DON'T RECORD CAMERAS
+# if you want to record cameras, create a copy of this script
+# and place it at you tmux session.
+
+# Every compressed
+'(.*)compressed(.*)'
+# Every image raw
+'(.*)image_raw(.*)'
 # Every theora message
 '(.*)theora(.*)'
+# Every h264 message
+'(.*)h264(.*)'
+
 )
 
 # file's header

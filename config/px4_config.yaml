@@ -138,11 +138,14 @@ mission:
 distance_sensor:
   garmin:
     id: 0
-    frame_id: "garmin"
+
+    # the frame name is now specified in the launch file
+    # frame_id: "garmin"
+
     orientation: PITCH_270
     field_of_view: 0.0  # XXX TODO
     send_tf: false
-    sensor_position: {x:  0.0, y:  0.0, z:  -0.1}
+    sensor_position: {x:  0.0, y:  0.0, z: -0.1}
 
 # image_pub
 image:

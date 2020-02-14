@@ -6,7 +6,10 @@ exclude=(
 # Image detect bluefox
 '/mv(.*)/compressed(.*)'
 # Bluefox
-'(.*)bluefox/image_raw'
+'(.*)bluefox_left/image_raw'
+'(.*)bluefox_right/image_raw'
+'(.*)bluefox_left/image_raw/h264'
+'(.*)bluefox_right/image_raw/h264'
 # Realsense d435
 '(.*)/rs_d435/aligned_depth_to_color/(.*)compressed(.*)'
 '(.*)/rs_d435/aligned_depth_to_infra(.*)'
@@ -18,6 +21,25 @@ exclude=(
 '(.*)compressedDepth(.*)'
 # every theora
 '(.*)/theora(.*)'
+# ouster data
+'(.*)/os1_cloud_node/points'
+'(.*)/os1_cloud_node/points_processed'
+'(.*)/os1_cloud_node/points_over_max_range'
+'(.*)/os1_cloud_node/scan'
+'(.*)/imu_packets'
+'(.*)/lidar_packets'
+# aloam
+'(.*)/aloam_registration/(.*)'
+'(.*)/aloam_odometry/(.*)cloud(.*)'
+'(.*)/aloam_mapping/(.*)cloud(.*)'
+'(.*)/aloam_mapping/aft_mapped_path'
+# mapping
+'(.*)/octomap_(.*)'
+'(.*)/occupied_cells_vis_array'
+'(.*)/free_cells_vis_array'
+'(.*)/projected_map'
+# general visualization
+'(.*)/disturbances_markers'
 )
 
 # file's header
