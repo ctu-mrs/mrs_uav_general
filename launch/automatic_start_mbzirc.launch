@@ -50,23 +50,23 @@
       <remap if="$(eval arg('challenge') == 'wall' and arg('RUN_TYPE') == 'uav')" from="~realsense_in" to="rs_d435/depth/camera_info" />
 
         <!-- Ball subscribers -->
-      <param if="$(eval arg('challenge') == 'ball')" name="check_bluefox1" type="bool" value="true" />
+      <param if="$(eval arg('challenge') == 'ball')" name="check_bluefox1" type="bool" value="false" />
       <remap if="$(eval arg('challenge') == 'ball')" from="~bluefox1_in" to="bluefox3_front/camera_info" />
 
       <param if="$(eval arg('challenge') == 'ball')" name="check_bluefox2" type="bool" value="false" />
       <remap if="$(eval arg('challenge') == 'ball')" from="~bluefox2_in" to="~bluefox2_in" />
 
-      <param if="$(eval arg('challenge') == 'ball')" name="check_realsense" type="bool" value="true" />
+      <param if="$(eval arg('challenge') == 'ball')" name="check_realsense" type="bool" value="false" />
       <remap if="$(eval arg('challenge') == 'ball')" from="~realsense" to="rs_d435/color/camera_info" />
 
         <!-- Balloons subscribers -->
-      <param if="$(eval arg('challenge') == 'balloons')" name="check_bluefox1" type="bool" value="true" />
+      <param if="$(eval arg('challenge') == 'balloons')" name="check_bluefox1" type="bool" value="false" />
       <remap if="$(eval arg('challenge') == 'balloons')" from="~bluefox1_in" to="bluefox_sky/camera_info" />
 
       <param if="$(eval arg('challenge') == 'balloons')" name="check_bluefox2" type="bool" value="false" />
       <remap if="$(eval arg('challenge') == 'balloons')" from="~bluefox2_in" to="~bluefox2_in" />
 
-      <param if="$(eval arg('challenge') == 'balloons')" name="check_realsense" type="bool" value="true" />
+      <param if="$(eval arg('challenge') == 'balloons')" name="check_realsense" type="bool" value="false" />
       <remap if="$(eval arg('challenge') == 'balloons' and arg('RUN_TYPE') == 'simulation')" from="~realsense_in" to="rs_d435/aligned_depth_to_color/camera_info" />
       <remap if="$(eval arg('challenge') == 'balloons' and arg('RUN_TYPE') == 'uav')" from="~realsense_in" to="rs_d435/depth/camera_info" />
 
