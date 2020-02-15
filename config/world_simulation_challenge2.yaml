@@ -32,10 +32,10 @@ safety_area:
   point_obstacles:
     # loaded as a vector of matrices
     # x, y, radius
-    enabled: true
+    enabled: false
     data: [-5.0, -5.0, 5, 2.5] # 1st point
     rows: 1 # each matrix has a single row
-    cols: [3] # nums of cols of each matrix
+    cols: [4] # nums of cols of each matrix
 
   # convex polygon CCW
   # race track
