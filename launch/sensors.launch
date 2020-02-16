@@ -225,12 +225,12 @@
       </group>
 
       <group if="$(eval arg('UAV_TYPE') == 't650')">
-
+ <!--
         <group if="$(eval arg('NATO_NAME') == 'echo')">
           <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.23 0.23 -0.07 -2.56613 1.25747 -0.972314 $(arg fcu_frame) $(arg realsense_frame)" />
         </group>
-
-        <group if="$(eval arg('NATO_NAME') == 'delta' or arg('NATO_NAME') == 'foxtrot')">
+ -->
+        <group if="$(eval arg('NATO_NAME') == 'delta' or arg('NATO_NAME') == 'foxtrot' or arg('NATO_NAME') == 'lima' or arg('NATO_NAME') == 'echo')">
           <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.23 0.23 -0.07 -2.0375 1.37586 -0.459057 $(arg fcu_frame) $(arg realsense_frame)" />
         </group>
 
@@ -476,7 +476,7 @@
           <!-- TF -->
 
         <arg name="brick_cam_yaw" default="3.14159265359" />
-        <group if="$(eval arg('NATO_NAME') == 'echo' or arg('NATO_NAME') == 'delta' or arg('NATO_NAME') == 'foxtrot')">
+        <group if="$(eval arg('NATO_NAME') == 'echo' or arg('NATO_NAME') == 'delta' or arg('NATO_NAME') == 'foxtrot' or arg('NATO_NAME') == 'lima')">
           <node pkg="tf2_ros" type="static_transform_publisher" name="brick_cam_tf" args="0 -0.19 -0.06 $(arg brick_cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
         </group>
 
