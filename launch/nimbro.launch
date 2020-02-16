@@ -61,6 +61,7 @@
 
         <!-- Load a config YAML file -->
       <rosparam command="load" file="$(find mrs_general)/config/communication_config.yaml" />
+      <rosparam command="load" if="$(eval arg('custom_config') != '')" file="$(arg custom_config)" />
     </node>
   </group>
 
