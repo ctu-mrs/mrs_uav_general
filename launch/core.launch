@@ -15,6 +15,16 @@
   <arg name="WORLD_FILE" default="$(optenv WORLD_FILE)" />
   <arg name="WORLD_NAME" default="$(optenv WORLD_NAME)" />
 
+    <!-- currently, ROS_IP has to be set to 127.0.0.1 otherwise ROS dies when -->
+    <!-- the drone disconnects from wifi -->
+  <!-- <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="ROS_IP" default="$(optenv ROS_IP none)" /> -->
+  <!-- <arg if="$(eval arg('RUN_TYPE') == 'uav' and arg('ROS_IP') != '127.0.0.1')" name="SET_YOUR_ROS_IP_TO_127.0.0.1" default="$(env MISSING_ROS_IP)" /> -->
+
+    <!-- currently, ROS_MASTER_URI has to be set to http://localhost:11311 otherwise ROS dies when -->
+    <!-- the drone disconnects from wifi -->
+  <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="ROS_MASTER_URI" default="$(optenv ROS_MASTER_URI none)" />
+  <arg if="$(eval arg('RUN_TYPE') == 'uav' and arg('ROS_MASTER_URI') != 'http://localhost:11311')" name="SET_YOUR_ROS_MASTER_URI_TO_LOCALHOST" default="$(env MISSING_ROS_MASTER_URI)" />
+
     <!-- custom configs args -->
   <arg name="config_constraint_manager" default="" />
   <arg name="config_gain_manager" default="" />

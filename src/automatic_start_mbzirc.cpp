@@ -1,3 +1,5 @@
+#define VERSION "0.0.3.1"
+
 /* includes //{ */
 
 #include <stdio.h>
@@ -21,6 +23,8 @@
 #include <mrs_msgs/SetInt.h>
 #include <mrs_msgs/ControlManagerDiagnostics.h>
 #include <mrs_msgs/MpcTrackerDiagnostics.h>
+
+#include <sensor_msgs/CameraInfo.h>
 
 //}
 
@@ -59,6 +63,7 @@ class AutomaticStartMbzirc : public nodelet::Nodelet {
 
 public:
   virtual void onInit();
+  std::string  _version_;
 
 private:
   ros::NodeHandle nh_;
@@ -68,6 +73,30 @@ private:
 
 private:
   double _safety_timeout_;
+
+private:
+  bool gotSensors(void);
+
+  bool            _check_bluefox_1_;
+  ros::Subscriber subscriber_bluefox_1_;
+  ros::Time       bluefox_1_last_time_;
+  std::mutex      mutex_bluefox_1_;
+  void            callbackBluefox1(const sensor_msgs::CameraInfoConstPtr& msg);
+  bool            gotBluefox1(void);
+
+  bool            _check_bluefox_2_;
+  ros::Subscriber subscriber_bluefox_2_;
+  ros::Time       bluefox_2_last_time_;
+  std::mutex      mutex_bluefox_2_;
+  void            callbackBluefox2(const sensor_msgs::CameraInfoConstPtr& msg);
+  bool            gotBluefox2(void);
+
+  bool            _check_realsense_;
+  ros::Subscriber subscriber_realsense_;
+  ros::Time       realsense_last_time_;
+  std::mutex      mutex_realsense_;
+  void            callbackRealsense(const sensor_msgs::CameraInfoConstPtr& msg);
+  bool            gotRealsense(void);
 
 private:
   ros::ServiceClient service_client_motors_;
@@ -136,6 +165,7 @@ private:
 
   double      _action_duration_;
   bool        _handle_landing_ = false;
+  bool        _handle_takeoff_ = false;
   std::string _land_mode_;
 
 private:
@@ -157,6 +187,10 @@ void AutomaticStartMbzirc::onInit() {
 
   ros::Time::waitForValid();
 
+  bluefox_1_last_time_ = ros::Time(0);
+  bluefox_2_last_time_ = ros::Time(0);
+  realsense_last_time_ = ros::Time(0);
+
   armed_      = false;
   armed_time_ = ros::Time(0);
 
@@ -164,6 +198,14 @@ void AutomaticStartMbzirc::onInit() {
   offboard_time_ = ros::Time(0);
 
   mrs_lib::ParamLoader param_loader(nh_, "AutomaticStartMbzirc");
+
+  param_loader.load_param("version", _version_);
+
+  if (_version_ != VERSION) {
+
+    ROS_ERROR("[AutomaticStartMbzirc]: the version of the binary (%s) does not match the config file (%s), please build me!", VERSION, _version_.c_str());
+    ros::shutdown();
+  }
 
   param_loader.load_param("safety_timeout", _safety_timeout_);
   param_loader.load_param("main_timer_rate", main_timer_rate_);
@@ -174,6 +216,7 @@ void AutomaticStartMbzirc::onInit() {
 
   param_loader.load_param("challenges/" + _challenge_ + "/land_mode", _land_mode_);
   param_loader.load_param("challenges/" + _challenge_ + "/handle_landing", _handle_landing_);
+  param_loader.load_param("challenges/" + _challenge_ + "/handle_takeoff", _handle_takeoff_);
   param_loader.load_param("challenges/" + _challenge_ + "/action_duration", _action_duration_);
 
   // recaltulate the acion duration to seconds
@@ -191,6 +234,19 @@ void AutomaticStartMbzirc::onInit() {
     ROS_ERROR("[MavrosInterface]: Could not load all parameters!");
     ros::shutdown();
   }
+
+  // --------------------------------------------------------------
+  // |                     sensors subscriber                     |
+  // --------------------------------------------------------------
+
+  param_loader.load_param("check_bluefox1", _check_bluefox_1_);
+  subscriber_bluefox_1_ = nh_.subscribe("bluefox1_in", 1, &AutomaticStartMbzirc::callbackBluefox1, this, ros::TransportHints().tcpNoDelay());
+
+  param_loader.load_param("check_bluefox2", _check_bluefox_2_);
+  subscriber_bluefox_2_ = nh_.subscribe("bluefox2_in", 1, &AutomaticStartMbzirc::callbackBluefox2, this, ros::TransportHints().tcpNoDelay());
+
+  param_loader.load_param("check_realsense", _check_realsense_);
+  subscriber_realsense_ = nh_.subscribe("realsense_in", 1, &AutomaticStartMbzirc::callbackRealsense, this, ros::TransportHints().tcpNoDelay());
 
   // --------------------------------------------------------------
   // |                         subscribers                        |
@@ -243,7 +299,7 @@ void AutomaticStartMbzirc::onInit() {
 
   is_initialized_ = true;
 
-  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: initialized");
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: initialized, version %s", VERSION);
 }
 
 //}
@@ -373,6 +429,57 @@ void AutomaticStartMbzirc::callbackRC(const mavros_msgs::RCInConstPtr& msg) {
 
 //}
 
+/* callbackBluefox1() //{ */
+
+void AutomaticStartMbzirc::callbackBluefox1([[maybe_unused]] const sensor_msgs::CameraInfoConstPtr& msg) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  ROS_INFO_ONCE("[AutomaticStartMbzirc]: getting bluefox 1");
+
+  std::scoped_lock lock(mutex_bluefox_1_);
+
+  bluefox_1_last_time_ = ros::Time::now();
+}
+
+//}
+
+/* callbackBluefox2() //{ */
+
+void AutomaticStartMbzirc::callbackBluefox2([[maybe_unused]] const sensor_msgs::CameraInfoConstPtr& msg) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  ROS_INFO_ONCE("[AutomaticStartMbzirc]: getting bluefox 2");
+
+  std::scoped_lock lock(mutex_bluefox_2_);
+
+  bluefox_2_last_time_ = ros::Time::now();
+}
+
+//}
+
+/* callbackRealsense() //{ */
+
+void AutomaticStartMbzirc::callbackRealsense([[maybe_unused]] const sensor_msgs::CameraInfoConstPtr& msg) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  ROS_INFO_ONCE("[AutomaticStartMbzirc]: getting realsense");
+
+  std::scoped_lock lock(mutex_realsense_);
+
+  realsense_last_time_ = ros::Time::now();
+}
+
+//}
+
 // --------------------------------------------------------------
 // |                           timers                           |
 // --------------------------------------------------------------
@@ -398,16 +505,27 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
   bool   motors           = control_manager_diagnostics.motors;
   double time_from_arming = (ros::Time::now() - armed_time).toSec();
 
+  if (gotSensors()) {
+    ROS_INFO_ONCE("[AutomaticStartMbzirc]: GOT ALL SENSORS, I AM HAPPY!");
+  }
+
   switch (current_state) {
 
     case STATE_IDLE: {
 
       if (armed && !motors) {
 
-        double res = setMotors(true);
+        if (!gotSensors()) {
 
-        if (!res) {
-          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON");
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: cannot set motors ON, missing sensors!");
+
+        } else {
+
+          double res = setMotors(true);
+
+          if (!res) {
+            ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: could not set motors ON");
+          }
         }
 
         if (time_from_arming > 1.5) {
@@ -428,7 +546,7 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
         if ((armed_time_diff > _safety_timeout_) && (offboard_time_diff > _safety_timeout_)) {
 
-          if (_challenge_ == "balloons" || _challenge_ == "ball") {
+          if (_handle_takeoff_) {
             changeState(STATE_TAKEOFF);
           } else {
             changeState(STATE_IN_ACTION);
@@ -544,16 +662,17 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
 
       bool res = start(start_mode);
 
-      if (++call_attempt_counter_ < _start_n_attempts_) {
+      if (!res) {
 
-        ROS_WARN("[AutomaticStartMbzirc]: failed to call start, attempting again");
+        if (++call_attempt_counter_ < _start_n_attempts_) {
 
-        if (!res) {
+          ROS_WARN("[AutomaticStartMbzirc]: failed to call start, attempting again");
           return;
-        }
-      } else {
 
-        ROS_ERROR("[AutomaticStartMbzirc]: failed to call start for the %dth time, giving up", call_attempt_counter_);
+        } else {
+
+          ROS_ERROR("[AutomaticStartMbzirc]: failed to call start for the %dth time, giving up", call_attempt_counter_);
+        }
       }
 
       call_attempt_counter_ = 0;
@@ -629,7 +748,7 @@ bool AutomaticStartMbzirc::takeoff() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: taking off failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for taking off failed");
   }
@@ -660,7 +779,7 @@ bool AutomaticStartMbzirc::landHomeImpl() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing home failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for landing home failed");
   }
@@ -691,7 +810,7 @@ bool AutomaticStartMbzirc::landImpl() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for landing failed");
   }
@@ -722,7 +841,7 @@ bool AutomaticStartMbzirc::elandImpl() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: elanding failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for elanding failed");
   }
@@ -778,7 +897,7 @@ bool AutomaticStartMbzirc::setMotors(const bool value) {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: setting motors failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for setting motors failed");
   }
@@ -827,7 +946,7 @@ bool AutomaticStartMbzirc::disarm() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: disarming failed");
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for disarming failed");
   }
@@ -861,7 +980,7 @@ bool AutomaticStartMbzirc::start(const int value) {
         ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
       }
 
-    } else if (!srv.response.success) {
+    } else {
 
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
     }
@@ -884,7 +1003,7 @@ bool AutomaticStartMbzirc::start(const int value) {
         ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
       }
 
-    } else if (!srv.response.success) {
+    } else {
 
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
     }
@@ -907,7 +1026,7 @@ bool AutomaticStartMbzirc::start(const int value) {
         ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
       }
 
-    } else if (!srv.response.success) {
+    } else {
 
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
     }
@@ -930,7 +1049,7 @@ bool AutomaticStartMbzirc::start(const int value) {
         ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
       }
 
-    } else if (!srv.response.success) {
+    } else {
 
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
     }
@@ -966,12 +1085,94 @@ bool AutomaticStartMbzirc::stop() {
       ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: stopping action failed failed: %s", srv.response.message.c_str());
     }
 
-  } else if (!srv.response.success) {
+  } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for stopping action failed");
   }
 
   return false;
+}
+
+//}
+
+/* gotBluefox1() //{ */
+
+bool AutomaticStartMbzirc::gotBluefox1(void) {
+
+  if (!_check_bluefox_1_) {
+    return true;
+  }
+
+  if ((ros::Time::now() - bluefox_1_last_time_).toSec() < 1.0) {
+
+    return true;
+
+  } else {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: missing bluefox 1");
+    return false;
+  }
+}
+
+//}
+
+/* gotBluefox2() //{ */
+
+bool AutomaticStartMbzirc::gotBluefox2(void) {
+
+  if (!_check_bluefox_2_) {
+    return true;
+  }
+
+  if ((ros::Time::now() - bluefox_2_last_time_).toSec() < 1.0) {
+
+    return true;
+  } else {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: missing bluefox 2");
+    return false;
+  }
+}
+
+//}
+
+/* gotRealsense() //{ */
+
+bool AutomaticStartMbzirc::gotRealsense(void) {
+
+  if (!_check_realsense_) {
+    return true;
+  }
+
+  if ((ros::Time::now() - realsense_last_time_).toSec() < 1.0) {
+
+    return true;
+  } else {
+
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStartMbzirc]: missing realsense");
+    return false;
+  }
+}
+
+//}
+
+/* gotSensors() //{ */
+
+bool AutomaticStartMbzirc::gotSensors(void) {
+
+  if (!gotBluefox1()) {
+    return false;
+  }
+
+  if (!gotBluefox2()) {
+    return false;
+  }
+
+  if (!gotRealsense()) {
+    return false;
+  }
+
+  return true;
 }
 
 //}

@@ -64,6 +64,5 @@ else
   echo "BROADCAST_IP set to $ip"
 fi
 
-
 # source ~/.bashrc
 
