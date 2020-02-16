@@ -27,7 +27,7 @@ fi
 
 echo "Setting BROADCAST_IP variable in .bashrc"
 
-~/git/uav_core/miscellaneous/scripts/get_set_rc_variable.sh "$HOME/.bashrc" "BROADCAST_IP" "$ip" "The broadcast IP address used for Nimbro network transport"
+~/git/uav_core/miscellaneous/scripts/get_set_rc_variable.sh "$HOME/.bashrc" "BROADCAST_IP" "${ip}" "The broadcast IP address used for Nimbro network transport"
 
 source ~/.bashrc
 
