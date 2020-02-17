@@ -303,6 +303,10 @@
               <arg name="cam_yaw" default="3.141592653" />
               <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_optflow" args="-0.04 -0.18 -0.06 $(arg cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
             </group>
+            <group if="$(eval arg('NATO_NAME') == 'echo')">
+              <arg name="cam_yaw" default="3.141592653" />
+              <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_optflow" args="-0.04 -0.18 -0.06 $(arg cam_yaw) 0.00000000000 -3.14159265359 $(arg fcu_frame) $(arg camera_frame)" />
+            </group>
 
           </group>
 
