@@ -2,8 +2,8 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.4 (2020-02-18)
+------------------
 * added bluefox net, removed bluefo sky
 * renaming thermal cameras for india
 * update sensots launch file for echo
