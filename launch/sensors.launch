@@ -843,32 +843,32 @@
 
         <!--//}-->
 
-        <!-- Bluefox sky //{ -->
+        <!-- Bluefox net //{ -->
 
-        <group if="$(eval ('bluefox_sky' in arg('SENSORS').replace(',', ' ').split()))">
+        <group if="$(eval ('bluefox_net' in arg('SENSORS').replace(',', ' ').split()))">
 
-          <arg name="camera_frame" default="sky_cam_$(arg UAV_NAME)" />
+          <arg name="camera_frame" default="net_cam_$(arg UAV_NAME)" />
 
             <!-- TF -->
 
-          <arg name="sky_cam_yaw" default="0" />
-          <node pkg="tf2_ros" type="static_transform_publisher" name="brick_cam_tf" args="0.0 0.05 0.10 $(arg sky_cam_yaw) 0 0 $(arg fcu_frame) $(arg camera_frame)" />
+          <arg name="net_cam_yaw" default="0" />
+          <node pkg="tf2_ros" type="static_transform_publisher" name="net_cam_tf" args="0.13 0.0 -0.2 0 1.57 0 $(arg fcu_frame) $(arg camera_frame)" />
 
           <arg     if="$(arg STANDALONE)" name="nodelet" value="STANDALONE" />
           <arg unless="$(arg STANDALONE)" name="nodelet" value="load" />
           <arg     if="$(arg STANDALONE)" name="nodelet_manager" value="" />
-          <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_sky_nodelet_manager" />
+          <arg unless="$(arg STANDALONE)" name="nodelet_manager" value="$(arg UAV_NAME)_net_nodelet_manager" />
 
             <!-- Nodelet manager -->
           <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0)">
 
-            <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_sky_nodelet_manager" args="manager" output="screen">
+            <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_net_nodelet_manager" args="manager" output="screen">
               <param name="num_worker_threads" value="20" />
             </node>
 
           </group>
 
-          <arg name="cam_device" default="$(env BLUEFOX_SKY)" />
+          <arg name="cam_device" default="$(env BLUEFOX_NET)" />
           <arg name="cam_rate" default="30" />
           <arg name="cam_plugin" default="true" />
           <arg name="cam_output" default="screen" />
@@ -878,7 +878,7 @@
           <arg name="node_start_delay" default="5" />
 
           <arg name="serial" default="$(arg cam_device)" />
-          <arg name="camera_name" default="bluefox_sky" />
+          <arg name="camera_name" default="bluefox_net" />
           <arg name="camera" default="$(arg camera_name)" />
           <arg name="frame_id" default="$(arg camera_frame)" />
           <arg name="calib_url" default="file://$(find mrs_general)/config/camera_calibrations/mv_$(arg cam_device).yaml" />
@@ -941,7 +941,7 @@
 
                 <!-- Node Settings -->
               <arg name="plugin" value="$(arg cam_plugin)" />
-              <arg name="manager" value="$(arg UAV_NAME)_sky_nodelet_manager" />
+              <arg name="manager" value="$(arg UAV_NAME)_net_nodelet_manager" />
               <arg name="output" value="$(arg cam_output)" />
               <arg name="proc" value="$(arg cam_proc)" />
               <arg name="view" value="$(arg cam_view)" />
