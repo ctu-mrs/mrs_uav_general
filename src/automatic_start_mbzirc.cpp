@@ -23,6 +23,12 @@
 #include <mrs_msgs/SetInt.h>
 #include <mrs_msgs/ControlManagerDiagnostics.h>
 #include <mrs_msgs/MpcTrackerDiagnostics.h>
+#include <mrs_msgs/ReferenceStampedSrv.h>
+
+#include <tf/transform_datatypes.h>
+#include <tf_conversions/tf_eigen.h>
+
+#include <geometry_msgs/PoseStamped.h>
 
 #include <sensor_msgs/CameraInfo.h>
 
@@ -103,6 +109,7 @@ private:
   ros::ServiceClient service_client_arm_;
   ros::ServiceClient service_client_takeoff_;
   ros::ServiceClient service_client_land_home_;
+  ros::ServiceClient service_client_land_there_;
   ros::ServiceClient service_client_land_;
   ros::ServiceClient service_client_eland_;
 
@@ -113,6 +120,13 @@ private:
   ros::Subscriber subscriber_mavros_state_;
   ros::Subscriber subscriber_rc_;
   ros::Subscriber subscriber_control_manager_diagnostics_;
+  ros::Subscriber subscriber_dropoff_pose_;
+
+private:
+  void                       callbackDropoffPose(const geometry_msgs::PoseStampedConstPtr& msg);
+  geometry_msgs::PoseStamped dropoff_pose_;
+  std::mutex                 mutex_dropoff_pose_;
+  bool                       got_dropoff_pose_ = false;
 
 private:
   ros::Timer main_timer_;
@@ -153,6 +167,7 @@ private:
   bool landImpl();
   bool elandImpl();
   bool landHomeImpl();
+  bool landThereImpl();
   bool land();
 
   bool setMotors(const bool value);
@@ -225,7 +240,7 @@ void AutomaticStartMbzirc::onInit() {
   // applies only in simulation
   param_loader.load_param("rc_mode", rc_mode_);
 
-  if (!(_land_mode_ == "land_home" || _land_mode_ == "land" || _land_mode_ == "eland")) {
+  if (!(_land_mode_ == "land_home" || _land_mode_ == "land" || _land_mode_ == "eland" || _land_mode_ == "land_there")) {
 
     ROS_ERROR("[MavrosInterface]: land_mode (\"%s\") was specified wrongly, will eland by default!!!", _land_mode_.c_str());
   }
@@ -255,18 +270,20 @@ void AutomaticStartMbzirc::onInit() {
   subscriber_mavros_state_ = nh_.subscribe("mavros_state_in", 1, &AutomaticStartMbzirc::callbackMavrosState, this, ros::TransportHints().tcpNoDelay());
   subscriber_control_manager_diagnostics_ =
       nh_.subscribe("control_manager_diagnostics_in", 1, &AutomaticStartMbzirc::callbackControlManagerDiagnostics, this, ros::TransportHints().tcpNoDelay());
-  subscriber_rc_ = nh_.subscribe("rc_in", 1, &AutomaticStartMbzirc::callbackRC, this, ros::TransportHints().tcpNoDelay());
+  subscriber_rc_           = nh_.subscribe("rc_in", 1, &AutomaticStartMbzirc::callbackRC, this, ros::TransportHints().tcpNoDelay());
+  subscriber_dropoff_pose_ = nh_.subscribe("dropoff_pose_in", 1, &AutomaticStartMbzirc::callbackDropoffPose, this, ros::TransportHints().tcpNoDelay());
 
   // --------------------------------------------------------------
   // |                       service clients                      |
   // --------------------------------------------------------------
 
-  service_client_takeoff_   = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
-  service_client_land_home_ = nh_.serviceClient<std_srvs::Trigger>("land_home_out");
-  service_client_land_      = nh_.serviceClient<std_srvs::Trigger>("land_out");
-  service_client_eland_     = nh_.serviceClient<std_srvs::Trigger>("eland_out");
-  service_client_motors_    = nh_.serviceClient<std_srvs::SetBool>("motors_out");
-  service_client_arm_       = nh_.serviceClient<mavros_msgs::CommandBool>("arm_out");
+  service_client_takeoff_    = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
+  service_client_land_home_  = nh_.serviceClient<std_srvs::Trigger>("land_home_out");
+  service_client_land_there_ = nh_.serviceClient<mrs_msgs::ReferenceStampedSrv>("land_there_out");
+  service_client_land_       = nh_.serviceClient<std_srvs::Trigger>("land_out");
+  service_client_eland_      = nh_.serviceClient<std_srvs::Trigger>("eland_out");
+  service_client_motors_     = nh_.serviceClient<std_srvs::SetBool>("motors_out");
+  service_client_arm_        = nh_.serviceClient<mavros_msgs::CommandBool>("arm_out");
 
   if (_challenge_ == "balloons") {
 
@@ -425,6 +442,25 @@ void AutomaticStartMbzirc::callbackRC(const mavros_msgs::RCInConstPtr& msg) {
   }
 
   got_rc_channels_ = true;
+}
+
+//}
+
+/* //{ callbackDropoffPose() */
+
+void AutomaticStartMbzirc::callbackDropoffPose(const geometry_msgs::PoseStampedConstPtr& msg) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  ROS_INFO_ONCE("[AutomaticStartMbzirc]: getting dropoffpose");
+
+  std::scoped_lock lock(mutex_dropoff_pose_);
+
+  dropoff_pose_ = *msg;
+
+  got_dropoff_pose_ = true;
 }
 
 //}
@@ -789,6 +825,46 @@ bool AutomaticStartMbzirc::landHomeImpl() {
 
 //}
 
+/* landThereImpl() //{ */
+
+bool AutomaticStartMbzirc::landThereImpl() {
+
+  auto dropoff_pose = mrs_lib::get_mutexed(mutex_dropoff_pose_, dropoff_pose_);
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing there (in the dropoff zone)");
+
+  mrs_msgs::ReferenceStampedSrv srv;
+
+  srv.request.header.stamp    = ros::Time::now();
+  srv.request.header.frame_id = dropoff_pose.header.frame_id;
+
+  srv.request.reference.position   = dropoff_pose.pose.position;
+  srv.request.reference.position.z = 3.0;
+  srv.request.reference.yaw        = tf::getYaw(dropoff_pose.pose.orientation);
+
+  bool res = service_client_land_there_.call(srv);
+
+  if (res) {
+
+    if (srv.response.success) {
+
+      return true;
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: landing in the dropoff zone failed: %s", srv.response.message.c_str());
+    }
+
+  } else {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for landing in the dropoff zone failed");
+  }
+
+  return false;
+}
+
+//}
+
 /* landImpl() //{ */
 
 bool AutomaticStartMbzirc::landImpl() {
@@ -864,6 +940,18 @@ bool AutomaticStartMbzirc::land() {
   } else if (_land_mode_ == "land_home") {
 
     res = landHomeImpl();
+
+  } else if (_land_mode_ == "land_there") {
+
+    if (got_dropoff_pose_) {
+
+      res = landThereImpl();
+
+    } else {
+
+      ROS_ERROR("[AutomaticStartMbzirc]: missing dropoff pose, landing home");
+      res = landHomeImpl();
+    }
 
   } else {
 

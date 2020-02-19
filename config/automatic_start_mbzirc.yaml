@@ -16,25 +16,25 @@ challenges:
     handle_takeoff: true
     handle_landing: true
     action_duration: 12.0 # [min]
-    land_mode: "land_home" # {land_home, land, eland}
+    land_mode: "land_home" # {land_home, land_there, land, eland}
 
   ball:
 
     handle_takeoff: true
     handle_landing: true
-    action_duration: 10.0 # [min]
-    land_mode: "land_home" # {land_home, land, eland}
+    action_duration: 0.5 # [min]
+    land_mode: "land_there" # {land_home, land_there, land, eland}
 
   wall:
 
     handle_takeoff: false
     handle_landing: false
     action_duration: 10.0 # [min]
-    land_mode: "eland" # {land_home, land, eland}
+    land_mode: "eland" # {land_home, land_there, land, eland}
 
   fire:
 
     handle_takeoff: true
     handle_landing: false
     action_duration: 10.0 # [min]
-    land_mode: "eland" # {land_home, land, eland}
+    land_mode: "eland" # {land_home, land_there, land, eland}

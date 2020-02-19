@@ -37,6 +37,7 @@
       <remap from="~mavros_state_in" to="mavros/state" />
       <remap from="~rc_in" to="mavros/rc/in" />
       <remap from="~control_manager_diagnostics_in" to="control_manager/diagnostics" />
+      <remap from="~dropoff_pose_in" to="arena_publisher/dropoff_pose" />
 
         <!-- Wall subscribers -->
       <param if="$(eval arg('challenge') == 'wall')" name="check_bluefox1" type="bool" value="true" />
@@ -84,6 +85,7 @@
         <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />
       <remap from="~land_home_out" to="uav_manager/land_home" />
+      <remap from="~land_there_out" to="uav_manager/land_there" />
       <remap from="~land_out" to="uav_manager/land" />
       <remap from="~eland_out" to="control_manager/eland" />
       <remap from="~motors_out" to="control_manager/motors" />
