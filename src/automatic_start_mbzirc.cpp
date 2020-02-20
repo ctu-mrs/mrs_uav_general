@@ -545,11 +545,19 @@ bool AutomaticStartMbzirc::callbackShutdown([[maybe_unused]] std_srvs::Trigger::
   if (!is_initialized_)
     return false;
 
-  shutdown_time_ = ros::Time::now();
-  shutdown_timer_.start();
+  if (_challenge_ == "fire") {
 
-  res.success = true;
-  res.message = "shutting down";
+    shutdown_time_ = ros::Time::now();
+    shutdown_timer_.start();
+
+    res.success = true;
+    res.message = "shutting down";
+
+  } else {
+
+    res.success = false;
+    res.message = "only for the fire challenge";
+  }
 
   return true;
 }
