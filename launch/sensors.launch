@@ -277,13 +277,13 @@
         <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.2 0.0 -0.05 0.0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
 
           <!-- <include file="$(find realsense_d435)/launch/uav_window_15fps.launch" /> -->
-          <include file="$(find realsense_d435)/launch/uav_ewok.launch" >
+          <!-- <include file="$(find realsense_d435)/launch/uav_ewok.launch" > -->
 
-            <arg name="external_manager"   value="true" />
-            <arg name="manager"            value="$(arg UAV_NAME)_ewok_nodelet_manager" />
-            <arg name="respawn"            value="true" />
+          <!--   <arg name="external_manager"   value="true" /> -->
+          <!--   <arg name="manager"            value="$(arg UAV_NAME)_ewok_nodelet_manager" /> -->
+          <!--   <arg name="respawn"            value="true" /> -->
 
-          </include>
+          <!-- </include> -->
 
         </group>
 
