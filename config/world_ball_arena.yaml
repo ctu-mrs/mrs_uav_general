@@ -2,7 +2,7 @@
 ## DEFINITION OF THE MBZIRC CHALLENGE ARENA
 #
  
-arena_id: "ball_adnec_after_rehearsal_1"
+arena_id: "ball_adnec"
  
 use_utm_origin: true
 utm_origin_units: 0 # 0 - UTM, 1 - Latitude Longitude
@@ -44,15 +44,25 @@ safety_area:
   # race track
   safety_area: [
     -38.08, -2.50,
+    -3.64, -12.25,
+    -1.55, -12.32,
+    9.02, -16.39,
     47.15, -27.94,
     48.90, -27.03,
     56.24, -2.26,
+    53.08, -0.97,
     54.58, 4.14,
+    19.66, 16.03,
+    17.04, 10.87,
+    6.81, 13.73,
+    7.43, 18.28,
     -27.33, 28.30,
+    -29.02, 24.79,
     -33.31, 25.58,
-    -39.79, 1.88]
+    -39.79, 1.88,
+    -38.11, 0.02]
 
-  max_height: 30.0
+  max_height: 18.0
   min_height: 1.0
 
 
