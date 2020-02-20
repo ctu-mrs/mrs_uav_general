@@ -6,6 +6,9 @@ main_timer_rate: 30 # [Hz]
 
 channel_number: 6
 
+# after landing and after this timeout, the computer will be shut down
+shutdown_timeout: 60 # [s]
+
 # how many times it will try to call the start/stop services if it fails
 call_n_attempts: 10
 

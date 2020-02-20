@@ -123,6 +123,11 @@ private:
   ros::Subscriber subscriber_dropoff_pose_;
 
 private:
+  double      _shutdown_timeout_;
+  std::string _scripts_path_;
+  bool        callbackShutdown(std_srvs::Trigger::Request& req, std_srvs::Trigger::Response& res);
+
+private:
   void                       callbackDropoffPose(const geometry_msgs::PoseStampedConstPtr& msg);
   geometry_msgs::PoseStamped dropoff_pose_;
   std::mutex                 mutex_dropoff_pose_;
@@ -132,6 +137,11 @@ private:
   ros::Timer main_timer_;
   void       mainTimer(const ros::TimerEvent& event);
   double     main_timer_rate_;
+
+private:
+  ros::Timer shutdown_timer_;
+  ros::Time  shutdown_time_;
+  void       shutdownTimer(const ros::TimerEvent& event);
 
 private:
   void callbackRC(const mavros_msgs::RCInConstPtr& msg);
@@ -234,6 +244,9 @@ void AutomaticStartMbzirc::onInit() {
   param_loader.load_param("challenges/" + _challenge_ + "/handle_takeoff", _handle_takeoff_);
   param_loader.load_param("challenges/" + _challenge_ + "/action_duration", _action_duration_);
 
+  param_loader.load_param("scripts_path", _scripts_path_);
+  param_loader.load_param("shutdown_timeout", _shutdown_timeout_);
+
   // recaltulate the acion duration to seconds
   _action_duration_ *= 60;
 
@@ -312,7 +325,8 @@ void AutomaticStartMbzirc::onInit() {
   // |                           timers                           |
   // --------------------------------------------------------------
 
-  main_timer_ = nh_.createTimer(ros::Rate(main_timer_rate_), &AutomaticStartMbzirc::mainTimer, this);
+  main_timer_     = nh_.createTimer(ros::Rate(main_timer_rate_), &AutomaticStartMbzirc::mainTimer, this);
+  shutdown_timer_ = nh_.createTimer(ros::Rate(1.0), &AutomaticStartMbzirc::shutdownTimer, this, false, false);
 
   is_initialized_ = true;
 
@@ -516,6 +530,24 @@ void AutomaticStartMbzirc::callbackRealsense([[maybe_unused]] const sensor_msgs:
 
 //}
 
+/* callbackShutdown() //{ */
+
+bool AutomaticStartMbzirc::callbackShutdown([[maybe_unused]] std_srvs::Trigger::Request& req, [[maybe_unused]] std_srvs::Trigger::Response& res) {
+
+  if (!is_initialized_)
+    return false;
+
+  shutdown_time_ = ros::Time::now();
+  shutdown_timer_.start();
+
+  res.success = true;
+  res.message = "shutting down";
+
+  return true;
+}
+
+//}
+
 // --------------------------------------------------------------
 // |                           timers                           |
 // --------------------------------------------------------------
@@ -661,6 +693,23 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
   }
 
 }  // namespace automatic_start_mbzirc
+
+//}
+
+/* shutdownTimer() //{ */
+
+void AutomaticStartMbzirc::shutdownTimer([[maybe_unused]] const ros::TimerEvent& event) {
+
+  double time_diff = (ros::Time::now() - shutdown_time_).toSec();
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: shutting down in %d s", int(_shutdown_timeout_ - time_diff));
+
+  if (time_diff > _shutdown_timeout_) {
+
+    ROS_INFO("[AutomaticStartDarpa]: calling for shutdown");
+    [[maybe_unused]] int res = system((_scripts_path_ + std::string("/shutdown.sh")).c_str());
+  }
+}
 
 //}
 

@@ -29,6 +29,8 @@
 
       <rosparam file="$(find mrs_general)/config/automatic_start_mbzirc.yaml" />
 
+      <param name="scripts_path" value="$(optenv HOME)" />
+
       <param name="CHALLENGE" value="$(arg CHALLENGE)" />
       <param name="simulation" value="$(arg simulation)" />
       <param name="rc_mode" value="$(arg rc_mode)" />
