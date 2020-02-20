@@ -29,7 +29,7 @@
 
       <rosparam file="$(find mrs_general)/config/automatic_start_mbzirc.yaml" />
 
-      <param name="scripts_path" value="$(optenv HOME)" />
+      <param name="scripts_path" value="$(optenv HOME)/git/uav_core/miscellaneous/automatic_nuc_shutdown" />
 
       <param name="CHALLENGE" value="$(arg CHALLENGE)" />
       <param name="simulation" value="$(arg simulation)" />
@@ -92,6 +92,7 @@
       <remap from="~eland_out" to="control_manager/eland" />
       <remap from="~motors_out" to="control_manager/motors" />
       <remap from="~arm_out" to="mavros/cmd/arming" />
+      <remap from="~shutdown_in" to="~shutdown" />
 
       <remap if="$(eval arg('challenge') == 'balloons')" from="~start_out" to="balloon_circle_destroy/auto_start" />
       <remap if="$(eval arg('challenge') == 'ball')" from="~start_out" to="balloon_planner/start_state_machine" />

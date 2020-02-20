@@ -116,6 +116,8 @@ private:
   ros::ServiceClient service_client_start_;
   ros::ServiceClient service_client_stop_;
 
+  ros::ServiceServer service_server_shutdown_;
+
 private:
   ros::Subscriber subscriber_mavros_state_;
   ros::Subscriber subscriber_rc_;
@@ -320,6 +322,12 @@ void AutomaticStartMbzirc::onInit() {
   }
 
   service_client_stop_ = nh_.serviceClient<std_srvs::Trigger>("stop_out");
+
+  // --------------------------------------------------------------
+  // |                       service servers                      |
+  // --------------------------------------------------------------
+
+  service_server_shutdown_ = nh_.advertiseService("shutdown_in", &AutomaticStartMbzirc::callbackShutdown, this);
 
   // --------------------------------------------------------------
   // |                           timers                           |
@@ -685,9 +693,6 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
       ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: we are done here");
 
-      ros::Duration(3.0).sleep();
-      ros::shutdown();
-
       break;
     }
   }
@@ -706,7 +711,7 @@ void AutomaticStartMbzirc::shutdownTimer([[maybe_unused]] const ros::TimerEvent&
 
   if (time_diff > _shutdown_timeout_) {
 
-    ROS_INFO("[AutomaticStartDarpa]: calling for shutdown");
+    ROS_INFO("[AutomaticStartMbzirc]: calling for shutdown");
     [[maybe_unused]] int res = system((_scripts_path_ + std::string("/shutdown.sh")).c_str());
   }
 }
