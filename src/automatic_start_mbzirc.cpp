@@ -1,4 +1,4 @@
-#define VERSION "0.0.4.0"
+#define VERSION "0.0.4.1"
 
 /* includes //{ */
 
@@ -116,11 +116,18 @@ private:
   ros::ServiceClient service_client_start_;
   ros::ServiceClient service_client_stop_;
 
+  ros::ServiceServer service_server_shutdown_;
+
 private:
   ros::Subscriber subscriber_mavros_state_;
   ros::Subscriber subscriber_rc_;
   ros::Subscriber subscriber_control_manager_diagnostics_;
   ros::Subscriber subscriber_dropoff_pose_;
+
+private:
+  double      _shutdown_timeout_;
+  std::string _scripts_path_;
+  bool        callbackShutdown(std_srvs::Trigger::Request& req, std_srvs::Trigger::Response& res);
 
 private:
   void                       callbackDropoffPose(const geometry_msgs::PoseStampedConstPtr& msg);
@@ -132,6 +139,11 @@ private:
   ros::Timer main_timer_;
   void       mainTimer(const ros::TimerEvent& event);
   double     main_timer_rate_;
+
+private:
+  ros::Timer shutdown_timer_;
+  ros::Time  shutdown_time_;
+  void       shutdownTimer(const ros::TimerEvent& event);
 
 private:
   void callbackRC(const mavros_msgs::RCInConstPtr& msg);
@@ -234,6 +246,9 @@ void AutomaticStartMbzirc::onInit() {
   param_loader.load_param("challenges/" + _challenge_ + "/handle_takeoff", _handle_takeoff_);
   param_loader.load_param("challenges/" + _challenge_ + "/action_duration", _action_duration_);
 
+  param_loader.load_param("scripts_path", _scripts_path_);
+  param_loader.load_param("shutdown_timeout", _shutdown_timeout_);
+
   // recaltulate the acion duration to seconds
   _action_duration_ *= 60;
 
@@ -297,6 +312,10 @@ void AutomaticStartMbzirc::onInit() {
 
     service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
 
+  } else if (_challenge_ == "blanket") {
+
+    service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
+
   } else if (_challenge_ == "wall") {
 
     service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
@@ -309,10 +328,17 @@ void AutomaticStartMbzirc::onInit() {
   service_client_stop_ = nh_.serviceClient<std_srvs::Trigger>("stop_out");
 
   // --------------------------------------------------------------
+  // |                       service servers                      |
+  // --------------------------------------------------------------
+
+  service_server_shutdown_ = nh_.advertiseService("shutdown_in", &AutomaticStartMbzirc::callbackShutdown, this);
+
+  // --------------------------------------------------------------
   // |                           timers                           |
   // --------------------------------------------------------------
 
-  main_timer_ = nh_.createTimer(ros::Rate(main_timer_rate_), &AutomaticStartMbzirc::mainTimer, this);
+  main_timer_     = nh_.createTimer(ros::Rate(main_timer_rate_), &AutomaticStartMbzirc::mainTimer, this);
+  shutdown_timer_ = nh_.createTimer(ros::Rate(1.0), &AutomaticStartMbzirc::shutdownTimer, this, false, false);
 
   is_initialized_ = true;
 
@@ -516,6 +542,32 @@ void AutomaticStartMbzirc::callbackRealsense([[maybe_unused]] const sensor_msgs:
 
 //}
 
+/* callbackShutdown() //{ */
+
+bool AutomaticStartMbzirc::callbackShutdown([[maybe_unused]] std_srvs::Trigger::Request& req, [[maybe_unused]] std_srvs::Trigger::Response& res) {
+
+  if (!is_initialized_)
+    return false;
+
+  if (_challenge_ == "fire") {
+
+    shutdown_time_ = ros::Time::now();
+    shutdown_timer_.start();
+
+    res.success = true;
+    res.message = "shutting down";
+
+  } else {
+
+    res.success = false;
+    res.message = "only for the fire challenge";
+  }
+
+  return true;
+}
+
+//}
+
 // --------------------------------------------------------------
 // |                           timers                           |
 // --------------------------------------------------------------
@@ -653,14 +705,28 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
 
       ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: we are done here");
 
-      ros::Duration(3.0).sleep();
-      ros::shutdown();
-
       break;
     }
   }
 
 }  // namespace automatic_start_mbzirc
+
+//}
+
+/* shutdownTimer() //{ */
+
+void AutomaticStartMbzirc::shutdownTimer([[maybe_unused]] const ros::TimerEvent& event) {
+
+  double time_diff = (ros::Time::now() - shutdown_time_).toSec();
+
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: shutting down in %d s", int(_shutdown_timeout_ - time_diff));
+
+  if (time_diff > _shutdown_timeout_) {
+
+    ROS_INFO("[AutomaticStartMbzirc]: calling for shutdown");
+    [[maybe_unused]] int res = system((_scripts_path_ + std::string("/shutdown.sh")).c_str());
+  }
+}
 
 //}
 
@@ -1097,6 +1163,29 @@ bool AutomaticStartMbzirc::start(const int value) {
     }
 
   } else if (_challenge_ == "fire") {
+
+    mrs_msgs::SetInt srv;
+    srv.request.value = value;
+
+    bool res = service_client_start_.call(srv);
+
+    if (res) {
+
+      if (srv.response.success) {
+
+        return true;
+
+      } else {
+
+        ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
+      }
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
+    }
+
+  } else if (_challenge_ == "blanket") {
 
     mrs_msgs::SetInt srv;
     srv.request.value = value;
