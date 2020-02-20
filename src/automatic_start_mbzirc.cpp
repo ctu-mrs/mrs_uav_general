@@ -1,4 +1,4 @@
-#define VERSION "0.0.4.0"
+#define VERSION "0.0.4.1"
 
 /* includes //{ */
 
@@ -309,6 +309,10 @@ void AutomaticStartMbzirc::onInit() {
     service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
 
   } else if (_challenge_ == "fire") {
+
+    service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
+
+  } else if (_challenge_ == "blanket") {
 
     service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
 
@@ -1159,6 +1163,29 @@ bool AutomaticStartMbzirc::start(const int value) {
     }
 
   } else if (_challenge_ == "fire") {
+
+    mrs_msgs::SetInt srv;
+    srv.request.value = value;
+
+    bool res = service_client_start_.call(srv);
+
+    if (res) {
+
+      if (srv.response.success) {
+
+        return true;
+
+      } else {
+
+        ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
+      }
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
+    }
+
+  } else if (_challenge_ == "blanket") {
 
     mrs_msgs::SetInt srv;
     srv.request.value = value;
