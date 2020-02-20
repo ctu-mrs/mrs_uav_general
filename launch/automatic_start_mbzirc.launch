@@ -78,9 +78,20 @@
       <param if="$(eval arg('challenge') == 'fire')" name="check_bluefox2" type="bool" value="false" />
       <remap if="$(eval arg('challenge') == 'fire')" from="~bluefox2_in" to="~bluefox2_in" />
 
-      <param if="$(eval arg('challenge') == 'fire')" name="check_realsense" type="bool" value="true" />
+      <param if="$(eval arg('challenge') == 'fire')" name="check_realsense" type="bool" value="false" />
       <remap if="$(eval arg('challenge') == 'fire' and arg('RUN_TYPE') == 'simulation')" from="~realsense_in" to="rs_d435/aligned_depth_to_color/camera_info" />
       <remap if="$(eval arg('challenge') == 'fire' and arg('RUN_TYPE') == 'uav')" from="~realsense_in" to="rs_d435/depth/camera_info" />
+        
+        <!-- Fire blanket subscribers -->
+      <param if="$(eval arg('challenge') == 'blanket')" name="check_bluefox1" type="bool" value="false" />
+      <remap if="$(eval arg('challenge') == 'blanket')" from="~bluefox1_in" to="bluefox_optflow/camera_info" />
+
+      <param if="$(eval arg('challenge') == 'blanket')" name="check_bluefox2" type="bool" value="false" />
+      <remap if="$(eval arg('challenge') == 'blanket')" from="~bluefox2_in" to="~bluefox2_in" />
+
+      <param if="$(eval arg('challenge') == 'blanket')" name="check_realsense" type="bool" value="false" />
+      <remap if="$(eval arg('challenge') == 'blanket' and arg('RUN_TYPE') == 'simulation')" from="~realsense_in" to="rs_d435/aligned_depth_to_color/camera_info" />
+      <remap if="$(eval arg('challenge') == 'blanket' and arg('RUN_TYPE') == 'uav')" from="~realsense_in" to="rs_d435/depth/camera_info" />
 
         <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />
