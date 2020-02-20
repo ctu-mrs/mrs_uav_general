@@ -1,10 +1,13 @@
-version: "0.0.4.0"
+version: "0.0.4.1"
 
 safety_timeout: 5.0 # [s]
 
 main_timer_rate: 30 # [Hz]
 
 channel_number: 6
+
+# after landing and after this timeout, the computer will be shut down
+shutdown_timeout: 120 # [s]
 
 # how many times it will try to call the start/stop services if it fails
 call_n_attempts: 10
@@ -34,7 +37,14 @@ challenges:
 
   fire:
 
-    handle_takeoff: true
+    handle_takeoff: false
     handle_landing: false
     action_duration: 10.0 # [min]
+    land_mode: "eland" # {land_home, land_there, land, eland}
+
+  blanket:
+
+    handle_takeoff: false
+    handle_landing: false
+    action_duration: 12.0 # [min]
     land_mode: "eland" # {land_home, land_there, land, eland}
