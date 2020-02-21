@@ -312,6 +312,10 @@ void AutomaticStartMbzirc::onInit() {
 
     service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
 
+  } else if (_challenge_ == "fire_indoor") {
+
+    service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
+
   } else if (_challenge_ == "blanket") {
 
     service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
@@ -549,7 +553,7 @@ bool AutomaticStartMbzirc::callbackShutdown([[maybe_unused]] std_srvs::Trigger::
   if (!is_initialized_)
     return false;
 
-  if (_challenge_ == "fire") {
+  if (_challenge_ == "fire_indoor") {
 
     shutdown_time_ = ros::Time::now();
     shutdown_timer_.start();
@@ -560,7 +564,7 @@ bool AutomaticStartMbzirc::callbackShutdown([[maybe_unused]] std_srvs::Trigger::
   } else {
 
     res.success = false;
-    res.message = "only for the fire challenge";
+    res.message = "only for the fire_indoor challenge";
   }
 
   return true;
@@ -1163,6 +1167,29 @@ bool AutomaticStartMbzirc::start(const int value) {
     }
 
   } else if (_challenge_ == "fire") {
+
+    mrs_msgs::SetInt srv;
+    srv.request.value = value;
+
+    bool res = service_client_start_.call(srv);
+
+    if (res) {
+
+      if (srv.response.success) {
+
+        return true;
+
+      } else {
+
+        ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
+      }
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
+    }
+
+  } else if (_challenge_ == "fire_indoor") {
 
     mrs_msgs::SetInt srv;
     srv.request.value = value;

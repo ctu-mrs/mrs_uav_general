@@ -39,7 +39,14 @@ challenges:
 
     handle_takeoff: true
     handle_landing: false
-    action_duration: 10.0 # [min]
+    action_duration: 6.0 # [min]
+    land_mode: "eland" # {land_home, land_there, land, eland}
+
+  fire_indoor:
+
+    handle_takeoff: true
+    handle_landing: false
+    action_duration: 6.0 # [min]
     land_mode: "eland" # {land_home, land_there, land, eland}
 
   blanket:
