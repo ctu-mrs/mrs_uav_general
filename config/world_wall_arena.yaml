@@ -2,7 +2,7 @@
 ## DEFINITION OF THE MBZIRC CHALLENGE ARENA
 #
  
-arena_id: "wall_adnec_after_rehearsal_1"
+arena_id: "wall_adnec_after_rehearsal1"
  
 use_utm_origin: true
 utm_origin_units: 0 # 0 - UTM, 1 - Latitude Longitude
@@ -52,8 +52,8 @@ safety_area:
     -19.71, 17.10,
     -25.99, -3.01]
 
-  max_height: 30.0
-  min_height: 1.0
+  max_height: 18.00
+  min_height: 0.50
 
 
 arena_ang_diff: -0.282316
