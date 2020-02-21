@@ -537,7 +537,7 @@
           <arg name="idpf" default="0" />
           <arg name="aec" default="true" />
           <arg name="expose_upper_limit_us" default="20000" />
-          <arg name="des_grey_value" default="128" />
+          <arg name="des_grey_value" default="100" />
           <arg name="expose_us" default="100" />
           <arg name="agc" default="true" />
           <arg name="boost" value="false" />
