@@ -84,7 +84,7 @@
 
       <param if="$(eval arg('challenge') == 'fire')" name="check_realsense" type="bool" value="true" />
       <remap if="$(eval arg('challenge') == 'fire' and arg('RUN_TYPE') == 'simulation')" from="~realsense_in" to="rs_d435/aligned_depth_to_color/camera_info" />
-      <remap if="$(eval arg('challenge') == 'fire' and arg('RUN_TYPE') == 'uav')" from="~realsense_in" to="rs_d435/depth/camera_info" />
+      <remap if="$(eval arg('challenge') == 'fire' and arg('RUN_TYPE') == 'uav')" from="~realsense_in" to="rs_d435/color/camera_info" />
 
         <!-- Fire_indoor subscribers -->
       <param if="$(eval arg('challenge') == 'fire_indoor')" name="check_bluefox1" type="bool" value="false" />
