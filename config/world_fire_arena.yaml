@@ -57,7 +57,7 @@ safety_area:
     -15.10, -15.24]
 
   max_height: 18.00
-  min_height: 0.50
+  min_height: 0.30
 
 
 arena_ang_diff: -0.304211
