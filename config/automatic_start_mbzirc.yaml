@@ -44,7 +44,7 @@ challenges:
     handle_landing: false
     action_duration: 6.0 # [min]
     land_mode: "eland" # {land_home, land_there, land, eland}
-    pre_takeoff_sleep: 0 # [s]
+    pre_takeoff_sleep: 15 # [s]
 
   fire_indoor:
 
@@ -52,7 +52,7 @@ challenges:
     handle_landing: false
     action_duration: 6.0 # [min]
     land_mode: "eland" # {land_home, land_there, land, eland}
-    pre_takeoff_sleep: 0 # [s]
+    pre_takeoff_sleep: 30 # [s]
 
   blanket:
 
