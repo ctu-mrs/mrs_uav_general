@@ -20,6 +20,7 @@ challenges:
     handle_landing: true
     action_duration: 12.0 # [min]
     land_mode: "land_home" # {land_home, land_there, land, eland}
+    pre_takeoff_sleep: 0 # [s]
 
   ball:
 
@@ -27,6 +28,7 @@ challenges:
     handle_landing: true
     action_duration: 8.0 # [min]
     land_mode: "land_there" # {land_home, land_there, land, eland}
+    pre_takeoff_sleep: 60 # [s]
 
   wall:
 
@@ -34,6 +36,7 @@ challenges:
     handle_landing: false
     action_duration: 10.0 # [min]
     land_mode: "eland" # {land_home, land_there, land, eland}
+    pre_takeoff_sleep: 0 # [s]
 
   fire:
 
@@ -41,6 +44,7 @@ challenges:
     handle_landing: false
     action_duration: 6.0 # [min]
     land_mode: "eland" # {land_home, land_there, land, eland}
+    pre_takeoff_sleep: 0 # [s]
 
   fire_indoor:
 
@@ -48,6 +52,7 @@ challenges:
     handle_landing: false
     action_duration: 6.0 # [min]
     land_mode: "eland" # {land_home, land_there, land, eland}
+    pre_takeoff_sleep: 0 # [s]
 
   blanket:
 
@@ -55,3 +60,4 @@ challenges:
     handle_landing: false
     action_duration: 12.0 # [min]
     land_mode: "eland" # {land_home, land_there, land, eland}
+    pre_takeoff_sleep: 0 # [s]

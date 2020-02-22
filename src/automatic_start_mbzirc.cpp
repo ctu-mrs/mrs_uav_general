@@ -191,6 +191,7 @@ private:
   ros::Time start_time_;
 
   double      _action_duration_;
+  double      _pre_takeoff_sleep_;
   bool        _handle_landing_ = false;
   bool        _handle_takeoff_ = false;
   std::string _land_mode_;
@@ -245,6 +246,7 @@ void AutomaticStartMbzirc::onInit() {
   param_loader.load_param("challenges/" + _challenge_ + "/handle_landing", _handle_landing_);
   param_loader.load_param("challenges/" + _challenge_ + "/handle_takeoff", _handle_takeoff_);
   param_loader.load_param("challenges/" + _challenge_ + "/action_duration", _action_duration_);
+  param_loader.load_param("challenges/" + _challenge_ + "/pre_takeoff_sleep", _pre_takeoff_sleep_);
 
   param_loader.load_param("scripts_path", _scripts_path_);
   param_loader.load_param("shutdown_timeout", _shutdown_timeout_);
@@ -754,6 +756,11 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
     }
 
     case STATE_TAKEOFF: {
+
+      if (_pre_takeoff_sleep_ > 1.0) {
+        ROS_INFO("[AutomaticStartMbzirc]: sleeping for %.2f secs before takeoff", _pre_takeoff_sleep_);
+        ros::Duration(_pre_takeoff_sleep_).sleep();
+      }
 
       bool res = takeoff();
 
