@@ -191,6 +191,7 @@ private:
   ros::Time start_time_;
 
   double      _action_duration_;
+  double      _pre_takeoff_sleep_;
   bool        _handle_landing_ = false;
   bool        _handle_takeoff_ = false;
   std::string _land_mode_;
@@ -245,6 +246,7 @@ void AutomaticStartMbzirc::onInit() {
   param_loader.load_param("challenges/" + _challenge_ + "/handle_landing", _handle_landing_);
   param_loader.load_param("challenges/" + _challenge_ + "/handle_takeoff", _handle_takeoff_);
   param_loader.load_param("challenges/" + _challenge_ + "/action_duration", _action_duration_);
+  param_loader.load_param("challenges/" + _challenge_ + "/pre_takeoff_sleep", _pre_takeoff_sleep_);
 
   param_loader.load_param("scripts_path", _scripts_path_);
   param_loader.load_param("shutdown_timeout", _shutdown_timeout_);
@@ -309,6 +311,10 @@ void AutomaticStartMbzirc::onInit() {
     service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
 
   } else if (_challenge_ == "fire") {
+
+    service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
+
+  } else if (_challenge_ == "fire_indoor") {
 
     service_client_start_ = nh_.serviceClient<mrs_msgs::SetInt>("start_out");
 
@@ -549,7 +555,7 @@ bool AutomaticStartMbzirc::callbackShutdown([[maybe_unused]] std_srvs::Trigger::
   if (!is_initialized_)
     return false;
 
-  if (_challenge_ == "fire") {
+  if (_challenge_ == "fire_indoor") {
 
     shutdown_time_ = ros::Time::now();
     shutdown_timer_.start();
@@ -560,7 +566,7 @@ bool AutomaticStartMbzirc::callbackShutdown([[maybe_unused]] std_srvs::Trigger::
   } else {
 
     res.success = false;
-    res.message = "only for the fire challenge";
+    res.message = "only for the fire_indoor challenge";
   }
 
   return true;
@@ -750,6 +756,11 @@ void AutomaticStartMbzirc::changeState(LandingStates_t new_state) {
     }
 
     case STATE_TAKEOFF: {
+
+      if (_pre_takeoff_sleep_ > 1.0) {
+        ROS_INFO("[AutomaticStartMbzirc]: sleeping for %.2f secs before takeoff", _pre_takeoff_sleep_);
+        ros::Duration(_pre_takeoff_sleep_).sleep();
+      }
 
       bool res = takeoff();
 
@@ -1163,6 +1174,29 @@ bool AutomaticStartMbzirc::start(const int value) {
     }
 
   } else if (_challenge_ == "fire") {
+
+    mrs_msgs::SetInt srv;
+    srv.request.value = value;
+
+    bool res = service_client_start_.call(srv);
+
+    if (res) {
+
+      if (srv.response.success) {
+
+        return true;
+
+      } else {
+
+        ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: starting action failed failed: %s", srv.response.message.c_str());
+      }
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: service call for starting action failed");
+    }
+
+  } else if (_challenge_ == "fire_indoor") {
 
     mrs_msgs::SetInt srv;
     srv.request.value = value;
