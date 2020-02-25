@@ -117,6 +117,7 @@
       <remap from="~motors_out" to="control_manager/motors" />
       <remap from="~arm_out" to="mavros/cmd/arming" />
       <remap from="~shutdown_in" to="~shutdown" />
+      <remap from="~validate_reference_out" to="control_manager/validate_reference" />
 
       <remap if="$(eval arg('challenge') == 'balloons')" from="~start_out" to="balloon_circle_destroy/auto_start" />
       <remap if="$(eval arg('challenge') == 'ball')" from="~start_out" to="balloon_planner/start_state_machine" />

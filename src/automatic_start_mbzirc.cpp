@@ -24,6 +24,7 @@
 #include <mrs_msgs/ControlManagerDiagnostics.h>
 #include <mrs_msgs/MpcTrackerDiagnostics.h>
 #include <mrs_msgs/ReferenceStampedSrv.h>
+#include <mrs_msgs/ValidateReference.h>
 
 #include <tf/transform_datatypes.h>
 #include <tf_conversions/tf_eigen.h>
@@ -112,6 +113,7 @@ private:
   ros::ServiceClient service_client_land_there_;
   ros::ServiceClient service_client_land_;
   ros::ServiceClient service_client_eland_;
+  ros::ServiceClient service_client_validate_reference_;
 
   ros::ServiceClient service_client_start_;
   ros::ServiceClient service_client_stop_;
@@ -181,6 +183,7 @@ private:
   bool landHomeImpl();
   bool landThereImpl();
   bool land();
+  void validateReference();
 
   bool setMotors(const bool value);
   bool disarm();
@@ -301,6 +304,8 @@ void AutomaticStartMbzirc::onInit() {
   service_client_eland_      = nh_.serviceClient<std_srvs::Trigger>("eland_out");
   service_client_motors_     = nh_.serviceClient<std_srvs::SetBool>("motors_out");
   service_client_arm_        = nh_.serviceClient<mavros_msgs::CommandBool>("arm_out");
+
+  service_client_validate_reference_ = nh_.serviceClient<mrs_msgs::ValidateReference>("validate_reference_out");
 
   if (_challenge_ == "balloons") {
 
@@ -606,6 +611,8 @@ void AutomaticStartMbzirc::mainTimer([[maybe_unused]] const ros::TimerEvent& eve
   switch (current_state) {
 
     case STATE_IDLE: {
+
+      validateReference();
 
       if (armed && !motors) {
 
@@ -1036,6 +1043,36 @@ bool AutomaticStartMbzirc::land() {
   }
 
   return res;
+}
+
+//}
+
+/* validateReference() //{ */
+
+void AutomaticStartMbzirc::validateReference() {
+
+  mrs_msgs::ValidateReference srv_out;
+
+  srv_out.request.reference.header.frame_id      = "fcu";
+  srv_out.request.reference.reference.position.z = 3.0;
+
+  bool res = service_client_validate_reference_.call(srv_out);
+
+  if (res) {
+
+    if (srv_out.response.success) {
+
+      ROS_INFO_THROTTLE(1.0, "[AutomaticStartMbzirc]: current pos is inside of the safety area");
+
+    } else {
+
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: the current pos is outside of the safety area!");
+    }
+
+  } else {
+
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStartMbzirc]: current pos could not be validated");
+  }
 }
 
 //}
