@@ -2,6 +2,14 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* updates in sensors.launch and core.launch
+* updates in camera calibration
+* the final version of mbzirc_auto_start
+* Contributors: Matej Petrlik, Matouš Vrba, Pavel Petracek, Petr Stepan, Tomas Baca, UAV_DRONA, Vaclav Pritzl, uav44, uav66, uav71
+
 0.0.4 (2020-02-18)
 ------------------
 * added bluefox net, removed bluefo sky
