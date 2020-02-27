@@ -9,7 +9,7 @@ exclude=(
 # IN GENERAL, DON'T RECORD CAMERAS
 #
 # If you want to record cameras, create a copy of this script
-# and place it at you tmux session.
+# and place it at your tmux session.
 #
 # Please, seek an advice of a senior researcher of MRS about
 # what can be recorded. Recording too much data can lead to
