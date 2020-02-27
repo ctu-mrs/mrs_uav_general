@@ -2,19 +2,27 @@
 
 path="/home/\$(optenv USER mrs)/bag_files/latest/"
 
+# By default, we record everything.
+# Except for this list of EXCLUDED topics:
 exclude=(
 
 # IN GENERAL, DON'T RECORD CAMERAS
-# if you want to record cameras, create a copy of this script
+#
+# If you want to record cameras, create a copy of this script
 # and place it at you tmux session.
+#
+# Please, seek an advice of a senior researcher of MRS about
+# what can be recorded. Recording too much data can lead to
+# ROS communication hiccups, which can lead to eland, failsafe
+# or just a CRASH.
 
-# Every compressed
+# Every topic containint "compressed"
 '(.*)compressed(.*)'
-# Every image raw
+# Every topic containint "image_raw"
 '(.*)image_raw(.*)'
-# Every theora message
+# Every topic containint "theora"
 '(.*)theora(.*)'
-# Every h264 message
+# Every topic containint "h264"
 '(.*)h264(.*)'
 
 )

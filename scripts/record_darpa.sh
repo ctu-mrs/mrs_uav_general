@@ -2,7 +2,20 @@
 
 path="/home/\$(optenv USER mrs)/bag_files/latest/"
 
+# By default, we record everything.
+# Except for this list of EXCLUDED topics:
 exclude=(
+
+# IN GENERAL, DON'T RECORD CAMERAS
+#
+# If you want to record cameras, create a copy of this script
+# and place it at you tmux session.
+#
+# Please, seek an advice of a senior researcher of MRS about
+# what can be recorded. Recording too much data can lead to
+# ROS communication hiccups, which can lead to eland, failsafe
+# or just a CRASH.
+
 # Image detect bluefox
 '/mv(.*)/compressed(.*)'
 # Bluefox
