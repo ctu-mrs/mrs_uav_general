@@ -3,9 +3,9 @@
 #
 
 use_utm_origin: false
-utm_origin_units: 0 # 0 - UTM, 1 - Latitude Longitude
-utm_origin_lat: 0.0
-utm_origin_lon: 0.0
+utm_origin_units: 1 # 0 - UTM, 1 - Latitude Longitude
+utm_origin_lat: 47.3977433
+utm_origin_lon: 8.5455938
 utm_origin_x: 0
 utm_origin_y: 0
 
