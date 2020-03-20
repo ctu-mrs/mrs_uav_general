@@ -33,13 +33,6 @@
 
 //}
 
-/* defines //{ */
-
-#define PWM_LOW_THIRD 1250
-#define PWM_HIGH_THIRD 1750
-
-//}
-
 namespace mrs_general
 {
 
@@ -68,20 +61,15 @@ class AutomaticStart : public nodelet::Nodelet {
 
 public:
   virtual void onInit();
-  std::string  _version_;
 
 private:
   ros::NodeHandle nh_;
   bool            is_initialized_ = false;
   bool            _simulation_    = false;
+  std::string     _version_;
 
-private:
-  double _safety_timeout_;
+  // | --------------------- service clients -------------------- |
 
-private:
-  bool gotSensors(void);
-
-private:
   ros::ServiceClient service_client_motors_;
   ros::ServiceClient service_client_arm_;
   ros::ServiceClient service_client_takeoff_;
@@ -89,23 +77,27 @@ private:
   ros::ServiceClient service_client_land_;
   ros::ServiceClient service_client_eland_;
   ros::ServiceClient service_client_validate_reference_;
-
   ros::ServiceClient service_client_start_;
   ros::ServiceClient service_client_stop_;
 
-private:
+  // | ----------------------- subscribers ---------------------- |
+
   ros::Subscriber subscriber_mavros_state_;
   ros::Subscriber subscriber_control_manager_diagnostics_;
 
-private:
-  ros::Timer main_timer_;
-  void       mainTimer(const ros::TimerEvent& event);
-  double     main_timer_rate_;
+  // | ----------------------- main timer ----------------------- |
 
-private:
+  ros::Timer timer_main_;
+  void       timerMain(const ros::TimerEvent& event);
+  double     _main_timer_rate_;
+
+  // | ---------------------- mavros state ---------------------- |
+
   void       callbackMavrosState(const mavros_msgs::StateConstPtr& msg);
   bool       got_mavros_state_ = false;
   std::mutex mutex_mavros_state_;
+
+  // | ----------------- arm and offboard check ----------------- |
 
   ros::Time armed_time_;
   bool      armed_ = false;
@@ -113,13 +105,15 @@ private:
   ros::Time offboard_time_;
   bool      offboard_ = false;
 
-private:
+  // | --------------- control manager diagnostics -------------- |
+
   void                                callbackControlManagerDiagnostics(const mrs_msgs::ControlManagerDiagnosticsConstPtr& msg);
   std::mutex                          mutex_control_manager_diagnostics_;
   mrs_msgs::ControlManagerDiagnostics control_manager_diagnostics_;
   bool                                got_control_manager_diagnostics_ = false;
 
-private:
+  // | ------------------------ routines ------------------------ |
+
   bool takeoff();
 
   bool landImpl();
@@ -133,20 +127,23 @@ private:
   bool start(void);
   bool stop();
 
-private:
-  ros::Time start_time_;
+  // | ---------------------- other params ---------------------- |
 
   double      _action_duration_;
   double      _pre_takeoff_sleep_;
   bool        _handle_landing_ = false;
   bool        _handle_takeoff_ = false;
   std::string _land_mode_;
+  double      _safety_timeout_;
 
-private:
-  int _start_n_attempts_;
-  int call_attempt_counter_ = 0;
+  // | ---------------------- start service --------------------- |
 
-private:
+  int       _start_n_attempts_;
+  int       call_attempt_counter_ = 0;
+  ros::Time start_time_;
+
+  // | ---------------------- state machine --------------------- |
+
   uint current_state = STATE_IDLE;
   void changeState(LandingStates_t new_state);
 };
@@ -178,7 +175,7 @@ void AutomaticStart::onInit() {
   }
 
   param_loader.load_param("safety_timeout", _safety_timeout_);
-  param_loader.load_param("main_timer_rate", main_timer_rate_);
+  param_loader.load_param("main_timer_rate", _main_timer_rate_);
   param_loader.load_param("simulation", _simulation_);
   param_loader.load_param("call_n_attempts", _start_n_attempts_);
 
@@ -188,30 +185,26 @@ void AutomaticStart::onInit() {
   param_loader.load_param("action_duration", _action_duration_);
   param_loader.load_param("pre_takeoff_sleep", _pre_takeoff_sleep_);
 
+  if (!param_loader.loaded_successfully()) {
+    ROS_ERROR("[AutomaticStart]: Could not load all parameters!");
+    ros::shutdown();
+  }
+
   // recaltulate the acion duration to seconds
   _action_duration_ *= 60;
 
   if (!(_land_mode_ == "land_home" || _land_mode_ == "land" || _land_mode_ == "eland")) {
 
-    ROS_ERROR("[MavrosInterface]: land_mode (\"%s\") was specified wrongly, will eland by default!!!", _land_mode_.c_str());
+    ROS_ERROR("[AutomaticStart]: land_mode ('%s') was specified wrongly, will eland by default!!!", _land_mode_.c_str());
   }
 
-  if (!param_loader.loaded_successfully()) {
-    ROS_ERROR("[MavrosInterface]: Could not load all parameters!");
-    ros::shutdown();
-  }
-
-  // --------------------------------------------------------------
-  // |                         subscribers                        |
-  // --------------------------------------------------------------
+  // | ----------------------- subscribers ---------------------- |
 
   subscriber_mavros_state_ = nh_.subscribe("mavros_state_in", 1, &AutomaticStart::callbackMavrosState, this, ros::TransportHints().tcpNoDelay());
   subscriber_control_manager_diagnostics_ =
       nh_.subscribe("control_manager_diagnostics_in", 1, &AutomaticStart::callbackControlManagerDiagnostics, this, ros::TransportHints().tcpNoDelay());
 
-  // --------------------------------------------------------------
-  // |                       service clients                      |
-  // --------------------------------------------------------------
+  // | --------------------- service clients -------------------- |
 
   service_client_takeoff_   = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
   service_client_land_home_ = nh_.serviceClient<std_srvs::Trigger>("land_home_out");
@@ -226,11 +219,9 @@ void AutomaticStart::onInit() {
 
   service_client_stop_ = nh_.serviceClient<std_srvs::Trigger>("stop_out");
 
-  // --------------------------------------------------------------
-  // |                           timers                           |
-  // --------------------------------------------------------------
+  // | ------------------------- timers ------------------------- |
 
-  main_timer_ = nh_.createTimer(ros::Rate(main_timer_rate_), &AutomaticStart::mainTimer, this);
+  timer_main_ = nh_.createTimer(ros::Rate(_main_timer_rate_), &AutomaticStart::timerMain, this);
 
   is_initialized_ = true;
 
@@ -325,9 +316,9 @@ void AutomaticStart::callbackControlManagerDiagnostics(const mrs_msgs::ControlMa
 // |                           timers                           |
 // --------------------------------------------------------------
 
-/* mainTimer() //{ */
+/* timerMain() //{ */
 
-void AutomaticStart::mainTimer([[maybe_unused]] const ros::TimerEvent& event) {
+void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
 
   if (!is_initialized_) {
     return;
@@ -384,7 +375,7 @@ void AutomaticStart::mainTimer([[maybe_unused]] const ros::TimerEvent& event) {
 
           double min = (armed_time_diff < offboard_time_diff) ? armed_time_diff : offboard_time_diff;
 
-          ROS_WARN_THROTTLE(1.0, "Starting in %1.0f", (_safety_timeout_ - min));
+          ROS_WARN_THROTTLE(1.0, "starting in %.0f", (_safety_timeout_ - min));
         }
       }
 
