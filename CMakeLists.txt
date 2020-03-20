@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   #  INCLUDE_DIRS include
-  LIBRARIES AutomaticStartDarpa
+  LIBRARIES AutomaticStart AutomaticStartDarpa
   CATKIN_DEPENDS std_msgs mrs_msgs mavros_msgs mrs_lib
   #  DEPENDS system_lib
   )
@@ -32,6 +32,20 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS})
 
+# automatic start
+
+add_library(AutomaticStart
+  src/automatic_start.cpp)
+
+add_dependencies(AutomaticStart
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+target_link_libraries(AutomaticStart
+  ${catkin_LIBRARIES}
+  )
+
 # automatic start DARPA
 
 add_library(AutomaticStartDarpa
@@ -43,19 +57,5 @@ add_dependencies(AutomaticStartDarpa
   )
 
 target_link_libraries(AutomaticStartDarpa
-  ${catkin_LIBRARIES}
-  )
-
-# automatic start MBZIRC
-
-add_library(AutomaticStartMbzirc
-  src/automatic_start_mbzirc.cpp)
-
-add_dependencies(AutomaticStartMbzirc
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-  )
-
-target_link_libraries(AutomaticStartMbzirc
   ${catkin_LIBRARIES}
   )
