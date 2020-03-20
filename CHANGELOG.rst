@@ -42,16 +42,12 @@ Changelog for package mrs_general
 * parametrized takeoff handling challenge
 * Sensors launch for foxtrot
 * Corrected bf brick calibration
-* namespace darpa bluefoxes in sensors.launch
 * updated autostart
 * incresed delay before launching optflow bluefox
-* switch darpa cameras
-* start just one nodelet manager for both darpa bluefoxes
 * added desert_building world config
 * increased optflow start delay
 * updated echo's rs tf
 * exclude imu/lidar packets for ouster record
-* update excluded topics from darpa record
 * changed var name
 * echo broadcast ip
 * setting broadcast ip address before starting nimbro
@@ -88,26 +84,18 @@ Changelog for package mrs_general
 * updated bluefox brick tf
 * updated brick realsense tf
 * increased world_local_hector.yaml safety area, added lidar tf offset for mike
-* Update excluded topics in record_darpa
-* add hector darpa world
-* Rotate darpa bluefox cameras by pi in roll
 * sensors.launch: added rplidar modes
 * sensors: added datapodavac, updated garmin serial condition
 * added realsense_fire option to sensors.launch
 * added world simulation for challenge 1
 * Add Ouster lidar and imu to its TF
 * Uncomment back mavros launch (uups)
-* Lower down ouster tf and include aloam in record_darpa.sh
-* Update darpa TF for bluefox cameras
 * updated safety area
 * updated worlds
-* Add left/right bluefox cameras for darpa
-* Add 5 bluefox calibrations for darpa
 * added thermal cameras to sensors.launch
 * changed sensors.launch to use the ball_catch.launch for realsense
 * fixed tf grou for brick rs
 * updated realsense brick tfs (group for echo and delta)
-* update darpa world
 * fixed record script for realsense, added rules for bluefox3
 * added bluefox3 to sensors.launch
 * updated nimbro config
@@ -168,7 +156,6 @@ Changelog for package mrs_general
 * added realsense to sensors hector launch file
 * Add sensor_naki_hector launch
 * updated communication config with services
-* updated world darpa
 * Add communication configs for nimbro network
 * updated brick record launch file
 * added velodyne sensors launch

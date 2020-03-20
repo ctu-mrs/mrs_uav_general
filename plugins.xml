@@ -1,9 +1,3 @@
-<library path="lib/libAutomaticStartDarpa">
-  <class name="mrs_general/AutomaticStartDarpa" type="mrs_general::automatic_start_darpa::AutomaticStartDarpa" base_class_type="nodelet::Nodelet">
-    <description>AutomaticStartDarpa nodelet</description>
-  </class>
-</library>
-
 <library path="lib/libAutomaticStart">
   <class name="mrs_general/AutomaticStart" type="mrs_general::automatic_start::AutomaticStart" base_class_type="nodelet::Nodelet">
     <description>AutomaticStart nodelet</description>
