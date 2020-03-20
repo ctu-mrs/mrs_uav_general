@@ -7,7 +7,6 @@ Changelog for package mrs_general
 
 * updates in sensors.launch and core.launch
 * updates in camera calibration
-* the final version of mbzirc_auto_start
 * Contributors: Matej Petrlik, Matouš Vrba, Pavel Petracek, Petr Stepan, Tomas Baca, UAV_DRONA, Vaclav Pritzl, uav44, uav66, uav71
 
 0.0.4 (2020-02-18)
@@ -74,10 +73,8 @@ Changelog for package mrs_general
 * LOGGER_DEBUG is optional, default false
 * remapped balloons autostart topic
 * added logger verbosity switch to nodelet manager
-* mbzirc autostart is tailored to the challenges
 * excluded camera topics in the general record script
 * de-niced control nodelet manager
-* modify autostart mbzirc wall
 * changed record for better balloons performance
 * fix ch2 simulation world
 * Sensor realsense brick position
@@ -85,8 +82,6 @@ Changelog for package mrs_general
 * thermal frames
 * add world_simulation_challenge2
 * updated nimbro config
-* added rc mode to mbzirc start
-* added mbzirc auto start
 * updated realsense brick tf
 * changed the safety area frames
 * reorganized core.launch
