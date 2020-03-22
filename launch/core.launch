@@ -60,8 +60,8 @@
   <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 'm600')" name="UAV_MASS" default="10.0" />
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="UAV_MASS" default="$(env UAV_MASS)" />
 
-  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') != '')" name="world_file" value="$(find mrs_general)/config/world_$(env WORLD_NAME).yaml" />
-  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') == '' and arg('RUN_TYPE') == 'simulation')" name="world_file" value="$(find mrs_general)/config/world_simulation.yaml" />
+  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') != '')" name="world_file" value="$(find mrs_general)/config/worlds/world_$(env WORLD_NAME).yaml" />
+  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') == '' and arg('RUN_TYPE') == 'simulation')" name="world_file" value="$(find mrs_general)/config/worlds/world_simulation.yaml" />
   <arg if="$(eval arg('WORLD_FILE') != '')" name="world_file" value="$(arg WORLD_FILE)" />
 
     <!-- NodeletManager //{ -->
