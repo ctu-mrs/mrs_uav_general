@@ -387,7 +387,7 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
       std::scoped_lock lock(mutex_control_manager_diagnostics_);
 
       // if takeoff finished
-      if (control_manager_diagnostics.tracker_status.tracker == "MpcTracker" && control_manager_diagnostics.tracker_status.callbacks_enabled) {
+      if (control_manager_diagnostics.active_tracker == "MpcTracker" && !control_manager_diagnostics.tracker_status.moving_reference) {
 
         ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: takeoff finished");
 
