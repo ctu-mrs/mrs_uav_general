@@ -2,13 +2,8 @@
 
 /* includes //{ */
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
-
-#include <mutex>
 
 #include <mrs_lib/ParamLoader.h>
 #include <mrs_lib/mutex.h>
@@ -23,9 +18,6 @@
 #include <mrs_msgs/MpcTrackerDiagnostics.h>
 #include <mrs_msgs/ReferenceStampedSrv.h>
 #include <mrs_msgs/ValidateReference.h>
-
-#include <tf/transform_datatypes.h>
-#include <tf_conversions/tf_eigen.h>
 
 #include <geometry_msgs/PoseStamped.h>
 
