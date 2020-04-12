@@ -43,7 +43,6 @@
 
     <!-- custom configs for controllers -->
   <arg name="config_acceleration_controller" default="" />
-  <arg name="config_attitude_controller" default="" />
   <arg name="config_failsafe_controller" default="" />
   <arg name="config_mpc_controller" default="" />
   <arg name="config_emergency_controller" default="" />
@@ -104,7 +103,6 @@
     <arg name="custom_config_uav_names" value="$(arg config_uav_names)" />
 
     <arg name="custom_config_acceleration_controller" value="$(arg config_acceleration_controller)" />
-    <arg name="custom_config_attitude_controller" value="$(arg config_attitude_controller)" />
     <arg name="custom_config_failsafe_controller" value="$(arg config_failsafe_controller)" />
     <arg name="custom_config_mpc_controller" value="$(arg config_mpc_controller)" />
     <arg name="custom_config_emergency_controller" value="$(arg config_emergency_controller)" />
