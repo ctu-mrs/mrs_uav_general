@@ -5,7 +5,7 @@
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
 
-#include <mrs_lib/ParamLoader.h>
+#include <mrs_lib/param_loader.h>
 #include <mrs_lib/mutex.h>
 
 #include <mavros_msgs/State.h>
@@ -158,7 +158,7 @@ void AutomaticStart::onInit() {
 
   mrs_lib::ParamLoader param_loader(nh_, "AutomaticStart");
 
-  param_loader.load_param("version", _version_);
+  param_loader.loadParam("version", _version_);
 
   if (_version_ != VERSION) {
 
@@ -166,18 +166,18 @@ void AutomaticStart::onInit() {
     ros::shutdown();
   }
 
-  param_loader.load_param("safety_timeout", _safety_timeout_);
-  param_loader.load_param("main_timer_rate", _main_timer_rate_);
-  param_loader.load_param("simulation", _simulation_);
-  param_loader.load_param("call_n_attempts", _start_n_attempts_);
+  param_loader.loadParam("safety_timeout", _safety_timeout_);
+  param_loader.loadParam("main_timer_rate", _main_timer_rate_);
+  param_loader.loadParam("simulation", _simulation_);
+  param_loader.loadParam("call_n_attempts", _start_n_attempts_);
 
-  param_loader.load_param("land_mode", _land_mode_);
-  param_loader.load_param("handle_landing", _handle_landing_);
-  param_loader.load_param("handle_takeoff", _handle_takeoff_);
-  param_loader.load_param("action_duration", _action_duration_);
-  param_loader.load_param("pre_takeoff_sleep", _pre_takeoff_sleep_);
+  param_loader.loadParam("land_mode", _land_mode_);
+  param_loader.loadParam("handle_landing", _handle_landing_);
+  param_loader.loadParam("handle_takeoff", _handle_takeoff_);
+  param_loader.loadParam("action_duration", _action_duration_);
+  param_loader.loadParam("pre_takeoff_sleep", _pre_takeoff_sleep_);
 
-  if (!param_loader.loaded_successfully()) {
+  if (!param_loader.loadedSuccessfully()) {
     ROS_ERROR("[AutomaticStart]: Could not load all parameters!");
     ros::shutdown();
   }
