@@ -14,7 +14,7 @@
   <arg name="fcu_frame_slashless" default="fcu_$(arg UAV_NAME)" />
 
     <!-- Mavros -->
-  <include file="$(find mrs_general)/launch/mavros_uav.launch" />
+  <include file="$(find mrs_uav_general)/launch/mavros_uav.launch" />
 
     <!-- Teraranger one //{ -->
 
@@ -359,7 +359,7 @@
           <arg name="camera_name" default="bluefox_optflow" />
           <arg name="camera" default="$(arg camera_name)" />
           <arg name="frame_id" default="$(arg camera)" />
-          <arg name="calib_url" default="file://$(find mrs_general)/config/camera_calibrations/mv_$(arg cam_device).yaml" />
+          <arg name="calib_url" default="file://$(find mrs_uav_general)/config/camera_calibrations/mv_$(arg cam_device).yaml" />
           <arg name="fps" default="$(arg cam_rate)" />
           <arg name="color" default="false" />
           <arg name="idpf" default="0" />
@@ -531,7 +531,7 @@
           <arg name="camera_name" default="bluefox_brick" />
           <arg name="camera" default="$(arg camera_name)" />
           <arg name="frame_id" default="$(arg camera_frame)" />
-          <arg name="calib_url" default="file://$(find mrs_general)/config/camera_calibrations/mv_$(arg cam_device).yaml" />
+          <arg name="calib_url" default="file://$(find mrs_uav_general)/config/camera_calibrations/mv_$(arg cam_device).yaml" />
           <arg name="fps" default="$(arg cam_rate)" />
           <arg name="color" default="true" />
           <arg name="idpf" default="0" />
@@ -649,7 +649,7 @@
           <arg name="camera_name" default="bluefox_left" />
           <arg name="camera" default="$(arg camera_name)" />
           <arg name="frame_id" default="$(arg camera_frame)" />
-          <arg name="calib_url" default="file://$(find mrs_general)/config/camera_calibrations/mv_$(arg cam_device)_darpa.yaml" />
+          <arg name="calib_url" default="file://$(find mrs_uav_general)/config/camera_calibrations/mv_$(arg cam_device)_darpa.yaml" />
           <arg name="fps" default="$(arg cam_rate)" />
           <arg name="color" default="true" />
           <arg name="idpf" default="0" />
@@ -757,7 +757,7 @@
           <arg name="camera_name" default="bluefox_right" />
           <arg name="camera" default="$(arg camera_name)" />
           <arg name="frame_id" default="$(arg camera_frame)" />
-          <arg name="calib_url" default="file://$(find mrs_general)/config/camera_calibrations/mv_$(arg cam_device)_darpa.yaml" />
+          <arg name="calib_url" default="file://$(find mrs_uav_general)/config/camera_calibrations/mv_$(arg cam_device)_darpa.yaml" />
           <arg name="fps" default="$(arg cam_rate)" />
           <arg name="color" default="true" />
           <arg name="idpf" default="0" />
@@ -881,7 +881,7 @@
           <arg name="camera_name" default="bluefox_net" />
           <arg name="camera" default="$(arg camera_name)" />
           <arg name="frame_id" default="$(arg camera_frame)" />
-          <arg name="calib_url" default="file://$(find mrs_general)/config/camera_calibrations/mv_$(arg cam_device).yaml" />
+          <arg name="calib_url" default="file://$(find mrs_uav_general)/config/camera_calibrations/mv_$(arg cam_device).yaml" />
           <arg name="fps" default="$(arg cam_rate)" />
           <arg name="color" default="true" />
           <arg name="idpf" default="0" />
@@ -998,7 +998,7 @@
 
           <arg name="camera_serial" default="$(env BLUEFOX3_FRONT)" />
           <arg name="frame_id" default="$(arg camera_frame)" />
-          <arg name="calib_url" default="file://$(find mrs_general)/config/camera_calibrations/mv_$(arg camera_serial).yaml" />
+          <arg name="calib_url" default="file://$(find mrs_uav_general)/config/camera_calibrations/mv_$(arg camera_serial).yaml" />
 
           <arg name="cam_output" default="screen" />
 

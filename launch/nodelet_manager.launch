@@ -12,7 +12,7 @@
   <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch" />
   <arg unless="$(arg debug)" name="launch_prefix" value="" />
 
-  <arg     if="$(arg LOGGER_DEBUG)" name="logger_debug_file" value="$(find mrs_general)/config/logger_verbosity/debug_verbosity.conf" />
+  <arg     if="$(arg LOGGER_DEBUG)" name="logger_debug_file" value="$(find mrs_uav_general)/config/logger_verbosity/debug_verbosity.conf" />
   <arg unless="$(arg LOGGER_DEBUG)" name="logger_debug_file" value="" />
 
   <env name="ROSCONSOLE_CONFIG_FILE" value="$(arg logger_debug_file)"/>

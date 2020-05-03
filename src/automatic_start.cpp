@@ -25,7 +25,7 @@
 
 //}
 
-namespace mrs_general
+namespace mrs_uav_general
 {
 
 namespace automatic_start
@@ -862,7 +862,7 @@ bool AutomaticStart::stop() {
 
 }  // namespace automatic_start
 
-}  // namespace mrs_general
+}  // namespace mrs_uav_general
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(mrs_general::automatic_start::AutomaticStart, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(mrs_uav_general::automatic_start::AutomaticStart, nodelet::Nodelet)

@@ -1,5 +1,5 @@
 <library path="lib/libAutomaticStart">
-  <class name="mrs_general/AutomaticStart" type="mrs_general::automatic_start::AutomaticStart" base_class_type="nodelet::Nodelet">
+  <class name="mrs_uav_general/AutomaticStart" type="mrs_uav_general::automatic_start::AutomaticStart" base_class_type="nodelet::Nodelet">
     <description>AutomaticStart nodelet</description>
   </class>
 </library>

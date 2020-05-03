@@ -58,13 +58,13 @@
   <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 'eaglemk2')" name="UAV_MASS" default="10.0" />
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="UAV_MASS" default="$(env UAV_MASS)" />
 
-  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') != '')" name="world_file" value="$(find mrs_general)/config/worlds/world_$(env WORLD_NAME).yaml" />
-  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') == '' and arg('RUN_TYPE') == 'simulation')" name="world_file" value="$(find mrs_general)/config/worlds/world_simulation.yaml" />
+  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') != '')" name="world_file" value="$(find mrs_uav_general)/config/worlds/world_$(env WORLD_NAME).yaml" />
+  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') == '' and arg('RUN_TYPE') == 'simulation')" name="world_file" value="$(find mrs_uav_general)/config/worlds/world_simulation.yaml" />
   <arg if="$(eval arg('WORLD_FILE') != '')" name="world_file" value="$(arg WORLD_FILE)" />
 
     <!-- NodeletManager //{ -->
 
-  <include file="$(find mrs_general)/launch/nodelet_manager.launch">
+  <include file="$(find mrs_uav_general)/launch/nodelet_manager.launch">
 
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="debug" value="$(arg DEBUG)" />
@@ -76,7 +76,7 @@
 
   <!-- ControlManager //{ -->
 
-  <include file="$(find mrs_uav_manager)/launch/control_manager.launch">
+  <include file="$(find mrs_uav_managers)/launch/control_manager.launch">
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
@@ -113,7 +113,7 @@
 
   <!-- Odometry //{ -->
 
-  <include file="$(find mrs_odometry)/launch/odometry.launch">
+  <include file="$(find mrs_uav_odometry)/launch/odometry.launch">
 
     <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
@@ -130,7 +130,7 @@
 
   <!-- ConstraintManager //{ -->
 
-  <include file="$(find mrs_uav_manager)/launch/constraint_manager.launch">
+  <include file="$(find mrs_uav_managers)/launch/constraint_manager.launch">
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
@@ -146,7 +146,7 @@
 
   <!-- GainManger //{ -->
 
-  <include file="$(find mrs_uav_manager)/launch/gain_manager.launch">
+  <include file="$(find mrs_uav_managers)/launch/gain_manager.launch">
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
@@ -162,7 +162,7 @@
 
   <!-- UavManager //{ -->
 
-  <include file="$(find mrs_uav_manager)/launch/uav_manager.launch">
+  <include file="$(find mrs_uav_managers)/launch/uav_manager.launch">
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="UAV_MASS" value="$(arg UAV_MASS)" />

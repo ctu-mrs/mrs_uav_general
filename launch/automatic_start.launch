@@ -19,9 +19,9 @@
 
   <group ns="$(arg UAV_NAME)">
 
-    <node name="automatic_start" pkg="nodelet" type="nodelet" args="$(arg nodelet) mrs_general/AutomaticStart $(arg nodelet_manager)" output="screen">
+    <node name="automatic_start" pkg="nodelet" type="nodelet" args="$(arg nodelet) mrs_uav_general/AutomaticStart $(arg nodelet_manager)" output="screen">
 
-      <rosparam file="$(find mrs_general)/config/automatic_start.yaml" />
+      <rosparam file="$(find mrs_uav_general)/config/automatic_start.yaml" />
 
       <param name="simulation" value="$(arg simulation)" />
 

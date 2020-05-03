@@ -1,7 +1,7 @@
 <launch>
 
   <!-- set broadcast ip -->
-  <node name="set_broadcast" pkg="mrs_general" type="set_broadcast_rc_variable.sh" output='screen' />
+  <node name="set_broadcast" pkg="mrs_uav_general" type="set_broadcast_rc_variable.sh" output='screen' />
 
   <!-- args corresponding to environment variables -->
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
@@ -30,10 +30,10 @@
       <param name="topic_prefix" value="$(arg UAV_NAME)" />
 
         <!-- Load a config YAML file -->
-      <rosparam if="$(eval arg('RUN_TYPE') == 'uav')" file="$(find mrs_general)/config/uav_names.yaml" />
-      <rosparam if="$(eval arg('RUN_TYPE') == 'simulation')" file="$(find mrs_general)/config/uav_names_simulation.yaml" />
+      <rosparam if="$(eval arg('RUN_TYPE') == 'uav')" file="$(find mrs_uav_general)/config/uav_names.yaml" />
+      <rosparam if="$(eval arg('RUN_TYPE') == 'simulation')" file="$(find mrs_uav_general)/config/uav_names_simulation.yaml" />
       <rosparam if="$(eval not arg('custom_config_uav_names') == '')" file="$(arg custom_config_uav_names)" />
-      <rosparam command="load" file="$(find mrs_general)/config/communication_config.yaml" />
+      <rosparam command="load" file="$(find mrs_uav_general)/config/communication_config.yaml" />
       <rosparam command="load" if="$(eval arg('custom_config') != '')" file="$(arg custom_config)" />
     </node>
 
@@ -60,7 +60,7 @@
       <param name="topic_prefix" value="$(arg UAV_NAME)" />
 
         <!-- Load a config YAML file -->
-      <rosparam command="load" file="$(find mrs_general)/config/communication_config.yaml" />
+      <rosparam command="load" file="$(find mrs_uav_general)/config/communication_config.yaml" />
       <rosparam command="load" if="$(eval arg('custom_config') != '')" file="$(arg custom_config)" />
     </node>
   </group>
