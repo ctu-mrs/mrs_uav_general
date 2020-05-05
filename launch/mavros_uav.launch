@@ -1,28 +1,37 @@
 <launch>
 
+	<arg name="fcu_url" default="/dev/pixhawk:921600" />
+	<arg name="gcs_url" default="" />
+	<arg name="tgt_system" default="" />
+	<arg name="tgt_component" default="" />
+	<arg name="pluginlists_yaml" value="$(find mrs_uav_general)/config/px4_pluginlists.yaml" />
+	<arg name="config_yaml" value="$(find mrs_uav_general)/config/px4_config.yaml" />
+	<arg name="log_output" default="screen" />
+	<arg name="fcu_protocol" default="v2.0" />
+	<arg name="respawn_mavros" default="false" />
+
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
 
   <group ns="$(arg UAV_NAME)">
 
-    <arg name="fcu_url" default="/dev/pixhawk:921600" />
-    <arg name="gcs_url" default="" />
-    <arg name="tgt_system" default="1" />
-    <arg name="tgt_component" default="1" />
-    <arg name="log_output" default="screen" />
+		<node pkg="mavros" type="mavros_node" name="mavros" required="$(eval not respawn_mavros)" clear_params="true" output="$(arg log_output)" respawn="$(arg respawn_mavros)">
 
-    <include file="$(find mavros)/launch/node.launch">
+			<param name="fcu_url" value="$(arg fcu_url)" />
+			<param name="gcs_url" value="$(arg gcs_url)" />
+			<param name="target_system_id" value="$(arg tgt_system)" />
+			<param name="target_component_id" value="$(arg tgt_component)" />
+			<param name="fcu_protocol" value="$(arg fcu_protocol)" />
 
-      <arg name="pluginlists_yaml" value="$(find mrs_uav_general)/config/px4_pluginlists.yaml" />
-      <arg name="config_yaml" value="$(find mrs_uav_general)/config/px4_config.yaml" />
+			<param name="distance_sensor/garmin/frame_id" value="$(arg UAV_NAME)/garmin" />
 
-      <arg name="fcu_url" value="$(arg fcu_url)" />
-      <arg name="gcs_url" value="$(arg gcs_url)" />
-      <arg name="tgt_system" value="$(arg tgt_system)" />
-      <arg name="tgt_component" value="$(arg tgt_component)" />
-      <arg name="log_output" value="$(arg log_output)" />
-      <arg name="uav_name" value="$(arg UAV_NAME)" />
+			<!-- load blacklist, config -->
+			<rosparam command="load" file="$(arg pluginlists_yaml)" />
+			<rosparam command="load" file="$(arg config_yaml)" />
 
-    </include>
+			<!-- prevent all uavs from publishing to the same diagnostics topic -->
+			<remap from="/diagnostics" to="/$(arg UAV_NAME)/diagnostics" />
+
+		</node>
 
   </group>
 
