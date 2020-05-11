@@ -332,7 +332,8 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
 
     case STATE_IDLE: {
 
-      validateReference();
+      // TODO this needs to be 2-D only
+      /* validateReference(); */
 
       if (armed && !motors) {
 
@@ -693,8 +694,7 @@ void AutomaticStart::validateReference() {
 
   mrs_msgs::ValidateReference srv_out;
 
-  srv_out.request.reference.header.frame_id      = "fcu";
-  srv_out.request.reference.reference.position.z = 3.0;
+  srv_out.request.reference.header.frame_id = "fcu";
 
   bool res = service_client_validate_reference_.call(srv_out);
 
