@@ -4,7 +4,7 @@
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
   <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
 
-  <arg name="challenge" default="" />
+  <arg name="custom_config" default="" />
 
   <arg if="$(eval arg('RUN_TYPE') == 'simulation')" name="simulation" default="true" />
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="simulation" default="false" />
@@ -22,6 +22,9 @@
     <node name="automatic_start" pkg="nodelet" type="nodelet" args="$(arg nodelet) mrs_uav_general/AutomaticStart $(arg nodelet_manager)" output="screen">
 
       <rosparam file="$(find mrs_uav_general)/config/automatic_start.yaml" />
+
+      <!-- Load a user param file -->
+      <rosparam if="$(eval not arg('custom_config') == '')" file="$(arg custom_config)" />
 
       <param name="uav_name" value="$(arg UAV_NAME)" />
 
