@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
   std_msgs
   mavros_msgs
+  topic_tools
   )
 
 catkin_package(

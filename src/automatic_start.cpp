@@ -23,6 +23,8 @@
 
 #include <sensor_msgs/CameraInfo.h>
 
+#include <topic_tools/shape_shifter.h>
+
 //}
 
 namespace mrs_uav_general
@@ -30,6 +32,33 @@ namespace mrs_uav_general
 
 namespace automatic_start
 {
+
+/* class Topic //{ */
+
+class Topic {
+private:
+  std::string topic_name_;
+  ros::Time   last_time_;
+
+public:
+  Topic(std::string topic_name) : topic_name_(topic_name) {
+    last_time_ = ros::Time(0);
+  }
+
+  void updateTime(void) {
+    last_time_ = ros::Time::now();
+  }
+
+  ros::Time getTime(void) {
+    return last_time_;
+  }
+
+  std::string getTopicName(void) {
+    return topic_name_;
+  }
+};
+
+//}
 
 /* class AutomaticStart //{ */
 
@@ -57,8 +86,9 @@ public:
 private:
   ros::NodeHandle nh_;
   bool            is_initialized_ = false;
-  bool            _simulation_    = false;
   std::string     _version_;
+
+  std::string _uav_name_;
 
   // | --------------------- service clients -------------------- |
 
@@ -112,7 +142,7 @@ private:
   bool elandImpl();
   bool landHomeImpl();
   bool land();
-  void validateReference();
+  bool validateReference();
 
   bool setMotors(const bool value);
   bool disarm();
@@ -138,6 +168,18 @@ private:
 
   uint current_state = STATE_IDLE;
   void changeState(LandingStates_t new_state);
+
+  // | ---------------- generic topic subscribers --------------- |
+
+  bool                     _topic_check_enabled_ = false;
+  double                   _topic_check_timeout_;
+  std::vector<std::string> _topic_check_topic_names_;
+
+  std::vector<Topic>           topic_check_topics_;
+  std::vector<ros::Subscriber> generic_subscriber_vec_;
+
+  // generic callback, for any topic, to monitor its rate
+  void genericCallback(const topic_tools::ShapeShifter::ConstPtr& msg, const std::string& topic_name, const int id);
 };
 
 //}
@@ -166,9 +208,10 @@ void AutomaticStart::onInit() {
     ros::shutdown();
   }
 
+  param_loader.loadParam("uav_name", _uav_name_);
+
   param_loader.loadParam("safety_timeout", _safety_timeout_);
   param_loader.loadParam("main_timer_rate", _main_timer_rate_);
-  param_loader.loadParam("simulation", _simulation_);
   param_loader.loadParam("call_n_attempts", _start_n_attempts_);
 
   param_loader.loadParam("land_mode", _land_mode_);
@@ -176,6 +219,10 @@ void AutomaticStart::onInit() {
   param_loader.loadParam("handle_takeoff", _handle_takeoff_);
   param_loader.loadParam("action_duration", _action_duration_);
   param_loader.loadParam("pre_takeoff_sleep", _pre_takeoff_sleep_);
+
+  param_loader.loadParam("topic_check/enabled", _topic_check_enabled_);
+  param_loader.loadParam("topic_check/timeout", _topic_check_timeout_);
+  param_loader.loadParam("topic_check/topics", _topic_check_topic_names_);
 
   if (!param_loader.loadedSuccessfully()) {
     ROS_ERROR("[AutomaticStart]: Could not load all parameters!");
@@ -211,6 +258,32 @@ void AutomaticStart::onInit() {
 
   service_client_stop_ = nh_.serviceClient<std_srvs::Trigger>("stop_out");
 
+  // | ------------------ setup generic topics ------------------ |
+
+  if (_topic_check_enabled_) {
+
+    boost::function<void(const topic_tools::ShapeShifter::ConstPtr&)> callback;
+
+    for (int i = 0; i < int(_topic_check_topic_names_.size()); i++) {
+
+      std::string topic_name = _topic_check_topic_names_[i];
+
+      if (topic_name.at(0) != '/') {
+        topic_name = "/" + _uav_name_ + "/" + topic_name;
+      }
+
+      Topic tmp_topic(topic_name);
+      topic_check_topics_.push_back(tmp_topic);
+
+      int id = i;  // id to identify which topic called the generic callback
+
+      callback                       = [this, topic_name, id](const topic_tools::ShapeShifter::ConstPtr& msg) -> void { genericCallback(msg, topic_name, id); };
+      ros::Subscriber tmp_subscriber = nh_.subscribe(topic_name, 1, callback);
+
+      generic_subscriber_vec_.push_back(tmp_subscriber);
+    }
+  }
+
   // | ------------------------- timers ------------------------- |
 
   timer_main_ = nh_.createTimer(ros::Rate(_main_timer_rate_), &AutomaticStart::timerMain, this);
@@ -225,6 +298,15 @@ void AutomaticStart::onInit() {
 // --------------------------------------------------------------
 // |                          callbacks                         |
 // --------------------------------------------------------------
+
+/* genericCallback() //{ */
+
+void AutomaticStart::genericCallback([[maybe_unused]] const topic_tools::ShapeShifter::ConstPtr& msg, [[maybe_unused]] const std::string& topic_name,
+                                     const int id) {
+  topic_check_topics_[id].updateTime();
+}
+
+//}
 
 /* callbackMavrosState() //{ */
 
@@ -327,20 +409,39 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
 
   bool   motors           = control_manager_diagnostics.motors;
   double time_from_arming = (ros::Time::now() - armed_time).toSec();
+  bool   position_valid   = validateReference();
+
+  bool got_topics = true;
+
+  std::stringstream missing_topics;
+
+  if (_topic_check_enabled_) {
+
+    for (int i = 0; i < int(topic_check_topics_.size()); i++) {
+      if ((ros::Time::now() - topic_check_topics_[i].getTime()).toSec() > _topic_check_timeout_) {
+        missing_topics << std::endl << "\t" << topic_check_topics_[i].getTopicName();
+        got_topics = false;
+      }
+    }
+  }
+
+  if (!got_topics) {
+    ROS_WARN_STREAM_THROTTLE(1.0, "[AutomaticStart]: missing data on topics: " << missing_topics.str());
+  }
 
   switch (current_state) {
 
     case STATE_IDLE: {
 
-      // TODO this needs to be 2-D only
-      /* validateReference(); */
-
       if (armed && !motors) {
 
-        double res = setMotors(true);
+        if (position_valid && got_topics) {
 
-        if (!res) {
-          ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: could not set motors ON");
+          double res = setMotors(true);
+
+          if (!res) {
+            ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: could not set motors ON");
+          }
         }
 
         if (time_from_arming > 1.5) {
@@ -690,7 +791,7 @@ bool AutomaticStart::land() {
 
 /* validateReference() //{ */
 
-void AutomaticStart::validateReference() {
+bool AutomaticStart::validateReference() {
 
   mrs_msgs::ValidateReference srv_out;
 
@@ -702,16 +803,19 @@ void AutomaticStart::validateReference() {
 
     if (srv_out.response.success) {
 
-      ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: current pos is inside of the safety area");
+      ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: current postion is valid");
+      return true;
 
     } else {
 
-      ROS_ERROR_THROTTLE(1.0, "[AutomaticStart]: the current pos is outside of the safety area!");
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStart]: current position is not valid (safety area, bumper)!");
+      return false;
     }
 
   } else {
 
-    ROS_ERROR_THROTTLE(1.0, "[AutomaticStart]: current pos could not be validated");
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStart]: current position could not be validated");
+    return false;
   }
 }
 
