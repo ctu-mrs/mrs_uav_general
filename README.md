@@ -21,5 +21,5 @@ This package contains configuration files, launch files, and utilities that are 
 * **automatic start** utility - triggers automatic takeoff after the uav is **arm** and successfully in **offboard**
   * disarms the UAV when pre-conditions are not met
   * can check for messages being published on topics specified in the [config file](https://github.com/ctu-mrs/mrs_uav_general/blob/master/config/automatic_start.yaml)
-  * can trigger *user nodes* after takeoff via its `automatic_start/start` service (*std_srvs/Trigger)
+  * can trigger *user nodes* after takeoff via its `automatic_start/start` service (of type *std_srvs/Trigger*)
 * **record.sh** script - generates and launches a launch file for recording rosbag (its simpler to add exclusions to this script)
