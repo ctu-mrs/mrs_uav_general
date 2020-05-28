@@ -4,7 +4,7 @@
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
   <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
 
-  <arg name="challenge" default="" />
+  <arg name="custom_config" default="" />
 
   <arg if="$(eval arg('RUN_TYPE') == 'simulation')" name="simulation" default="true" />
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="simulation" default="false" />
@@ -23,7 +23,10 @@
 
       <rosparam file="$(find mrs_uav_general)/config/automatic_start.yaml" />
 
-      <param name="simulation" value="$(arg simulation)" />
+      <!-- Load a user param file -->
+      <rosparam if="$(eval not arg('custom_config') == '')" file="$(arg custom_config)" />
+
+      <param name="uav_name" value="$(arg UAV_NAME)" />
 
         <!-- Subscribers -->
       <remap from="~mavros_state_in" to="mavros/state" />
@@ -36,7 +39,7 @@
       <remap from="~eland_out" to="control_manager/eland" />
       <remap from="~motors_out" to="control_manager/motors" />
       <remap from="~arm_out" to="mavros/cmd/arming" />
-      <remap from="~validate_reference_out" to="control_manager/validate_reference" />
+      <remap from="~validate_reference_out" to="control_manager/validate_reference_2d" />
 
       <remap from="~start_out" to="~start" />
       <remap from="~stop_out" to="~stop" />
