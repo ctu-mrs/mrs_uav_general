@@ -1036,6 +1036,12 @@
 
       <group if="$(eval 'ouster' in arg('SENSORS'))">
 
+        <!-- Ouster env. variables: -->
+        <!-- OUSTER_IP          (required, IP address of the Ouster sensor) --> 
+        <!-- OUSTER_UDP_DEST_IP (required, IP address where Ouster will send data) --> 
+        <!-- OUSTER_CABLE_FRONT (optional (default: false), orientation of the sensor (true rotates TF by pi in z-axis)) --> 
+        <!-- OUSTER_STANDALONE  (optional (default: false), run ouster nodes as standalone) --> 
+
         <arg name="ouster_frame" default="$(arg UAV_NAME)/os1_sensor" />
         <arg name="ouster_lidar_frame" default="$(arg UAV_NAME)/os1_lidar" />
         <arg name="ouster_imu_frame" default="$(arg UAV_NAME)/os1_imu" />
@@ -1043,17 +1049,37 @@
         <arg name="ouster_lidar_slashless" default="os1_lidar_$(arg UAV_NAME)" />
         <arg name="ouster_imu_slashless" default="os1_imu_$(arg UAV_NAME)" />
 
-          <!-- Platform specific TF -->
-        <group if="$(eval arg('UAV_TYPE') == 'f450')">
-          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg ouster_frame_slashless)" args="0.0 0.0 0.078 0 0.0 0.0 $(arg fcu_frame) $(arg ouster_frame)" />
+        <arg   name="ouster_cable_front" default="$(optenv OUSTER_CABLE_FRONT false)" />
+        <arg     if="$(eval arg('ouster_cable_front'))" name="ouster_heading" value="3.14159265359" />
+        <arg unless="$(eval arg('ouster_cable_front'))" name="ouster_heading" value="0.0" />
+        
+        <!-- Nodelet manager -->
+        <arg   name="ouster_standalone" default="$(optenv OUSTER_STANDALONE false)" />
+        <arg     if="$(arg ouster_standalone)" name="ouster_nodelet" value="standalone" />
+        <arg unless="$(arg ouster_standalone)" name="ouster_nodelet" value="load" />
+        <arg     if="$(arg ouster_standalone)" name="ouster_nodelet_manager" value="" />
+        <arg unless="$(arg ouster_standalone)" name="ouster_nodelet_manager" value="$(arg UAV_NAME)_ouster_nodelet_manager" />
+
+        <group ns="$(arg UAV_NAME)" if="$(eval arg('ouster_standalone') == 0)">
+          <node pkg="nodelet" type="nodelet" name="$(arg ouster_nodelet_manager)" args="manager" output="screen">
+            <param name="num_worker_threads" value="8" />
+          </node>
         </group>
 
-        <!-- General Ouster TF -->
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg ouster_frame_slashless)_to_$(arg ouster_lidar_slashless)" args="0.0 0.0 0.03618 3.14159265359 0.0 0.0 $(arg ouster_frame) $(arg ouster_lidar_frame)" />
-        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg ouster_frame_slashless)_to_$(arg ouster_imu_slashless)" args="0.006253 -0.011775 0.007645 0 0 0 $(arg ouster_frame) $(arg ouster_imu_frame)" />
+        <!-- Platform specific TF -->
+        <group if="$(eval arg('UAV_TYPE') == 'f450')">
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg ouster_frame_slashless)" args="0.0 0.0 0.08 $(arg ouster_heading) 0.0 0.0 $(arg fcu_frame) $(arg ouster_frame)" />
+        </group>
+        
+        <group if="$(eval arg('UAV_TYPE') == 't650')">
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg ouster_frame_slashless)" args="0.0 0.0 0.10 $(arg ouster_heading) 0.0 0.0 $(arg fcu_frame) $(arg ouster_frame)" />
+        </group>
 
-          <!-- The node -->
-        <include file="$(find ouster_ros)/launch/uav.launch" />
+        <!-- The node -->
+        <include file="$(find os1_driver)/launch/uav.launch" >
+          <arg name="nodelet" value="$(arg ouster_nodelet)" />
+          <arg name="nodelet_manager" value="$(arg ouster_nodelet_manager)" />
+        </include>
 
       </group>
 
