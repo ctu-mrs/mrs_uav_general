@@ -46,7 +46,7 @@
   <arg name="config_mpc_controller" default="" />
   <arg name="config_emergency_controller" default="" />
   <arg name="config_nsf_controller" default="" />
-  <arg name="config_so3_controller" default="" />
+  <arg name="config_se3_controller" default="" />
 
   <arg name="g" default="9.8" />
   <arg name="n_threads" default="16" />
@@ -105,7 +105,7 @@
     <arg name="custom_config_mpc_controller" value="$(arg config_mpc_controller)" />
     <arg name="custom_config_emergency_controller" value="$(arg config_emergency_controller)" />
     <arg name="custom_config_nsf_controller" value="$(arg config_nsf_controller)" />
-    <arg name="custom_config_so3_controller" value="$(arg config_so3_controller)" />
+    <arg name="custom_config_se3_controller" value="$(arg config_se3_controller)" />
 
   </include>
 
