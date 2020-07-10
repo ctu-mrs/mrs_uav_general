@@ -23,27 +23,13 @@
   <arg name="map_start_x" default="0.5" /> 
   <arg name="map_start_y" default="0.5" />
 
-  <!-- will it run using GNU debugger? -->
-  <arg name="DEBUG" default="false" />
-  <arg unless="$(arg DEBUG)" name="launch_prefix_debug" value=""/>
-  <arg     if="$(arg DEBUG)" name="launch_prefix_debug" value="debug_roslaunch"/>
-
-  <!-- will it run as standalone nodelet or using a nodelet manager? -->
-  <arg name="standalone" default="true" />
-  <arg name="manager" default="$(arg UAV_NAME)_waypointflier_manager" />
-  <arg name="n_threads" default="8" />
-  <arg unless="$(arg standalone)" name="nodelet" value="load"/>
-  <arg     if="$(arg standalone)" name="nodelet" value="standalone"/>
-  <arg unless="$(arg standalone)" name="nodelet_manager" value="$(arg manager)"/>
-  <arg     if="$(arg standalone)" name="nodelet_manager" value=""/>
 
   <group ns="$(arg UAV_NAME)">
 
   <!-- Static TFs -->
   <node pkg="tf2_ros" type="static_transform_publisher" name="hector_origin_to_hector_map" args="0 0 0 0 0 0 $(arg UAV_NAME)/hector_origin $(arg map_frame)" />
 
-    <!-- HectorMapping nodelet -->
-    <node pkg="nodelet" type="nodelet" name="hector_mapping" args="$(arg nodelet) hector_mapping/HectorMappingRos $(arg nodelet_manager)" launch-prefix="$(arg launch_prefix_debug)" output="screen">
+    <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
 
       <!-- Frame names -->
       <param name="map_frame" value="$(arg map_frame)" />
