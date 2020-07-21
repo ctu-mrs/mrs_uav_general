@@ -1150,7 +1150,6 @@
         <!-- OUSTER_IP          (required, IP address of the Ouster sensor) --> 
         <!-- OUSTER_UDP_DEST_IP (required, IP address where Ouster will send data) --> 
         <!-- OUSTER_CABLE_FRONT (optional (default: false), orientation of the sensor (true rotates TF by pi in z-axis)) --> 
-        <!-- OUSTER_STANDALONE  (optional (default: false), run ouster nodes as standalone) --> 
 
         <arg name="ouster_frame" default="$(arg UAV_NAME)/os1_sensor" />
         <arg name="ouster_lidar_frame" default="$(arg UAV_NAME)/os1_lidar" />
@@ -1162,19 +1161,6 @@
         <arg   name="ouster_cable_front" default="$(optenv OUSTER_CABLE_FRONT false)" />
         <arg     if="$(eval arg('ouster_cable_front'))" name="ouster_heading" value="3.14159265359" />
         <arg unless="$(eval arg('ouster_cable_front'))" name="ouster_heading" value="0.0" />
-        
-        <!-- Nodelet manager -->
-        <arg   name="ouster_standalone" default="$(optenv OUSTER_STANDALONE false)" />
-        <arg     if="$(arg ouster_standalone)" name="ouster_nodelet" value="standalone" />
-        <arg unless="$(arg ouster_standalone)" name="ouster_nodelet" value="load" />
-        <arg     if="$(arg ouster_standalone)" name="ouster_nodelet_manager" value="" />
-        <arg unless="$(arg ouster_standalone)" name="ouster_nodelet_manager" value="$(arg UAV_NAME)_ouster_nodelet_manager" />
-
-        <group ns="$(arg UAV_NAME)" if="$(eval arg('ouster_standalone') == 0)">
-          <node pkg="nodelet" type="nodelet" name="$(arg ouster_nodelet_manager)" args="manager" output="screen">
-            <param name="num_worker_threads" value="8" />
-          </node>
-        </group>
 
         <!-- Platform specific TF -->
         <group if="$(eval arg('UAV_TYPE') == 'f450')">
@@ -1185,11 +1171,31 @@
           <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg ouster_frame_slashless)" args="0.0 0.0 0.10 $(arg ouster_heading) 0.0 0.0 $(arg fcu_frame) $(arg ouster_frame)" />
         </group>
 
-        <!-- The node -->
-        <include file="$(find os1_driver)/launch/uav.launch" >
-          <arg name="nodelet" value="$(arg ouster_nodelet)" />
-          <arg name="nodelet_manager" value="$(arg ouster_nodelet_manager)" />
-        </include>
+
+      </group>
+
+      <!-- //} -->
+
+  <!-- PMD pico flexx //{ -->
+
+  <group if="$(eval ('picoflexx' in arg('SENSORS')))">
+
+    <arg name="picoflexx_frame" default="$(arg UAV_NAME)/picoflexx" />
+    <arg name="picoflexx_frame_slashless" default="$(arg UAV_NAME)_picoflexx" />
+
+      <!-- TF -->
+
+      <!-- up //{ -->
+
+    <group if="$(eval ('picoflexx_up' in arg('SENSORS').replace(',', ' ').split()))">
+
+      <group if="$(eval arg('UAV_TYPE') == 't650')">
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg picoflexx_frame_slashless)" args="0.06 0.0 0.075 3.14159265359 -1.57079632679 0 $(arg fcu_frame) $(arg picoflexx_frame)" />
+      </group>
+
+    </group>
+
+    <!-- //} -->
 
       </group>
 
