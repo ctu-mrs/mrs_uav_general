@@ -14,7 +14,7 @@
   <arg name="fcu_frame_slashless" default="fcu_$(arg UAV_NAME)" />
 
     <!-- Mavros -->
-  <!-- <include file="$(find mrs_uav_general)/launch/mavros_uav.launch" /> -->
+  <include file="$(find mrs_uav_general)/launch/mavros_uav.launch" />
 
     <!-- Teraranger one //{ -->
 
