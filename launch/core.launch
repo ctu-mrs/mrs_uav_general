@@ -9,17 +9,17 @@
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
   <arg name="PIXGARM" default="$(optenv PIXGARM false)" />
   <arg name="SENSORS" default="$(optenv SENSORS)" />
-  <arg name="STANDALONE" default="$(optenv STANDALONE false)" />
   <arg name="BODY_DISTURBANCE_X" default="$(optenv INITIAL_DISTURBANCE_X 0.0)" />
   <arg name="BODY_DISTURBANCE_Y" default="$(optenv INITIAL_DISTURBANCE_Y 0.0)" />
   <arg name="DEBUG" default="$(optenv DEBUG false)" />
+  <arg name="LOGGER_DEBUG" default="$(optenv LOGGER_DEBUG false)" />
   <arg name="WORLD_FILE" default="$(optenv WORLD_FILE)" />
   <arg name="WORLD_NAME" default="$(optenv WORLD_NAME)" />
 
-    <!-- currently, ROS_IP has to be set to 127.0.0.1 otherwise ROS dies when -->
-    <!-- the drone disconnects from wifi -->
-  <!-- <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="ROS_IP" default="$(optenv ROS_IP none)" /> -->
-  <!-- <arg if="$(eval arg('RUN_TYPE') == 'uav' and arg('ROS_IP') != '127.0.0.1')" name="SET_YOUR_ROS_IP_TO_127.0.0.1" default="$(env MISSING_ROS_IP)" /> -->
+  <arg if="$(eval not arg('LOGGER_DEBUG'))" name="STANDALONE" default="$(optenv STANDALONE false)" />
+  <arg if="$(eval arg('LOGGER_DEBUG'))" name="STANDALONE" default="true" />
+
+  <env name="ROSCONSOLE_CONFIG_FILE" if="$(eval arg('LOGGER_DEBUG'))" value="$(find mrs_uav_general)/config/debug_verbosity.yaml" />
 
     <!-- currently, ROS_MASTER_URI has to be set to http://localhost:11311 otherwise ROS dies when -->
     <!-- the drone disconnects from wifi -->
@@ -125,6 +125,21 @@
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="WORLD_FILE" value="$(arg world_file)" />
     <arg name="custom_config" value="$(arg config_odometry)" />
+
+  </include>
+
+  <!-- //} -->
+
+  <!-- MavrosDiagnostics //{ -->
+
+  <include file="$(find mrs_mavros_interface)/launch/mavros_diagnostics.launch">
+
+    <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
+    <arg name="PROFILER" value="$(arg PROFILER)" />
+    <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
+    <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
+
+    <arg name="standalone" value="$(arg STANDALONE)" />
 
   </include>
 
