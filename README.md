@@ -1,4 +1,4 @@
-# MRS UAV general [![Build Status](https://travis-ci.com/ctu-mrs/mrs_uav_general.svg?branch=master)](https://travis-ci.com/ctu-mrs/mrs_uav_general)
+# MRS UAV general [![Build Status](https://github.com/ctu-mrs/mrs_uav_general/workflows/CI/badge.svg)](https://github.com/ctu-mrs/mrs_uav_general/actions)
 
 ![](.fig/thumbnail.jpg)
 
