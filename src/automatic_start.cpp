@@ -7,7 +7,6 @@
 
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/mutex.h>
-#include <mrs_lib/timer.h>
 
 #include <mavros_msgs/State.h>
 #include <mavros_msgs/CommandBool.h>
@@ -25,16 +24,6 @@
 #include <sensor_msgs/CameraInfo.h>
 
 #include <topic_tools/shape_shifter.h>
-
-//}
-
-/* using //{ */
-
-#if ROS_VERSION_MINIMUM(1, 15, 8)
-using Timer = mrs_lib::ThreadTimer;
-#else
-using Timer = mrs_lib::ROSTimer;
-#endif
 
 //}
 
@@ -120,7 +109,7 @@ private:
 
   // | ----------------------- main timer ----------------------- |
 
-  Timer timer_main_;
+  ros::Timer timer_main_;
   void       timerMain(const ros::TimerEvent& event);
   double     _main_timer_rate_;
 
@@ -297,7 +286,7 @@ void AutomaticStart::onInit() {
 
   // | ------------------------- timers ------------------------- |
 
-  timer_main_ = Timer(nh_, ros::Rate(_main_timer_rate_), &AutomaticStart::timerMain, this);
+  timer_main_ = nh_.createTimer(ros::Rate(_main_timer_rate_), &AutomaticStart::timerMain, this);
 
   is_initialized_ = true;
 
