@@ -19,8 +19,6 @@
   <arg if="$(eval not arg('LOGGER_DEBUG'))" name="STANDALONE" default="$(optenv STANDALONE false)" />
   <arg if="$(eval arg('LOGGER_DEBUG'))" name="STANDALONE" default="true" />
 
-  <env name="ROSCONSOLE_CONFIG_FILE" if="$(eval arg('LOGGER_DEBUG'))" value="$(find mrs_uav_general)/config/debug_verbosity.yaml" />
-
     <!-- currently, ROS_MASTER_URI has to be set to http://localhost:11311 otherwise ROS dies when -->
     <!-- the drone disconnects from wifi -->
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="ROS_MASTER_URI" default="$(optenv ROS_MASTER_URI none)" />
@@ -32,6 +30,7 @@
   <arg name="config_uav_manager" default="" />
   <arg name="config_control_manager" default="" />
   <arg name="config_odometry" default="" />
+  <arg name="config_trajectory_generation" default="" />
 
     <!-- custom configs for trackers -->
   <arg name="config_csv_tracker" default="" />
@@ -88,6 +87,7 @@
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
     <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
+    <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="WORLD_FILE" value="$(arg world_file)" />
@@ -121,6 +121,7 @@
     <arg name="PIXGARM" value="$(arg PIXGARM)" />
     <arg name="SENSORS" value="$(arg SENSORS)" />
     <arg name="UAV_MASS" value="$(arg UAV_MASS)" />
+    <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="WORLD_FILE" value="$(arg world_file)" />
@@ -138,6 +139,7 @@
     <arg name="PROFILER" value="$(arg PROFILER)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
+    <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
 
@@ -153,6 +155,7 @@
     <arg name="PROFILER" value="$(arg PROFILER)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
+    <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="custom_config" value="$(arg config_constraint_manager)" />
@@ -169,6 +172,7 @@
     <arg name="PROFILER" value="$(arg PROFILER)" />
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
+    <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="custom_config" value="$(arg config_gain_manager)" />
@@ -188,11 +192,25 @@
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="PROPULSION_TYPE" value="$(arg PROPULSION_TYPE)" />
     <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
+    <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="WORLD_FILE" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_uav_manager)" />
+
+  </include>
+
+  <!-- //} -->
+
+  <!-- Trajectory generation //{ -->
+
+  <include file="$(find mrs_uav_trajectory_generation)/launch/trajectory_generation.launch">
+
+    <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
+    <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
+
+    <arg name="custom_config" value="$(arg config_trajectory_generation)" />
 
   </include>
 
