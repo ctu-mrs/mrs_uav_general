@@ -1,6 +1,9 @@
-# MRS UAV general [![Build Status](https://github.com/ctu-mrs/mrs_uav_general/workflows/CI/badge.svg)](https://github.com/ctu-mrs/mrs_uav_general/actions)
+# MRS UAV general
 
 ![](.fig/thumbnail.jpg)
+
+| Build status | [![Build Status](https://github.com/ctu-mrs/mrs_uav_general/workflows/Melodic/badge.svg)](https://github.com/ctu-mrs/mrs_uav_general/actions) | [![Build Status](https://github.com/ctu-mrs/mrs_uav_general/workflows/Noetic/badge.svg)](https://github.com/ctu-mrs/mrs_simulation/actions) |
+|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
 
 ## Overview
 
