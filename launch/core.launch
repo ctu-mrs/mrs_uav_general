@@ -48,7 +48,7 @@
   <arg name="config_nsf_controller" default="" />
   <arg name="config_se3_controller" default="" />
 
-  <arg name="g" default="9.8" />
+  <arg name="g" default="9.81" />
   <arg name="n_threads" default="16" />
 
   <arg if="$(eval arg('RUN_TYPE') == 'simulation' and arg('UAV_TYPE') == 'f450')" name="UAV_MASS" default="2.0" />
