@@ -19,6 +19,10 @@ utm_origin_y: 5551241.4
 # utm_origin_x: 458326
 # utm_origin_y: 5551249
 
+# # Giuseppe's lamp
+# utm_origin_x: 458393
+# utm_origin_y: 5551259
+
 use_local_origin: false
 local_origin_x: 0.0
 local_origin_y: 0.0
@@ -27,7 +31,7 @@ safety_area:
 
   use_safety_area: true
 
-  frame_name: "gps_origin"
+  frame_name: "latlon_origin"
 
   polygon_obstacles:
     # loaded as a vector of matrices
@@ -45,9 +49,9 @@ safety_area:
     enabled: false
     # [x1, y1, radisu1, height1,
     #  x2, y2, radius2, height2]
-    data: [-5.0, -5.0, 2, 2,
-           -10.0, -10.0, 4, 2]
-    rows: 1 # each matrix has a single row
+    data: [50.112116, 14.418092, 2, 4,
+           50.112214, 14.418636, 2, 4]
+    rows: 2 # each matrix has a single row
     cols: [4, 4] # nums of cols of each matrix
 
   # convex polygon CCW
@@ -84,6 +88,14 @@ safety_area:
   #   14, 20,
   #   -26, 15,
   #   -32, -26,
+  # ]
+
+  # # Giuseppe's lamp
+  # safety_area: [
+  #   50.112031, 14.417871,
+  #   50.112206, 14.418939,
+  #   50.112344, 14.418459,
+  #   50.112236, 14.417759,
   # ]
 
   max_height: 8.0
