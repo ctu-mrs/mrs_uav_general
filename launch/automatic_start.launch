@@ -27,10 +27,12 @@
       <rosparam if="$(eval not arg('custom_config') == '')" file="$(arg custom_config)" />
 
       <param name="uav_name" value="$(arg UAV_NAME)" />
+      <param name="simulation" value="$(arg simulation)" />
 
         <!-- Subscribers -->
       <remap from="~mavros_state_in" to="mavros/state" />
       <remap from="~control_manager_diagnostics_in" to="control_manager/diagnostics" />
+      <remap from="~spawner_diagnostics_in" to="drone_spawner/diagnostics" />
 
         <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />

@@ -18,6 +18,7 @@
 #include <mrs_msgs/MpcTrackerDiagnostics.h>
 #include <mrs_msgs/ReferenceStampedSrv.h>
 #include <mrs_msgs/ValidateReference.h>
+#include <mrs_msgs/SpawnerDiagnostics.h>
 
 #include <geometry_msgs/PoseStamped.h>
 
@@ -89,6 +90,7 @@ private:
   std::string     _version_;
 
   std::string _uav_name_;
+  bool        _simulation_;
 
   // | --------------------- service clients -------------------- |
 
@@ -106,6 +108,7 @@ private:
 
   ros::Subscriber subscriber_mavros_state_;
   ros::Subscriber subscriber_control_manager_diagnostics_;
+  ros::Subscriber subscriber_spawner_diagnostics_;
 
   // | ----------------------- main timer ----------------------- |
 
@@ -118,6 +121,13 @@ private:
   void       callbackMavrosState(const mavros_msgs::StateConstPtr& msg);
   bool       got_mavros_state_ = false;
   std::mutex mutex_mavros_state_;
+
+  // | ---------------------- mavros state ---------------------- |
+
+  void                         callbackSpawnerDiagnostics(const mrs_msgs::SpawnerDiagnosticsConstPtr& msg);
+  bool                         got_spawner_diagnostics = false;
+  mrs_msgs::SpawnerDiagnostics spawner_diagnostics_;
+  std::mutex                   mutex_spawner_diagnostics_;
 
   // | ----------------- arm and offboard check ----------------- |
 
@@ -209,6 +219,7 @@ void AutomaticStart::onInit() {
   }
 
   param_loader.loadParam("uav_name", _uav_name_);
+  param_loader.loadParam("simulation", _simulation_);
 
   param_loader.loadParam("safety_timeout", _safety_timeout_);
   param_loader.loadParam("main_timer_rate", _main_timer_rate_);
@@ -242,6 +253,8 @@ void AutomaticStart::onInit() {
   subscriber_mavros_state_ = nh_.subscribe("mavros_state_in", 1, &AutomaticStart::callbackMavrosState, this, ros::TransportHints().tcpNoDelay());
   subscriber_control_manager_diagnostics_ =
       nh_.subscribe("control_manager_diagnostics_in", 1, &AutomaticStart::callbackControlManagerDiagnostics, this, ros::TransportHints().tcpNoDelay());
+  subscriber_spawner_diagnostics_ =
+      nh_.subscribe("spawner_diagnostics_in", 1, &AutomaticStart::callbackSpawnerDiagnostics, this, ros::TransportHints().tcpNoDelay());
 
   // | --------------------- service clients -------------------- |
 
@@ -386,6 +399,27 @@ void AutomaticStart::callbackControlManagerDiagnostics(const mrs_msgs::ControlMa
 
 //}
 
+/* callbackSpawnerDiagnostics() //{ */
+
+void AutomaticStart::callbackSpawnerDiagnostics(const mrs_msgs::SpawnerDiagnosticsConstPtr& msg) {
+
+  if (!is_initialized_) {
+    return;
+  }
+
+  ROS_INFO_ONCE("[AutomaticStart]: getting spawner diagnostics");
+
+  {
+    std::scoped_lock lock(mutex_spawner_diagnostics_);
+
+    spawner_diagnostics_ = *msg;
+
+    got_spawner_diagnostics = true;
+  }
+}
+
+//}
+
 // --------------------------------------------------------------
 // |                           timers                           |
 // --------------------------------------------------------------
@@ -448,6 +482,24 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
 
           ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: could not set motors ON for 1.5 secs, disarming");
           disarm();
+        }
+      }
+
+      if (_simulation_) {
+
+        std::scoped_lock lock(mutex_spawner_diagnostics_);
+
+        if (got_spawner_diagnostics) {
+
+          if (!spawner_diagnostics_.spawn_called || spawner_diagnostics_.processing) {
+            ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: (simulation) waiting for spawner to finish spawning UAVs");
+            return;
+          }
+
+        } else {
+
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: (simulation) missing spawner diagnostics");
+          return;
         }
       }
 
