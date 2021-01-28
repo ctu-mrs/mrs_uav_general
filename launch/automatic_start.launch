@@ -32,7 +32,7 @@
         <!-- Subscribers -->
       <remap from="~mavros_state_in" to="mavros/state" />
       <remap from="~control_manager_diagnostics_in" to="control_manager/diagnostics" />
-      <remap from="~spawner_diagnostics_in" to="drone_spawner/diagnostics" />
+      <remap from="~spawner_diagnostics_in" to="/mrs_drone_spawner/diagnostics" />
 
         <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />
