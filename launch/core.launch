@@ -39,6 +39,7 @@
   <arg name="config_line_tracker" default="" />
   <arg name="config_matlab_tracker" default="" />
   <arg name="config_mpc_tracker" default="" />
+  <arg name="config_flip_tracker" default="" />
   <arg name="config_uav_names" default="" />
 
     <!-- custom configs for controllers -->
@@ -101,6 +102,7 @@
     <arg name="custom_config_line_tracker" value="$(arg config_line_tracker)" />
     <arg name="custom_config_matlab_tracker" value="$(arg config_matlab_tracker)" />
     <arg name="custom_config_mpc_tracker" value="$(arg config_mpc_tracker)" />
+    <arg name="custom_config_flip_tracker" value="$(arg config_flip_tracker)" />
     <arg name="custom_config_uav_names" value="$(arg config_uav_names)" />
 
     <arg name="custom_config_failsafe_controller" value="$(arg config_failsafe_controller)" />
