@@ -1176,12 +1176,12 @@
         <!-- OUSTER_UDP_DEST_IP (required, IP address where Ouster will send data) --> 
         <!-- OUSTER_CABLE_FRONT (optional (default: false), orientation of the sensor (true rotates TF by pi in z-axis)) --> 
 
-        <arg name="ouster_frame" default="$(arg UAV_NAME)/os1_sensor" />
-        <arg name="ouster_lidar_frame" default="$(arg UAV_NAME)/os1_lidar" />
-        <arg name="ouster_imu_frame" default="$(arg UAV_NAME)/os1_imu" />
-        <arg name="ouster_frame_slashless" default="os1_sensor_$(arg UAV_NAME)" />
-        <arg name="ouster_lidar_slashless" default="os1_lidar_$(arg UAV_NAME)" />
-        <arg name="ouster_imu_slashless" default="os1_imu_$(arg UAV_NAME)" />
+        <arg name="ouster_frame" default="$(arg UAV_NAME)/os_sensor" />
+        <arg name="ouster_lidar_frame" default="$(arg UAV_NAME)/os_lidar" />
+        <arg name="ouster_imu_frame" default="$(arg UAV_NAME)/os_imu" />
+        <arg name="ouster_frame_slashless" default="os_sensor_$(arg UAV_NAME)" />
+        <arg name="ouster_lidar_slashless" default="os_lidar_$(arg UAV_NAME)" />
+        <arg name="ouster_imu_slashless" default="os_imu_$(arg UAV_NAME)" />
 
         <arg   name="ouster_cable_front" default="$(optenv OUSTER_CABLE_FRONT false)" />
         <arg     if="$(eval arg('ouster_cable_front'))" name="ouster_heading" value="3.14159265359" />
@@ -1193,6 +1193,10 @@
         </group>
         
         <group if="$(eval arg('UAV_TYPE') == 't650')">
+          <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg ouster_frame_slashless)" args="0.0 0.0 0.10 $(arg ouster_heading) 0.0 0.0 $(arg fcu_frame) $(arg ouster_frame)" />
+        </group>
+
+        <group if="$(eval arg('UAV_TYPE') == 'x500')">
           <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg ouster_frame_slashless)" args="0.0 0.0 0.10 $(arg ouster_heading) 0.0 0.0 $(arg fcu_frame) $(arg ouster_frame)" />
         </group>
 
