@@ -855,7 +855,7 @@ bool AutomaticStart::validateReference() {
 
     if (srv_out.response.success) {
 
-      ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: current postion is valid");
+      ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: current position is valid");
       return true;
 
     } else {
