@@ -2,6 +2,13 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Noetic-compatible
+* +Automatic start node
+* World-definition overhaul, configs overhaul
+* Contributors: Daniel Hert, Matej Petrlik, Matej Petrlik Pavel Petracek, Robert Penicka, Tomas Baca, Viktor Walter, Vojtech Spurny, Afzal
+
 0.0.5 (2020-02-26)
 ------------------
 
