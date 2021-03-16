@@ -2,8 +2,8 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.6 (2021-03-16)
+------------------
 * Noetic-compatible
 * +Automatic start node
 * World-definition overhaul, configs overhaul
