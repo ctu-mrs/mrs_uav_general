@@ -16,13 +16,13 @@ exclude=(
 # ROS communication hiccups, which can lead to eland, failsafe
 # or just a CRASH.
 
-# Every topic containint "compressed"
+# Every topic containing "compressed"
 '(.*)compressed(.*)'
-# Every topic containint "image_raw"
+# Every topic containing "image_raw"
 '(.*)image_raw(.*)'
-# Every topic containint "theora"
+# Every topic containing "theora"
 '(.*)theora(.*)'
-# Every topic containint "h264"
+# Every topic containing "h264"
 '(.*)h264(.*)'
 
 )
