@@ -471,7 +471,7 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
 
         if (position_valid && got_topics) {
 
-          double res = setMotors(true);
+          bool res = setMotors(true);
 
           if (!res) {
             ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: could not set motors ON");
