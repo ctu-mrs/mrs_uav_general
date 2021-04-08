@@ -213,8 +213,12 @@
   <group if="$(eval ('realsense' in arg('SENSORS')))">
 
     <arg name="realsense_frame" default="$(arg UAV_NAME)/rs_d435/link" />
-    <arg name="realsense_frame_tmp" default="$(arg UAV_NAME)/rs_d435/tmp_optical" />
     <arg name="realsense_frame_slashless" default="$(arg UAV_NAME)_rs_d435_link" />
+
+    <arg name="realsense_frame_up" default="$(arg UAV_NAME)/up_rgbd/link" />
+    <arg name="realsense_frame_up_slashless" default="$(arg UAV_NAME)_up_rgbd_link" />
+    <arg name="realsense_frame_down" default="$(arg UAV_NAME)/down_rgbd/link" />
+    <arg name="realsense_frame_down_slashless" default="$(arg UAV_NAME)_down_rgbd_link" />
 
       <!-- TF -->
       <!-- front //{ -->
@@ -311,6 +315,21 @@
       <!--     </include> -->
 
       <!--   </group> -->
+
+        <!-- //} -->
+
+      <!-- up_down //{ -->
+
+      <group if="$(eval ('realsense_up_down' in arg('SENSORS').replace(',', ' ').split()))">
+
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_up_slashless)" args="-0.01 -0.07 0.05 0.0 -1.570796326 1.570796326 $(arg fcu_frame) $(arg realsense_frame_up)" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_down_slashless)" args="0.12 0.0 -0.05 0.0 1.570796326 0.0 $(arg fcu_frame) $(arg realsense_frame_down)" />
+
+          <include file="$(find realsense_d435)/launch/uav_2_cameras_up_down.launch" >
+
+          </include>
+
+        </group>
 
         <!-- //} -->
 
