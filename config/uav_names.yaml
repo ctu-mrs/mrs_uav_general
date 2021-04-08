@@ -21,5 +21,7 @@ network:
 
   robot_names: [
 
-    uav60, uav61, uav62, uav63, uav64, uav65, uav66, uav67, uav68, uav90, uav69, uav70, uav71, uav46, uav45, uav47, uav49, uav50, uav51, uav42, uav53, uav44, uav55, uav56, uav91
+    uav1, uav2, uav3, uav4, uav5, uav6, uav7, uav8, uav9, uav10,
+    uav42, uav44, uav45, uav46, uav47, uav49, uav50, uav51, uav53, uav55, uav56, uav60, uav61, uav62, uav63, uav64, uav65, uav66, uav67, uav68, uav69, uav70, uav71, uav90, uav91,
+
   ]
