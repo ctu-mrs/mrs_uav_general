@@ -1,10 +1,8 @@
 #
 ## DEFINITION OF THE ARENA
 #
- 
+
 utm_origin_units: 0 # 0 - UTM, 1 - Latitude Longitude
-utm_origin_lat: 0.0
-utm_origin_lon: 0.0
 
 # cisar race track
 utm_origin_x: 458422.2
@@ -22,6 +20,9 @@ utm_origin_y: 5551241.4
 # utm_origin_x: 458393
 # utm_origin_y: 5551259
 
+utm_origin_lat: 0.0
+utm_origin_lon: 0.0
+
 init_gps_origin_local: false # origin of gps_origin will be in the position of UAV at odometry launch
 init_gps_offset_x: 0.0 # initial position of UAV relative to gps_origin when init_gps_origin_local is enabled
 init_gps_offset_y: 0.0 # initial position of UAV relative to gps_origin when init_gps_origin_local is enabled
@@ -30,7 +31,7 @@ safety_area:
 
   use_safety_area: true
 
-  frame_name: "latlon_origin"
+  frame_name: "gps_origin"
 
   polygon_obstacles:
     # loaded as a vector of matrices
@@ -68,7 +69,7 @@ safety_area:
   # -112.2, -0.4,
   # -48.2, -48.4
   # ]
-  
+
   # # convex polygon CCW
   # # mezi stromy a lampou
   # safety_area: [
