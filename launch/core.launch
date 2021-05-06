@@ -33,7 +33,6 @@
   <arg name="config_trajectory_generation" default="" />
 
     <!-- custom configs for trackers -->
-  <arg name="config_csv_tracker" default="" />
   <arg name="config_joy_tracker" default="" />
   <arg name="config_landoff_tracker" default="" />
   <arg name="config_line_tracker" default="" />
@@ -96,7 +95,6 @@
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_control_manager)" />
 
-    <arg name="custom_config_csv_tracker" value="$(arg config_csv_tracker)" />
     <arg name="custom_config_joy_tracker" value="$(arg config_joy_tracker)" />
     <arg name="custom_config_landoff_tracker" value="$(arg config_landoff_tracker)" />
     <arg name="custom_config_line_tracker" value="$(arg config_line_tracker)" />
