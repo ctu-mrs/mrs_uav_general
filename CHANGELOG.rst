@@ -2,6 +2,36 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* version -> 1.0.1
+* updated ros::shutdown
+* removed csv tracker form core.launch
+* updated Cisar world
+* add uav_type switch to realsense_up_down in sensors.launch
+* added tii net world
+* remapped the joystick topic to be namespaced and command only a single drone
+* added path to nimbro config
+* added node crash checker
+* Merge branch 'master' of github.com:ctu-mrs/mrs_uav_general
+* adding bluefox front
+* updated uav_names
+* added klaxalk-xps to robot names
+* updated nimbro config
+* added farmstay basin world
+* updated CI
+* Merge branch 'master' of github.com:ctu-mrs/mrs_uav_general
+* added realsense_up_down sensor to sensors.launch
+* fixed double -> bool variables
+* Merge branch 'master' of https://github.com/ctu-mrs/mrs_uav_general
+* updated uav names
+* Merge branch 'master' of https://github.com/ctu-mrs/mrs_uav_general
+* updated world files to be compatible with odometry
+* Merge branch 'master' of github.com:ctu-mrs/mrs_uav_general
+* Fixing typo
+* updated garmin params in px4 config
+* Contributors: Matej Petrlik, Matouš Vrba, Tomas Baca, Viktor Walter
+
 1.0.0 (2021-03-18)
 ------------------
 * Major release
