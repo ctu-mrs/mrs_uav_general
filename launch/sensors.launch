@@ -1260,6 +1260,34 @@
 
       <!-- //} -->
 
+      <!-- Mobius //{ -->
+
+      <group if="$(eval ('mobius' in arg('SENSORS')))">
+
+        <arg name="camera_frame" default="$(arg UAV_NAME)/mobius" />
+
+        <group if="$(eval ('mobius_front_pitch_30' in arg('SENSORS').replace(',', ' ').split()))">
+
+          <node pkg="tf2_ros" type="static_transform_publisher" name="front_cam_tf" args="0.0 0.0 0.0 0.0 0.5236 0.0 $(arg fcu_frame) $(arg camera_frame)" />
+
+        </group>
+
+        <include file="$(find usb_cam)/launch/test_node.launch" >
+
+          <!-- Camera Settings -->
+          <arg name="video_device" value="/dev/video0" />
+          <arg name="image_width" value="1280" />
+          <arg name="image_height" value="720" />
+          <arg name="pixel_format" value="mjpeg" />
+          <arg name="camera_frame_id" value="$(arg camera_frame)" />
+          <arg name="camera_info_url" value="$(find mrs_uav_general)/config/camera_calibrations/mobius/mobius_narrow.yaml" />
+
+        </include>
+
+      </group>
+
+      <!-- //} -->
+
       <!-- Bluefox3 //{ -->
 
       <group if="$(eval ('bluefox3' in arg('SENSORS')))">
