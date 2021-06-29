@@ -1280,7 +1280,7 @@
           <arg name="image_height" value="720" />
           <arg name="pixel_format" value="mjpeg" />
           <arg name="camera_frame_id" value="$(arg camera_frame)" />
-          <arg name="camera_info_url" value="$(find mrs_uav_general)/config/camera_calibrations/mobius/mobius_narrow.yaml" />
+          <arg name="camera_info_url" value="file://$(find mrs_uav_general)/config/camera_calibrations/mobius/mobius_narrow.yaml" />
 
         </include>
 
