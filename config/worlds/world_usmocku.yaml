@@ -13,13 +13,14 @@
 # H = 49.449435, 18.232611
 # I = 49.449609, 18.232708
 # J = 49.449821, 18.232943
-# K = 49.449955, 18.233322 origin
+# K = 49.449955, 18.233322
+# ORIGIN = 49.449616, 18.233141
 
 utm_origin_units: 1 # 0 - UTM, 1 - Latitude Longitude
 utm_origin_x: 0.0
 utm_origin_y: 0.0
-utm_origin_lat: 49.449955
-utm_origin_lon: 18.233322
+utm_origin_lat: 49.449616
+utm_origin_lon: 18.233141
 
 init_gps_origin_local: false # origin of gps_origin will be in the position of UAV at odometry launch
 init_gps_offset_x: 0.0 # initial position of UAV relative to gps_origin when init_gps_origin_local is enabled
@@ -43,16 +44,17 @@ safety_area:
   safety_area: [
 
 # default, large without the football field
-49.449998, 18.233608 #  A 
-49.449802, 18.233672 #  B 
-49.449668, 18.233598 #  C 
-49.449428, 18.233674 #  D 
-49.449132, 18.233273 #  E 
-# 49.499246, 18.233074 #  F 
-49.449350, 18.233186 #  G 
-# 49.449435, 18.232611 #  H 
-49.449609, 18.232708 #  I 
-49.449821, 18.232943 #  J 
+49.449998, 18.233608, #  A 
+49.449802, 18.233672, #  B 
+49.449668, 18.233598, #  C 
+49.449428, 18.233674, #  D 
+49.449132, 18.233273, #  E 
+49.449246, 18.233074, #  F, football
+# 49.449350, 18.233186, #  G 
+49.449435, 18.232611, #  H , football
+# 49.449609, 18.232708, #  I 
+49.449821, 18.232943, #  J 
+49.449955, 18.233322, # K
 
 ]
 
@@ -60,16 +62,16 @@ safety_area:
     # loaded as a vector of matrices
     # each matrix has polygon vertices in columns
     # [[M1], [M2]]
-    enabled: false
-    data: [1, 10, 10, 1,    5, 8, 5,
-           1, 1, 10, 10,    5, 5, 8,]
+    enabled: true
+    data: [49.449227, 49.449211, 49.449338, 49.449357,
+           18.232965, 18.233002, 18.233148, 18.233110,]
     rows: 2 # each matrix has two rows
-    cols: [4, 3] # nums of cols of each matrix
+    cols: [4] # nums of cols of each matrix
 
   point_obstacles:
     # loaded as a vector of matrices
     # x, y, radius
-    enabled: false
+    enabled: true
     # [x1, y1, radisu1, height1,
     #  x2, y2, radius2, height2]
     data: [49.449294, 18.233058, 3, 2.5,
