@@ -12,6 +12,15 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>libboost-date-time-dev</depend>
+  <depend>libboost-filesystem-dev</depend>
+  <depend>libboost-program-options-dev</depend>
+  <depend>libboost-regex-dev</depend>
+  <depend>libboost-thread-dev</depend>
+  <depend>rosbag_storage</depend>
+  <depend>rosconsole</depend>
+  <depend>std_srvs</depend>
+  <depend>xmlrpcpp</depend>
   <depend>nodelet</depend>
   <depend>roscpp</depend>
   <depend>rospy</depend>
@@ -22,6 +31,10 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf</depend>
   <depend>topic_tools</depend>
+
+  <exec_depend>genmsg</exec_depend>
+  <exec_depend>genpy</exec_depend>
+  <exec_depend>roslib</exec_depend>
 
   <export>
     <nodelet plugin="${prefix}/plugins.xml" />
