@@ -33,6 +33,8 @@
  ********************************************************************/
 
 #include "rosbag/recorder.h"
+#include "std_msgs/String.h"
+#include "std_msgs/Float64.h"
 
 #include <sys/stat.h>
 #include <boost/filesystem.hpp>
@@ -72,17 +74,25 @@ using std::vector;
 namespace rosbag
 {
 
-// OutgoingMessage
+/* OutgoingMessage() //{ */
 
 OutgoingMessage::OutgoingMessage(string const& _topic, topic_tools::ShapeShifter::ConstPtr _msg, boost::shared_ptr<ros::M_string> _connection_header,
                                  Time _time)
     : topic(_topic), msg(_msg), connection_header(_connection_header), time(_time) {
 }
 
+//}
+
+/* OutgoingQueue //{ */
+
 // OutgoingQueue
 
 OutgoingQueue::OutgoingQueue(string const& _filename, std::queue<OutgoingMessage>* _queue, Time _time) : filename(_filename), queue(_queue), time(_time) {
 }
+
+//}
+
+/* RecorderOptions() //{ */
 
 // RecorderOptions
 
@@ -112,11 +122,19 @@ RecorderOptions::RecorderOptions()
       min_space_str("1G") {
 }
 
+//}
+
+/* Recorder() //{ */
+
 // Recorder
 
 Recorder::Recorder(RecorderOptions const& options)
     : options_(options), num_subscribers_(0), exit_code_(0), queue_size_(0), split_count_(0), writing_enabled_(true) {
 }
+
+//}
+
+/* run() //{ */
 
 int Recorder::run() {
   if (options_.trigger) {
@@ -138,7 +156,7 @@ int Recorder::run() {
     }
   }
 
-  ros::NodeHandle nh;
+  ros::NodeHandle nh("~");
   if (!nh.ok()) {
     return 0;
   }
@@ -231,10 +249,14 @@ int Recorder::run() {
   return exit_code_;
 }
 
+//}
+
+/* subscribe() //{ */
+
 shared_ptr<ros::Subscriber> Recorder::subscribe(string const& topic) {
   ROS_INFO("[MrsRosbag] Subscribing to %s", topic.c_str());
 
-  ros::NodeHandle             nh;
+  ros::NodeHandle             nh("~");
   shared_ptr<int>             count(boost::make_shared<int>(options_.limit));
   shared_ptr<ros::Subscriber> sub(boost::make_shared<ros::Subscriber>());
 
@@ -254,9 +276,17 @@ shared_ptr<ros::Subscriber> Recorder::subscribe(string const& topic) {
   return sub;
 }
 
+//}
+
+/* isSubscribed() //{ */
+
 bool Recorder::isSubscribed(string const& topic) const {
   return currently_recording_.find(topic) != currently_recording_.end();
 }
+
+//}
+
+/* shouldSubscribeTotTopic() //{ */
 
 bool Recorder::shouldSubscribeToTopic(std::string const& topic, bool from_node) {
   // ignore already known topics
@@ -296,6 +326,10 @@ std::string Recorder::timeToStr(T ros_t) {
   return msg.str();
 }
 
+//}
+
+/* doQueue //{ */
+
 //! Callback to be invoked to save messages into a queue
 void Recorder::doQueue(const ros::MessageEvent<topic_tools::ShapeShifter const>& msg_event, string const& topic, shared_ptr<ros::Subscriber> subscriber,
                        shared_ptr<int> count) {
@@ -332,6 +366,17 @@ void Recorder::doQueue(const ros::MessageEvent<topic_tools::ShapeShifter const>&
       if (!options_.snapshot) {
         Time now = Time::now();
         if (now > last_buffer_warn_ + ros::Duration(5.0)) {
+
+          std_msgs::String string_msg;
+          string_msg.data = "-p -R ROSBAG STOPPED, TOO MUCH DATA";
+
+          try {
+            pub_status_msg_.publish(string_msg);
+          }
+          catch (...) {
+            ROS_ERROR("exception caught when publishing ");
+          }
+
           ROS_WARN("[MrsRosbag] rosbag record buffer exceeded.  Dropping oldest queued message.");
           last_buffer_warn_ = now;
           ROS_WARN("[MrsRosbag] disk is not able to record all the messages");
@@ -388,6 +433,10 @@ void Recorder::updateFilenames() {
   write_filename_ = target_filename_ + string(".active");
 }
 
+//}
+
+/* snapshotTrigger //{ */
+
 //! Callback to be invoked to actually do the recording
 void Recorder::snapshotTrigger(std_msgs::Empty::ConstPtr trigger) {
   (void)trigger;
@@ -437,11 +486,19 @@ void Recorder::startWriting() {
   }
 }
 
+//}
+
+/* stopWriting //{ */
+
 void Recorder::stopWriting() {
   ROS_INFO("[MrsRosbag] Closing '%s'.", target_filename_.c_str());
   bag_.close();
   rename(write_filename_.c_str(), target_filename_.c_str());
 }
+
+//}
+
+/* checkNumSplits() //{ */
 
 void Recorder::checkNumSplits() {
   if (options_.max_splits > 0) {
@@ -455,6 +512,10 @@ void Recorder::checkNumSplits() {
     }
   }
 }
+
+//}
+
+/* checkSize() //{ */
 
 bool Recorder::checkSize() {
   if (options_.max_size > 0) {
@@ -472,6 +533,10 @@ bool Recorder::checkSize() {
   }
   return false;
 }
+
+//}
+
+/* checkDuration() //{ */
 
 bool Recorder::checkDuration(const ros::Time& t) {
   if (options_.max_duration > ros::Duration(0)) {
@@ -493,11 +558,14 @@ bool Recorder::checkDuration(const ros::Time& t) {
   return false;
 }
 
+//}
+
+/* doRecord() //{ */
 
 //! Thread that actually does writing to file.
 void Recorder::doRecord() {
   // Open bag file for writing
-  
+
   ROS_INFO("[MrsRosbag] Starting mrs_rosbag!");
   ROS_INFO("[MrsRosbag] mrs_rosbag is a fork of the official rosbag, with added features");
   ROS_INFO("[MrsRosbag] mrs_rosbag will shutdown automatically if write buffer is exceeded (disk cannot cope with the ammount of data written)");
@@ -522,7 +590,16 @@ void Recorder::doRecord() {
   // Technically the queue_mutex_ should be locked while checking empty.
   // Except it should only get checked if the node is not ok, and thus
   // it shouldn't be in contention.
-  ros::NodeHandle nh;
+  ros::NodeHandle nh("~");
+
+  last_bag_MB_   = 0.0;
+  last_bag_time_ = ros::Time::now();
+
+  pub_status_msg_ = nh.advertise<std_msgs::String>("status_msg_out", 1, true);
+  pub_data_rate_  = nh.advertise<std_msgs::Float64>("data_rate_out", 1, true);
+
+  ros::Timer write_rate_timer = nh.createTimer(ros::Rate(1), &Recorder::checkWriteRate, this);
+
   while (nh.ok() || !queue_->empty()) {
     boost::unique_lock<boost::mutex> lock(queue_mutex_);
 
@@ -571,8 +648,12 @@ void Recorder::doRecord() {
   stopWriting();
 }
 
+//}
+
+/* doRecordSnapshotter() //{ */
+
 void Recorder::doRecordSnapshotter() {
-  ros::NodeHandle nh;
+  ros::NodeHandle nh("~");
 
   while (nh.ok() || !queue_queue_.empty()) {
     boost::unique_lock<boost::mutex> lock(queue_mutex_);
@@ -608,6 +689,10 @@ void Recorder::doRecordSnapshotter() {
     stopWriting();
   }
 }
+
+//}
+
+/* doCheckMaster() //{ */
 
 void Recorder::doCheckMaster(ros::TimerEvent const& e, ros::NodeHandle& node_handle) {
   (void)e;
@@ -655,8 +740,12 @@ void Recorder::doCheckMaster(ros::TimerEvent const& e, ros::NodeHandle& node_han
   }
 }
 
+//}
+
+/* doTrigger() //{ */
+
 void Recorder::doTrigger() {
-  ros::NodeHandle nh;
+  ros::NodeHandle nh("~");
   ros::Publisher  pub = nh.advertise<std_msgs::Empty>("snapshot_trigger", 1, true);
   pub.publish(std_msgs::Empty());
 
@@ -673,6 +762,63 @@ bool Recorder::scheduledCheckDisk() {
   check_disk_next_ += ros::WallDuration().fromSec(20.0);
   return checkDisk();
 }
+
+//}
+
+/* checkWriteRate() //{ */
+
+void Recorder::checkWriteRate([[maybe_unused]] const ros::TimerEvent& event) {
+
+  uint64_t bag_size    = bag_.getSize();
+  double   bag_MB      = (double(bag_size) / 1000000);
+  double   secs_passed = (ros::Time::now() - last_bag_time_).toSec();
+
+  last_bag_time_ = ros::Time::now();
+
+  double rate_MB = (bag_MB - last_bag_MB_) / secs_passed;
+  last_bag_MB_   = bag_MB;
+
+  std_msgs::Float64 float_msg;
+  float_msg.data = rate_MB;
+
+  try {
+    pub_data_rate_.publish(float_msg);
+  }
+  catch (...) {
+    ROS_ERROR("exception caught when publishing ");
+  }
+
+  std_msgs::String string_msg;
+
+  std::stringstream stream;
+  stream << std::fixed << std::setprecision(2) << rate_MB;
+
+  string_msg.data = " rosbag: " + stream.str() + " MB/s";
+  if (rate_MB < 20.0) {
+    string_msg.data = "-g" + string_msg.data;
+  } else if (rate_MB < 100) {
+    string_msg.data = "-y" + string_msg.data;
+  } else {
+    string_msg.data = "-r" + string_msg.data;
+  }
+
+  try {
+    pub_status_msg_.publish(string_msg);
+  }
+  catch (...) {
+    ROS_ERROR("exception caught when publishing ");
+  }
+
+  // do 20 mb/s zeleny
+  // do 100 mb/s zluty
+  // pres 100 cerveny
+
+  ROS_INFO("[MrsRosbag] Recording data, write rate: %.2f MB/s", rate_MB);
+}
+
+//}
+
+/* checkDisk() //{ */
 
 bool Recorder::checkDisk() {
 #if BOOST_FILESYSTEM_VERSION < 3
@@ -717,6 +863,10 @@ bool Recorder::checkDisk() {
   return true;
 }
 
+//}
+
+/* checkLogging() //{ */
+
 bool Recorder::checkLogging() {
   if (writing_enabled_)
     return true;
@@ -728,5 +878,7 @@ bool Recorder::checkLogging() {
   }
   return false;
 }
+
+//}
 
 }  // namespace rosbag
