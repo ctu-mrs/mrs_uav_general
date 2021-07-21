@@ -1147,8 +1147,30 @@
 
             <!-- TF -->
 
-          <arg name="front_cam_yaw" default="0" />
-          <node pkg="tf2_ros" type="static_transform_publisher" name="front_cam_tf" args="0.0 0.0 0.0 -1.5708 0.0 -1.5708 $(arg fcu_frame) $(arg camera_frame)" />
+          <group if="$(eval arg('UAV_TYPE') == 'f330')">
+            <arg name="front_cam_yaw" default="0" />
+            <node pkg="tf2_ros" type="static_transform_publisher" name="front_cam_tf" args="0.0 0.0 0.0 -1.5708 0.0 -1.5708 $(arg fcu_frame) $(arg camera_frame)" />
+          </group>
+
+          <group if="$(eval arg('UAV_TYPE') == 'f450')">
+            <arg name="front_cam_yaw" default="0" />
+            <node pkg="tf2_ros" type="static_transform_publisher" name="front_cam_tf" args="0.1 0.0 -0.3 -1.5708 0.0 -1.5708 $(arg fcu_frame) $(arg camera_frame)" />
+          </group>
+
+          <group if="$(eval arg('UAV_TYPE') == 'f550')">
+            <arg name="front_cam_yaw" default="0" />
+            <node pkg="tf2_ros" type="static_transform_publisher" name="front_cam_tf" args="0.1 0.0 -0.3 -1.5708 0.0 -1.5708 $(arg fcu_frame) $(arg camera_frame)" />
+          </group>
+
+          <group if="$(eval arg('UAV_TYPE') == 't650')">
+            <arg name="front_cam_yaw" default="0" />
+            <node pkg="tf2_ros" type="static_transform_publisher" name="front_cam_tf" args="0.1 0.0 -0.3 -1.5708 0.0 -1.5708 $(arg fcu_frame) $(arg camera_frame)" />
+          </group>
+
+          <group if="$(eval arg('UAV_TYPE') == 'x500')">
+            <arg name="front_cam_yaw" default="0" />
+            <node pkg="tf2_ros" type="static_transform_publisher" name="front_cam_tf" args="0.1 0.0 -0.3 -1.5708 0.0 -1.5708 $(arg fcu_frame) $(arg camera_frame)" />
+          </group>
 
           <arg     if="$(arg STANDALONE)" name="nodelet" value="STANDALONE" />
           <arg unless="$(arg STANDALONE)" name="nodelet" value="load" />
