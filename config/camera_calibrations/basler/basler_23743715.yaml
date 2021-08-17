@@ -1,6 +1,6 @@
 image_width: 800
 image_height: 600
-camera_name: basler_right
+camera_name: basler_left
 camera_matrix:
   rows: 3
   cols: 3
