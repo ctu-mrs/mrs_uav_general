@@ -265,7 +265,7 @@
 
     <group if="$(eval ('realsense_tii_front' in arg('SENSORS').replace(',', ' ').split()))">
 
-      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.12 0.0 -0.05 0.0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame_down)" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg fcu_frame_slashless)_to_$(arg realsense_frame_slashless)" args="0.12 0.0 -0.05 0.0 0.0 0.0 $(arg fcu_frame) $(arg realsense_frame)" />
 
       <include file="$(find realsense_d435)/launch/uav_tii_uc1.launch" />
 
