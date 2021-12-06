@@ -3,6 +3,9 @@
 #
 
 utm_origin_units: 0 # 0 - UTM, 1 - Latitude Longitude
+# !!! BEWARE !!!: the lat&lon and UTM coordinates below might be wrong
+# !!! do NOT just switch utm_origin_units from 0<->1, the other form
+# !!! might not be updated or even set correctly in the first place.
 
 # cisar race track
 utm_origin_x: 458422.2

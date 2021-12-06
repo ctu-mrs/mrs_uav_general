@@ -3,6 +3,9 @@
 #
 
 utm_origin_units: 0 # 0 - UTM, 1 - Latitude Longitude
+# !!! BEWARE !!!: the lat&lon and UTM coordinates below might be wrong
+# !!! do NOT just switch utm_origin_units from 0<->1, the other form
+# !!! might not be updated or even set correctly in the first place.
 utm_origin_x: 460212.6
 utm_origin_y: 5601195.2
 utm_origin_lat: 0.0
