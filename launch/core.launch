@@ -15,6 +15,7 @@
   <arg name="LOGGER_DEBUG" default="$(optenv LOGGER_DEBUG false)" />
   <arg name="WORLD_FILE" default="$(optenv WORLD_FILE)" />
   <arg name="WORLD_NAME" default="$(optenv WORLD_NAME)" />
+  <arg name="UAV_MASS" default="$(env UAV_MASS)" />
 
   <arg if="$(eval not arg('LOGGER_DEBUG'))" name="STANDALONE" default="$(optenv STANDALONE false)" />
   <arg if="$(eval arg('LOGGER_DEBUG'))" name="STANDALONE" default="true" />
@@ -52,9 +53,9 @@
   <arg name="g" default="9.81" />
   <arg name="n_threads" default="16" />
 
-  <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="UAV_MASS" default="$(env UAV_MASS)" />
+  <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="UAV_MASS" default="$(arg UAV_MASS)" />
 
-  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') != '')" name="world_file" value="$(find mrs_uav_general)/config/worlds/world_$(env WORLD_NAME).yaml" />
+  <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') != '')" name="world_file" value="$(find mrs_uav_general)/config/worlds/world_$(arg WORLD_NAME).yaml" />
   <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') == '' and arg('RUN_TYPE') == 'simulation')" name="world_file" value="$(find mrs_uav_general)/config/worlds/world_simulation.yaml" />
   <arg if="$(eval arg('WORLD_FILE') != '')" name="world_file" value="$(arg WORLD_FILE)" />
 
