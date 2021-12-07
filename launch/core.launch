@@ -15,7 +15,7 @@
   <arg name="LOGGER_DEBUG" default="$(optenv LOGGER_DEBUG false)" />
   <arg name="WORLD_FILE" default="$(optenv WORLD_FILE)" />
   <arg name="WORLD_NAME" default="$(optenv WORLD_NAME)" />
-  <arg name="UAV_MASS" default="$(env UAV_MASS)" />
+  <arg name="UAV_MASS" default="$(optenv UAV_MASS)" />
 
   <arg if="$(eval not arg('LOGGER_DEBUG'))" name="STANDALONE" default="$(optenv STANDALONE false)" />
   <arg if="$(eval arg('LOGGER_DEBUG'))" name="STANDALONE" default="true" />
