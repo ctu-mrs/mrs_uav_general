@@ -8,7 +8,7 @@
   <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
   <arg name="BROADCAST_IP" default="$(optenv BROADCAST_IP 192.168.0.255)" />
 
-    <!-- other args -->
+  <!-- other args -->
   <arg name="service_response_timeout" default="3" />
   <arg name="service_call_timeout" default="0.2" />
   <arg name="service_call_repeats" default="3" />
@@ -29,7 +29,7 @@
       <param name="call_repeats" value="$(arg service_call_repeats)" />
       <param name="topic_prefix" value="$(arg UAV_NAME)" />
 
-        <!-- Load a config YAML file -->
+      <!-- Load a config YAML file -->
       <rosparam if="$(eval arg('RUN_TYPE') == 'uav')" file="$(find mrs_uav_general)/config/uav_names.yaml" />
       <rosparam if="$(eval arg('RUN_TYPE') == 'simulation')" file="$(find mrs_uav_general)/config/uav_names_simulation.yaml" />
       <rosparam if="$(eval not arg('custom_config_uav_names') == '')" file="$(arg custom_config_uav_names)" />
@@ -59,7 +59,7 @@
       <param name="destination_port" value="$(arg topic_server_port)" />
       <param name="topic_prefix" value="$(arg UAV_NAME)" />
 
-        <!-- Load a config YAML file -->
+      <!-- Load a config YAML file -->
       <rosparam command="load" file="$(find mrs_uav_general)/config/communication_config.yaml" />
       <rosparam command="load" if="$(eval arg('custom_config') != '')" file="$(arg custom_config)" />
     </node>

@@ -20,12 +20,12 @@
   <arg if="$(eval not arg('LOGGER_DEBUG'))" name="STANDALONE" default="$(optenv STANDALONE false)" />
   <arg if="$(eval arg('LOGGER_DEBUG'))" name="STANDALONE" default="true" />
 
-    <!-- currently, ROS_MASTER_URI has to be set to http://localhost:11311 otherwise ROS dies when -->
-    <!-- the drone disconnects from wifi -->
+  <!-- currently, ROS_MASTER_URI has to be set to http://localhost:11311 otherwise ROS dies when -->
+  <!-- the drone disconnects from wifi -->
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="ROS_MASTER_URI" default="$(optenv ROS_MASTER_URI none)" />
   <arg if="$(eval arg('RUN_TYPE') == 'uav' and arg('ROS_MASTER_URI') != 'http://localhost:11311')" name="SET_YOUR_ROS_MASTER_URI_TO_LOCALHOST" default="$(env MISSING_ROS_MASTER_URI)" />
 
-    <!-- custom configs args -->
+  <!-- custom configs args -->
   <arg name="config_constraint_manager" default="" />
   <arg name="config_gain_manager" default="" />
   <arg name="config_uav_manager" default="" />
@@ -33,7 +33,7 @@
   <arg name="config_odometry" default="" />
   <arg name="config_trajectory_generation" default="" />
 
-    <!-- custom configs for trackers -->
+  <!-- custom configs for trackers -->
   <arg name="config_joy_tracker" default="" />
   <arg name="config_landoff_tracker" default="" />
   <arg name="config_line_tracker" default="" />
@@ -42,7 +42,7 @@
   <arg name="config_flip_tracker" default="" />
   <arg name="config_uav_names" default="" />
 
-    <!-- custom configs for controllers -->
+  <!-- custom configs for controllers -->
   <arg name="config_failsafe_controller" default="" />
   <arg name="config_mpc_controller" default="" />
   <arg name="config_emergency_controller" default="" />
@@ -59,7 +59,7 @@
   <arg if="$(eval arg('WORLD_FILE') == '' and arg('WORLD_NAME') == '' and arg('RUN_TYPE') == 'simulation')" name="world_file" value="$(find mrs_uav_general)/config/worlds/world_simulation.yaml" />
   <arg if="$(eval arg('WORLD_FILE') != '')" name="world_file" value="$(arg WORLD_FILE)" />
 
-    <!-- NodeletManager //{ -->
+  <!-- NodeletManager //{ -->
 
   <include file="$(find mrs_uav_general)/launch/nodelet_manager.launch">
 
