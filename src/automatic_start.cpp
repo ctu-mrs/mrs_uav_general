@@ -911,7 +911,7 @@ bool AutomaticStart::disarm() {
 
   if (!got_mavros_state_) {
 
-    ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: cannot not disarm, missing mavros state!");
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: cannot disarm, missing mavros state!");
 
     return false;
   }
@@ -921,7 +921,7 @@ bool AutomaticStart::disarm() {
 
   if (offboard) {
 
-    ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: cannot not disarm, not in offboard mode!");
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: cannot disarm, already in offboard mode!");
 
     return false;
   }
