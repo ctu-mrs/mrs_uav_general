@@ -1,7 +1,7 @@
 plugin_blacklist:
 # common
 - 3dr_radio
-- actuator_control
+# - actuator_control
 - hil
 - ftp
 - manual_control
