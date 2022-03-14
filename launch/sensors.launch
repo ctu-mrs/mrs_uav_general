@@ -1249,7 +1249,7 @@
 
       </group>
 
-      <arg name="cam_device" default="$(env BLUEFOX_FRONT)" />
+      <arg name="cam_device" default="$(env BLUEFOX_DOWN)" />
       <arg name="cam_rate" default="20" />
       <arg name="cam_plugin" default="true" />
       <arg name="cam_output" default="screen" />
@@ -1296,17 +1296,17 @@
 
           <!-- Common Interface -->
           <arg name="device" value="$(arg cam_device)" />
-          <arg name="rate" value="$(arg cam_rate)" />
+          <!-- <arg name="rate" value="$(arg cam_rate)" /> -->
           <arg name="node_start_delay" value="$(arg node_start_delay)" />
 
             <!-- Camera Settings -->
-          <arg name="serial" value="$(arg cam_device)" />
+          <!-- <arg name="serial" value="$(arg cam_device)" /> -->
           <arg name="camera_name" value="$(arg camera_name)" />
           <arg name="camera" value="$(arg camera)" />
           <arg name="frame_id" value="$(arg frame_id)" />
           <arg name="calib_url" value="$(arg calib_url)" />
           <arg name="fps" value="$(arg fps)" />
-          <arg name="color" value="$(arg color)" />
+          <!-- <arg name="color" value="$(arg color)" /> -->
           <arg name="aec" value="$(arg aec)" />
           <arg name="expose_upper_limit_us" value="$(arg expose_upper_limit_us)" />
           <arg name="des_grey_value" value="$(arg des_grey_value)"/>
@@ -1317,14 +1317,14 @@
           <arg name="wbp" value="$(arg wbp)" />
           <arg name="expose_us" value="$(arg expose_us)" />
           <arg name="gain_db" value="$(arg gain_db)" />
-          <arg name="boost" value="$(arg boost)" />
+          <!-- <arg name="boost" value="$(arg boost)" /> -->
           <arg name="mm" value="$(arg mm)" />
 
             <!-- Node Settings -->
           <arg name="plugin" value="$(arg cam_plugin)" />
           <arg name="manager" value="$(arg UAV_NAME)_front_nodelet_manager" />
           <arg name="output" value="$(arg cam_output)" />
-          <arg name="proc" value="$(arg cam_proc)" />
+          <!-- <arg name="proc" value="$(arg cam_proc)" /> -->
           <arg name="view" value="$(arg cam_view)" />
           <arg name="calib" value="$(arg cam_calib)" />
 
