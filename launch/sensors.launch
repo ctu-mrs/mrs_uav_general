@@ -376,7 +376,6 @@
 
       <arg name="expose_us" default="400" />
       <arg name="agc" default="true" />
-      <arg name="boost" value="false" />
       <arg name="gain_db" default="0.0" />
       <arg name="cbm" default="0" />
       <arg name="ctm" default="1" />
@@ -419,7 +418,6 @@
           <arg name="wbp" value="$(arg wbp)" />
           <arg name="expose_us" value="$(arg expose_us)" />
           <arg name="gain_db" value="$(arg gain_db)" />
-          <arg name="boost" value="$(arg boost)" />
           <arg name="mm" value="$(arg mm)" />
 
             <!-- Node Settings -->
@@ -450,7 +448,7 @@
 
     <group if="$(eval ('bluefox_brick' in arg('SENSORS').replace(',', ' ').split()))">
 
-      <arg name="camera_frame" default="brick_cam_$(arg UAV_NAME)" />
+      <arg name="camera_frame" default="$(arg UAV_NAME)/brick_cam_$(arg UAV_NAME)" />
 
       <arg name="brick_cam_yaw" default="3.14159265359" />
 
@@ -494,7 +492,6 @@
       <arg name="des_grey_value" default="100" />
       <arg name="expose_us" default="100" />
       <arg name="agc" default="true" />
-      <arg name="boost" value="false" />
       <arg name="gain_db" default="0.0" />
       <arg name="cbm" default="0" />
       <arg name="ctm" default="1" />
@@ -538,7 +535,6 @@
           <arg name="wbp" value="$(arg wbp)" />
           <arg name="expose_us" value="$(arg expose_us)" />
           <arg name="gain_db" value="$(arg gain_db)" />
-          <arg name="boost" value="$(arg boost)" />
           <arg name="mm" value="$(arg mm)" />
 
             <!-- Node Settings -->
@@ -569,7 +565,7 @@
 
     <group if="$(eval ('bluefox_net' in arg('SENSORS').replace(',', ' ').split()))">
 
-      <arg name="camera_frame" default="net_cam_$(arg UAV_NAME)" />
+      <arg name="camera_frame" default="$(arg UAV_NAME)/net_cam_$(arg UAV_NAME)" />
 
         <!-- TF -->
       <arg name="net_cam_yaw" default="0" />
@@ -611,7 +607,6 @@
       <arg name="des_grey_value" default="70" />
       <arg name="expose_us" default="100" />
       <arg name="agc" default="true" />
-      <arg name="boost" value="false" />
       <arg name="gain_db" default="0.0" />
       <arg name="cbm" default="0" />
       <arg name="ctm" default="1" />
@@ -655,7 +650,6 @@
           <arg name="wbp" value="$(arg wbp)" />
           <arg name="expose_us" value="$(arg expose_us)" />
           <arg name="gain_db" value="$(arg gain_db)" />
-          <arg name="boost" value="$(arg boost)" />
           <arg name="mm" value="$(arg mm)" />
 
             <!-- Node Settings -->
@@ -686,7 +680,7 @@
 
     <group if="$(eval ('bluefox_front' in arg('SENSORS').replace(',', ' ').split()))">
 
-      <arg name="camera_frame" default="bluefox_front" />
+      <arg name="camera_frame" default="$(arg UAV_NAME)/bluefox_front" />
 
         <!-- TF -->
       <group if="$(eval arg('UAV_TYPE') == 'f330')">
@@ -750,7 +744,6 @@
       <arg name="des_grey_value" default="70" />
       <arg name="expose_us" default="100" />
       <arg name="agc" default="true" />
-      <arg name="boost" value="false" />
       <arg name="gain_db" default="0.0" />
       <arg name="cbm" default="0" />
       <arg name="ctm" default="1" />
@@ -783,7 +776,6 @@
           <arg name="frame_id" value="$(arg frame_id)" />
           <arg name="calib_url" value="$(arg calib_url)" />
           <arg name="fps" value="$(arg fps)" />
-          <arg name="color" value="$(arg color)" />
           <arg name="aec" value="$(arg aec)" />
           <arg name="expose_upper_limit_us" value="$(arg expose_upper_limit_us)" />
           <arg name="des_grey_value" value="$(arg des_grey_value)"/>
@@ -794,7 +786,6 @@
           <arg name="wbp" value="$(arg wbp)" />
           <arg name="expose_us" value="$(arg expose_us)" />
           <arg name="gain_db" value="$(arg gain_db)" />
-          <arg name="boost" value="$(arg boost)" />
           <arg name="mm" value="$(arg mm)" />
 
             <!-- Node Settings -->
@@ -825,7 +816,7 @@
 
     <group if="$(eval ('bluefox_down' in arg('SENSORS').replace(',', ' ').split()))">
 
-      <arg name="camera_frame" default="bluefox_down" />
+      <arg name="camera_frame" default="$(arg UAV_NAME)/bluefox_down" />
 
         <!-- TF -->
       <group if="$(eval arg('UAV_TYPE') == 't650')">
@@ -874,7 +865,6 @@
       <arg name="des_grey_value" default="70" />
       <arg name="expose_us" default="100" />
       <arg name="agc" default="true" />
-      <arg name="boost" value="false" />
       <arg name="gain_db" default="0.0" />
       <arg name="cbm" default="0" />
       <arg name="ctm" default="1" />
