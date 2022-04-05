@@ -13,137 +13,151 @@ from socket import gethostbyname
 TOPIC_START_PORT = 17000
 SERVICE_START_PORT = 6000
 
+def print_help():
+    print("""
+    Runs nimbro_network according to settings in 'config.yaml' files. 
+    This script accepts multiple config files as arguments (See usage).
+
+    Usage:  rosrun mrs_general run_nimbro.py config.yaml
+            rosrun mrs_general run_nimbro.py config1.yaml config2.yaml config3.yaml
+    """)
+
+
 class Task:
     """
     Class to launch multiple ros launch files
     """
-    def __init__(self, *config_file_paths):
+    def __init__(self, argv):
         UAV_NAME = os.getenv('UAV_NAME')
         if UAV_NAME == None:
             print("Missing environment variable UAV_NAME")
             sys.exit(0)
             
-        paramlist = rosparam.load_file(filename = config_file_paths[0])
-        paramlist.append(rosparam.load_file(filename = config_file_paths[1])[0])
+        paramlist = []
+        try:
+            for i in range(1, len(argv)):
+                paramlist.append(rosparam.load_file(filename = argv[i])[0])
 
-        robot_names_list = None
-        for params, ns in paramlist:
-            if  'network' in params:
-                if 'robot_names' in params['network']:
-                    robot_names_list = params['network']['robot_names']
-
-        if robot_names_list is None:
-            rospy.logerr('!!! List of robot names is missing in config files !!!')
-            sys.exit(0)
-
-
-        this_uav_ip_address = gethostbyname(UAV_NAME)
-        this_uav_last_item_in_ip_address = this_uav_ip_address.split('.')[-1] 
-
-        self.wait_for_roscore()
-        uuid = roslaunch.rlutil.get_or_generate_uuid(options_runid = None, options_wait_for_master = False)
-        roslaunch.configure_logging(uuid)
-        launch = roslaunch.scriptapi.ROSLaunch()
-        launch.start()
-
-        for i in range(0, len(robot_names_list)): 
-            if robot_names_list[i] == UAV_NAME:
-                continue
-            ip_address = gethostbyname(robot_names_list[i])
-            last_item_in_ip_address = ip_address.split('.')[-1] 
-
-            ## | ---------------------- Topic sender ---------------------- |
-            
-            package = 'nimbro_topic_transport'
-            executable = 'sender'
-            name = 'nimbro_topic_sender_{}'.format(robot_names_list[i])
-            namespace = UAV_NAME
-            args = '_destination_addr:={} _port:={}'.format(str(robot_names_list[i]), 
-                                                            int(TOPIC_START_PORT) + int(this_uav_last_item_in_ip_address))
-           
-            # rosparam load
-            param_ns = ''.join([UAV_NAME, '/', name])
-            has_params = False
+            robot_names_list = None
             for params, ns in paramlist:
-                if  'topics' in params:
-                    rosparam.upload_params(param_ns, {'udp_topics' : params['topics']})
-                    has_params = True
+                if  'network' in params:
+                    if 'robot_names' in params['network']:
+                        robot_names_list = params['network']['robot_names']
 
-            if not has_params:
-                rospy.logwarn_once('Sender doesn\'t have any *topics* specified in config files. Not running the topic sender nodes!')
-            else:
+            if robot_names_list is None:
+                rospy.logerr('!!! List of robot names described by \'network.robot_names\' parameter is missing in config files !!!')
+                sys.exit(0)
+
+            this_uav_ip_address = gethostbyname(UAV_NAME)
+            this_uav_last_item_in_ip_address = this_uav_ip_address.split('.')[-1] 
+
+            self.wait_for_roscore()
+            uuid = roslaunch.rlutil.get_or_generate_uuid(options_runid = None, options_wait_for_master = False)
+            roslaunch.configure_logging(uuid)
+            launch = roslaunch.scriptapi.ROSLaunch()
+            launch.start()
+
+            for i in range(0, len(robot_names_list)): 
+                if robot_names_list[i] == UAV_NAME:
+                    continue
+                ip_address = gethostbyname(robot_names_list[i])
+                last_item_in_ip_address = ip_address.split('.')[-1] 
+
+                ## | ---------------------- Topic sender ---------------------- |
+                
+                package = 'nimbro_topic_transport'
+                executable = 'sender'
+                name = 'nimbro_topic_sender_{}'.format(robot_names_list[i])
+                namespace = UAV_NAME
+                args = '_destination_addr:={} _port:={}'.format(str(robot_names_list[i]), 
+                                                                int(TOPIC_START_PORT) + int(this_uav_last_item_in_ip_address))
+               
+                # rosparam load
+                param_ns = ''.join([UAV_NAME, '/', name])
+                has_params = False
+                for params, ns in paramlist:
+                    if  'topics' in params:
+                        rosparam.upload_params(param_ns, {'udp_topics' : params['topics']})
+                        has_params = True
+
+                if not has_params:
+                    rospy.logwarn_once('Sender doesn\'t have any *topics* specified in config files. Not running the topic sender nodes!')
+                else:
+                    # Start node
+                    node = self.define_node(package, executable, name, namespace, args)
+                    launch.launch(node)
+
+                ## | --------------------- Topic receiver --------------------- |
+
+                package = 'nimbro_topic_transport'
+                executable = 'receiver'
+                name = 'nimbro_topic_receiver_{}'.format(robot_names_list[i])
+                namespace = UAV_NAME
+                args = '_port:={}'.format(int(TOPIC_START_PORT) + int(last_item_in_ip_address))
+                
                 # Start node
                 node = self.define_node(package, executable, name, namespace, args)
                 launch.launch(node)
 
-            ## | --------------------- Topic receiver --------------------- |
+                ## | --------------------- Service client --------------------- |
 
-            package = 'nimbro_topic_transport'
-            executable = 'receiver'
-            name = 'nimbro_topic_receiver_{}'.format(robot_names_list[i])
-            namespace = UAV_NAME
-            args = '_port:={}'.format(int(TOPIC_START_PORT) + int(last_item_in_ip_address))
-            
-            # Start node
-            node = self.define_node(package, executable, name, namespace, args)
-            launch.launch(node)
+                package = 'nimbro_service_transport'
+                executable = 'udp_client'
+                name = 'nimbro_service_client_{}'.format(robot_names_list[i])
+                namespace = UAV_NAME
+                args = '_server:={} _port:={}'.format(str(robot_names_list[i]), int(SERVICE_START_PORT) + int(this_uav_last_item_in_ip_address))
+               
+                # rosparam load
+                param_ns = ''.join([UAV_NAME, '/', name])
+                has_params = False
+                for params, ns in paramlist:
+                    if  'services' in params:
+                        # add namespace for uav
+                        processed_services = []
+                        for service in params['services']:
+                            new_service = copy.copy(service)
+                            new_service['name'] = '/' + robot_names_list[i] + '/' + new_service['name']  
+                            processed_services.append(new_service)
+                        rosparam.upload_params(param_ns, {'services' : processed_services})
+                        has_params = True
 
-            ## | --------------------- Service client --------------------- |
+                if not has_params:
+                    rospy.logwarn_once('Service client doesn\'t have any *services* specified in config files. Not running the service client nodes!')
+                else:
+                    # Start node
+                    node = self.define_node(package, executable, name, namespace, args)
+                    launch.launch(node)
 
-            package = 'nimbro_service_transport'
-            executable = 'udp_client'
-            name = 'nimbro_service_client_{}'.format(robot_names_list[i])
-            namespace = UAV_NAME
-            args = '_server:={} _port:={}'.format(str(robot_names_list[i]), int(SERVICE_START_PORT) + int(this_uav_last_item_in_ip_address))
-           
-            # rosparam load
-            param_ns = ''.join([UAV_NAME, '/', name])
-            has_params = False
-            for params, ns in paramlist:
-                if  'services' in params:
-                    # add namespace for uav
-                    processed_services = []
-                    for service in params['services']:
-                        new_service = copy.copy(service)
-                        new_service['name'] = '/' + robot_names_list[i] + '/' + new_service['name']  
-                        processed_services.append(new_service)
-                    rosparam.upload_params(param_ns, {'services' : processed_services})
-                    has_params = True
+                ## | --------------------- Service server --------------------- |
 
-            if not has_params:
-                rospy.logwarn_once('Service client doesn\'t have any *services* specified in config files. Not running the service client nodes!')
-            else:
+                package = 'nimbro_service_transport'
+                executable = 'udp_server'
+                name = 'nimbro_service_server_{}'.format(robot_names_list[i])
+                namespace = UAV_NAME
+                args = '_port:={}'.format(int(SERVICE_START_PORT) + int(last_item_in_ip_address))
+                
                 # Start node
                 node = self.define_node(package, executable, name, namespace, args)
                 launch.launch(node)
 
-            ## | --------------------- Service server --------------------- |
+            launch.start()
+            launch.spin()
 
-            package = 'nimbro_service_transport'
-            executable = 'udp_server'
-            name = 'nimbro_service_server_{}'.format(robot_names_list[i])
-            namespace = UAV_NAME
-            args = '_port:={}'.format(int(SERVICE_START_PORT) + int(last_item_in_ip_address))
-            
-            # Start node
-            node = self.define_node(package, executable, name, namespace, args)
-            launch.launch(node)
-
-        launch.start()
-        launch.spin()
+        except Exception as e:
+            print(e) 
+            sys.exit(1)
+            return
 
     def define_node(self, package, executable, name, namespace, args):
         """
         Define ROS node
         """
-        try:
-            return roslaunch.core.Node(package=package, node_type=executable, name=name, namespace=namespace,
-                                         machine_name=None, args=args,
-                                         respawn=False, respawn_delay=0.0,
-                                         remap_args=None, env_args=None, output='screen', cwd=None,
-                                         launch_prefix=None, required=False, filename='<unknown>') 
-        except Exception as e:
-            raise e 
+        return roslaunch.core.Node(package=package, node_type=executable, name=name, namespace=namespace,
+                                     machine_name=None, args=args,
+                                     respawn=False, respawn_delay=0.0,
+                                     remap_args=None, env_args=None, output='screen', cwd=None,
+                                     launch_prefix=None, required=False, filename='<unknown>') 
+             
 
     def wait_for_roscore(self):
         """
@@ -160,15 +174,11 @@ class Task:
                     raise serr  # re-raise error if its not the one we want     
                 else:    
                     print("Waiting for roscore")  
-            time.sleep(0.1)  # sleep for 0.1 seconds   
+            time.sleep(0.2)   
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print("""
-        This script will run nimbro_network according to 'config.yaml' setting
-
-        Usage: rosrun mrs_general run_nimbro.py communication_config.yaml uav_names.yaml
-        """)
+    if len(sys.argv) == 1:
+        print_help()
         sys.exit(0)
 
-    Task(str(sys.argv[1]), str(sys.argv[2]))
+    Task(sys.argv)
