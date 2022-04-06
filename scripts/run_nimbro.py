@@ -78,8 +78,25 @@ class Task:
                 param_ns = ''.join([UAV_NAME, '/', name])
                 has_params = False
                 for params, ns in paramlist:
-                    if  'topics' in params:
-                        rosparam.upload_params(param_ns, {'udp_topics' : params['topics']})
+                    if 'topics' in params:
+                        udp_topics = []
+                        #check if the list is empty
+                        if params['topics'] is None:
+                            continue
+                        for topic in params['topics']:
+                            # check that each topic has the name parameter
+                            if not 'name' in topic:
+                                rospy.logerr_once('One of the topics doesn\'t contain \'name\' part.') 
+                                sys.exit(1)
+
+                            new_topic = copy.copy(topic)
+                            #  check if the namespace of UAV should be added
+                            if topic['name'][0] != '/':
+                                new_topic['name'] = ''.join(['/', UAV_NAME, '/', topic['name']])
+                            
+                            udp_topics.append(new_topic)
+                            
+                        rosparam.upload_params(param_ns, {'udp_topics' : udp_topics})
                         has_params = True
 
                 if not has_params:
@@ -114,12 +131,24 @@ class Task:
                 has_params = False
                 for params, ns in paramlist:
                     if  'services' in params:
-                        # add namespace for uav
+                        #check if the list is empty
+                        if params['services'] is None:
+                            continue
                         processed_services = []
                         for service in params['services']:
+                            # check that each service has the name parameter
+                            if not 'name' in service:
+                                rospy.logerr_once('One of the services doesn\'t contain \'name\' part.') 
+                                sys.exit(1)
+
                             new_service = copy.copy(service)
-                            new_service['name'] = '/' + robot_names_list[i] + '/' + new_service['name']  
+
+                            #  check if the namespace of UAV should be added
+                            if service['name'][0] != '/':
+                                new_service['name'] = ''.join(['/', robot_names_list[i], '/', service['name']])
+
                             processed_services.append(new_service)
+
                         rosparam.upload_params(param_ns, {'services' : processed_services})
                         has_params = True
 
