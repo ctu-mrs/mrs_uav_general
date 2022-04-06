@@ -18,8 +18,10 @@ def print_help():
     Runs nimbro_network according to settings in 'config.yaml' files. 
     This script accepts multiple config files as arguments (See usage).
 
-    Usage:  rosrun mrs_general run_nimbro.py config.yaml
-            rosrun mrs_general run_nimbro.py config1.yaml config2.yaml config3.yaml
+    Usage:  
+            rosrun mrs_uav_general run_nimbro.py config.yaml
+            rosrun mrs_uav_general run_nimbro.py config1.yaml config2.yaml config3.yaml
+            rosrun mrs_uav_general run_nimbro.py `rospack find MY_PACKAGE`/config/config1.yaml
     """)
 
 
