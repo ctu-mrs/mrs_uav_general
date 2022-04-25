@@ -2,6 +2,33 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.2 (2021-10-04)
+------------------
+* basler calibrations
+* swapped cameras on green
+* add world svetovar
+* udpated sensors and cameras
+* launch static tf of ouster for naki
+* Adding UVDAR masks
+* Adding UVDAR calibrations
+* add world_naki
+* Adding new masks
+* updated sensors for dofec
+* adding info publishers
+* minor changes
+* added fork of rosbag, with added features
+* adding rosbag checker script
+* updated usmocku world
+* updated mobius in sensors
+* adding mobius ;-)
+* added basler cameras from green
+* add left_right basler cameras to sensors
+* added left/right disambiguation to basler cameras
+* updated mass loading for simulation
+* added realsense_tii_front to sensors.launch
+* updated nimbro config
+* Contributors: Dan Hert, Matej, Matej Petrlik, Pavel, Pavel Petracek, Tomas Baca, Vaclav Pritzl, Viktor Walter, Vit Kratky
+
 1.0.1 (2021-05-16)
 ------------------
 * version -> 1.0.1

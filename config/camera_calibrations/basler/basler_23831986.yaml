@@ -1,17 +1,17 @@
 image_width: 1600
 image_height: 1200
-camera_name: basler_23743718
+camera_name: basler_left
 camera_matrix:
   rows: 3
   cols: 3
-  data: [1012.83234,    0.     ,  801.36889,
-            0.     , 1009.93499,  575.55466,
+  data: [1007.57153,    0.     ,  792.84391,
+            0.     , 1007.39919,  591.74378,
             0.     ,    0.     ,    1.     ]
-distortion_model: plumb_bob
+camera_model: plumb_bob
 distortion_coefficients:
   rows: 1
   cols: 5
-  data: [-0.352738, 0.099624, -0.000409, -0.000861, 0.000000]
+  data: [-0.344505, 0.090286, 0.000837, -0.000651, 0.000000]
 rectification_matrix:
   rows: 3
   cols: 3
@@ -21,6 +21,6 @@ rectification_matrix:
 projection_matrix:
   rows: 3
   cols: 4
-  data: [730.30054,   0.     , 796.85101,   0.     ,
-           0.     , 858.57831, 564.26757,   0.     ,
+  data: [719.33368,   0.     , 783.62457,   0.     ,
+           0.     , 860.20068, 590.08259,   0.     ,
            0.     ,   0.     ,   1.     ,   0.     ]

@@ -2,11 +2,16 @@
 ## DEFINITION OF THE ARENA
 #
 
-utm_origin_units: 0 # 0 - UTM, 1 - Latitude Longitude
-utm_origin_x: 460226.6
-utm_origin_y: 5601198.2
-utm_origin_lat: 0.0
-utm_origin_lon: 0.0
+utm_origin_units: 1 # 0 - UTM, 1 - Latitude Longitude
+# !!! BEWARE !!!: the lat&lon and UTM coordinates below might be wrong
+# !!! do NOT just switch utm_origin_units from 0<->1, the other form
+# !!! might not be updated or even set correctly in the first place.
+
+# pisecna louka
+utm_origin_x: 0.0
+utm_origin_y: 0.0
+utm_origin_lat: 24.123785
+utm_origin_lon: 55.249506
 
 init_gps_origin_local: false # origin of gps_origin will be in the position of UAV at odometry launch
 init_gps_offset_x: 0.0 # initial position of UAV relative to gps_origin when init_gps_origin_local is enabled
@@ -16,7 +21,7 @@ safety_area:
 
   use_safety_area: true
 
-  frame_name: "gps_origin"
+  frame_name: "latlon_origin"
 
   polygon_obstacles:
     # loaded as a vector of matrices
@@ -34,16 +39,19 @@ safety_area:
     enabled: false
     # [x1, y1, radisu1, height1,
     #  x2, y2, radius2, height2]
-    data: [-5.0, -5.0, 2, 2,
-           -10.0, -10.0, 4, 2]
-    rows: 1 # each matrix has a single row
+    data: [50.112116, 14.418092, 2, 4,
+           50.112214, 14.418636, 2, 4]
+    rows: 2 # each matrix has a single row
     cols: [4, 4] # nums of cols of each matrix
 
   # convex polygon CCW
-  safety_area: [-10, -15,
-  20, -15,
-  20, 15,
-  -10, 15]
+  # race track
+  safety_area: [
+    24.124513, 55.249034,
+    24.124571, 55.249855,
+    24.122998, 55.249975,
+    24.122942, 55.249126,
+  ]
 
-  max_height: 8.0
+  max_height: 10.0
   min_height: 0.5

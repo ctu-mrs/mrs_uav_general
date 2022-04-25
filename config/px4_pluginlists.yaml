@@ -1,7 +1,7 @@
 plugin_blacklist:
 # common
 - 3dr_radio
-- actuator_control
+# - actuator_control
 - hil
 - ftp
 - manual_control
@@ -9,10 +9,15 @@ plugin_blacklist:
 - setpoint_accel
 - setpoint_velocity
 - setpoint_position
+- setpoint_attitude
+- setpoint_trajectory
 - home_position
 - sys_time
 - vfr_hud
 - waypoint
+- landing_target
+- mount_control
+- onboard_computer_status
 
 # extras
 - image_pub
