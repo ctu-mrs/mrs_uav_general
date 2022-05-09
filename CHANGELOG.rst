@@ -2,8 +2,8 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2022-05-09)
+------------------
 * more masks
 * Add trajectory checker
 * Adding masks for the new UAV12 (lemmy) platform
