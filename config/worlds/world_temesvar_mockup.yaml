@@ -11,8 +11,8 @@ utm_origin_units: 1 # 0 - UTM, 1 - Latitude Longitude
 utm_origin_x: 0.0
 utm_origin_y: 0.0
 
-utm_origin_lat: 49.36225
-utm_origin_lon: 14.26143
+utm_origin_lat: 49.36221
+utm_origin_lon: 14.26004
 
 init_gps_origin_local: false # origin of gps_origin will be in the position of UAV at odometry launch
 init_gps_offset_x: 0.0 # initial position of UAV relative to gps_origin when init_gps_origin_local is enabled
@@ -52,12 +52,11 @@ safety_area:
   # 44.5, -23.5]
 
   safety_area: [
-    49.36179, 14.26094,
-    49.36166, 14.26124,
-    49.36173, 14.26190,
-    49.36311, 14.26350,
-    49.36355, 14.26084,
-    49.36232, 14.26025,
+    49.362130, 14.260018,
+    49.362112, 14.260209,
+    49.362509, 14.260354,
+    49.362559, 14.259969,
+    49.362148, 14.259741
   ]
 
   max_height: 15.0

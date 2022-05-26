@@ -2,6 +2,52 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.3 (2022-05-09)
+------------------
+* more masks
+* Add trajectory checker
+* Adding masks for the new UAV12 (lemmy) platform
+* Updating a mask
+* Adding masks for the x500 UAV14 (Nick)
+* updated louka
+* added garmin_down for x500
+* updated vltava safety area
+* Add Temesvar world mockup
+* Add world for Temesvar marine
+* Add temesvar louka world
+* updated run_nimbro.py
+* fixed remmaping in run_nimbro.py
+* upgdated help in run_nimbro.py script
+* update run_nimbro.py and modified communication_config for usage with this script
+* added nimbro_launcher script
+* added namespace to bluefox cameras, removed unused args
+* fixed bluefox in sensors.launch, removed darpa bluefox
+* fixed bluefox_down in sensors
+* added bluefox front
+  New calibration for basler_23743718
+* New calibration for basler_23743718.yaml
+* re-enabled actuator control plugin
+* adding realsense down to sensors
+* added missing uav names for sim
+* updated check_ros_package scirpt
+* blacklisted more mavros plugins
+* fixed prints in automatic start
+* + install in cmakelists
+* added static transform for x500 and rplidar
+* adding large safety area simulation world
+* added ros package checking script
+* removed redundant UAV_MASS argument
+* updated path to realsense launch file in sensors.launch, kept only realsense_front and realsense_up_down options
+* pedantically fix indentation in launch files
+* fixed UAV_MASS param in core.launch
+* fixed env variable loading in core.launch
+* updated world files
+  Add camera calibration file  UAV60
+* Add camera calibration file  UAV60
+* add world_farm_seven_stars.yaml
+* fixed realsense tf
+* Contributors: Dan Hert, Giuseppe Silano, Matej Petrlik, Pavel Petracek, Tomas Baca, Tomáš Báča, Vaclav Pritzl, Viktor Walter, Vit Kratky, id_rsa_drone_login, parakh, vojta
+
 1.0.2 (2021-10-04)
 ------------------
 * basler calibrations
