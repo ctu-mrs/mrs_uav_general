@@ -45,7 +45,7 @@ safety_area:
   # convex polygon CCW
   # the basic surrounded with the "fence"
   safety_area: [
-    41.719966, 12.700111,
+    41.720107, 12.700081,
     41.719762, 12.700318,
     41.720061, 12.700561,
     41.720179, 12.700399,
