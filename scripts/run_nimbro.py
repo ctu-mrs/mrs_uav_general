@@ -87,6 +87,19 @@ class Task:
                 rospy.logerr('List of robot names described by \'network.robot_names\' parameter is missing in config files.')
                 sys.exit(4)
 
+            resolved_all_hostnames = True
+            for robot in robot_names_list:
+                if robot == hostname:
+                    continue
+                try:  
+                    ip_address = gethostbyname(robot)
+                except:  
+                    resolved_all_hostnames = False
+                    rospy.logerr('Could not resolve hostname: \'{:s}\'. Check \'/etc/hosts\'.'.format(robot))
+            
+            if not resolved_all_hostnames:
+                sys.exit(8)
+
             for i in range(0, len(robot_names_list)): 
                 if robot_names_list[i] == hostname:
                     continue
