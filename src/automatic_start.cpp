@@ -11,6 +11,8 @@
 #include <mavros_msgs/State.h>
 #include <mavros_msgs/CommandBool.h>
 
+#include <std_msgs/Bool.h>
+
 #include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
 
@@ -109,6 +111,10 @@ private:
   ros::Subscriber subscriber_mavros_state_;
   ros::Subscriber subscriber_control_manager_diagnostics_;
   ros::Subscriber subscriber_spawner_diagnostics_;
+
+  // | ----------------------- publishers ----------------------- |
+
+  ros::Publisher publisher_can_takeoff_;
 
   // | ----------------------- main timer ----------------------- |
 
@@ -255,6 +261,10 @@ void AutomaticStart::onInit() {
       nh_.subscribe("control_manager_diagnostics_in", 1, &AutomaticStart::callbackControlManagerDiagnostics, this, ros::TransportHints().tcpNoDelay());
   subscriber_spawner_diagnostics_ =
       nh_.subscribe("spawner_diagnostics_in", 1, &AutomaticStart::callbackSpawnerDiagnostics, this, ros::TransportHints().tcpNoDelay());
+
+  // | ----------------------- publishers ----------------------- |
+
+  publisher_can_takeoff_ = nh_.advertise<std_msgs::Bool>("can_takeoff_out", 1);
 
   // | --------------------- service clients -------------------- |
 
@@ -457,6 +467,20 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
         got_topics = false;
       }
     }
+  }
+
+  std_msgs::Bool can_takeoff_msg;
+  can_takeoff_msg.data = false;
+
+  if (got_topics && position_valid && current_state == STATE_IDLE) {
+    can_takeoff_msg.data = true;
+  }
+
+  try {
+    publisher_can_takeoff_.publish(can_takeoff_msg);
+  }
+  catch (...) {
+    ROS_ERROR("exception caught, could not publish");
   }
 
   if (!got_topics) {

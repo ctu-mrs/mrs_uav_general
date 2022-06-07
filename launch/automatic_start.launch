@@ -9,7 +9,7 @@
   <arg if="$(eval arg('RUN_TYPE') == 'simulation')" name="simulation" default="true" />
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="simulation" default="false" />
 
-  <!-- other args -->
+    <!-- other args -->
   <arg name="standalone" default="true" />
 
   <arg     if="$(arg standalone)" name="nodelet" value="standalone" />
@@ -23,18 +23,21 @@
 
       <rosparam file="$(find mrs_uav_general)/config/automatic_start.yaml" />
 
-      <!-- Load a user param file -->
+        <!-- Load a user param file -->
       <rosparam if="$(eval not arg('custom_config') == '')" file="$(arg custom_config)" />
 
       <param name="uav_name" value="$(arg UAV_NAME)" />
       <param name="simulation" value="$(arg simulation)" />
 
-      <!-- Subscribers -->
+        <!-- Subscribers -->
       <remap from="~mavros_state_in" to="mavros/state" />
       <remap from="~control_manager_diagnostics_in" to="control_manager/diagnostics" />
       <remap from="~spawner_diagnostics_in" to="/mrs_drone_spawner/diagnostics" />
 
-      <!-- services -->
+        <!-- Publishers -->
+      <remap from="~can_takeoff_out" to="~can_takeoff" />
+
+        <!-- services -->
       <remap from="~takeoff_out" to="uav_manager/takeoff" />
       <remap from="~land_home_out" to="uav_manager/land_home" />
       <remap from="~land_out" to="uav_manager/land" />
