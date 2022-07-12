@@ -47,6 +47,7 @@
   <arg name="config_mpc_controller" default="" />
   <arg name="config_emergency_controller" default="" />
   <arg name="config_se3_controller" default="" />
+  <arg name="config_motor_controller" default="" />
 
   <arg name="config_motor_params" default="" />
 
@@ -103,6 +104,7 @@
     <arg name="custom_config_mpc_controller" value="$(arg config_mpc_controller)" />
     <arg name="custom_config_emergency_controller" value="$(arg config_emergency_controller)" />
     <arg name="custom_config_se3_controller" value="$(arg config_se3_controller)" />
+    <arg name="custom_config_motor_controller" value="$(arg config_motor_controller)" />
 
   </include>
 
