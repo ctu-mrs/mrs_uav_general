@@ -122,6 +122,8 @@
   <include file="$(find mrs_uav_odometry)/launch/odometry.launch">
 
     <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
+    <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
+    <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
     <arg name="PIXGARM" value="$(arg PIXGARM)" />
