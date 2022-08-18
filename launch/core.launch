@@ -20,10 +20,10 @@
   <arg name="UAV_MASS" default="$(optenv UAV_MASS)" />
 
   <!-- ============== check for the compulsory args ============= -->
-  <arg if="$(eval arg('RUN_TYPE') == 'UNSET' name="SET_RUN_TYPE_ENV_VARIABLE" default="$(env MISSING_RUN_TYPE)" />
-  <arg if="$(eval arg('UAV_TYPE') == 'UNSET' name="SET_UAV_TYPE_ENV_VARIABLE" default="$(env MISSING_UAV_TYPE)" />
-  <arg if="$(eval arg('ODOMETRY_TYPE') == 'UNSET' name="SET_ODOMETRY_TYPE_ENV_VARIABLE" default="$(env MISSING_ODOMETRY_TYPE)" />
-  <arg if="$(eval arg('UAV_NAME') == 'UNSET' name="SET_UAV_NAME_ENV_VARIABLE" default="$(env MISSING_UAV_NAME)" />
+  <arg if="$(eval arg('RUN_TYPE') == 'UNSET')" name="SET_RUN_TYPE_ENV_VARIABLE" default="$(env MISSING_RUN_TYPE)" />
+  <arg if="$(eval arg('UAV_TYPE') == 'UNSET')" name="SET_UAV_TYPE_ENV_VARIABLE" default="$(env MISSING_UAV_TYPE)" />
+  <arg if="$(eval arg('ODOMETRY_TYPE') == 'UNSET')" name="SET_ODOMETRY_TYPE_ENV_VARIABLE" default="$(env MISSING_ODOMETRY_TYPE)" />
+  <arg if="$(eval arg('UAV_NAME') == 'UNSET')" name="SET_UAV_NAME_ENV_VARIABLE" default="$(env MISSING_UAV_NAME)" />
 
   <arg if="$(eval not arg('LOGGER_DEBUG'))" name="STANDALONE" default="$(optenv STANDALONE false)" />
   <arg if="$(eval arg('LOGGER_DEBUG'))" name="STANDALONE" default="true" />
