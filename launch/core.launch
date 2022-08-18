@@ -61,6 +61,7 @@
 
   <include file="$(find mrs_uav_general)/launch/nodelet_manager.launch">
 
+    <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="debug" value="$(arg DEBUG)" />
     <arg name="n_threads" value="$(arg n_threads)" />
@@ -112,6 +113,7 @@
 
   <include file="$(find mrs_uav_odometry)/launch/odometry.launch">
 
+    <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
     <arg name="PIXGARM" value="$(arg PIXGARM)" />
