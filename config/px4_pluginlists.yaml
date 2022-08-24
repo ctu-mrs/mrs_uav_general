@@ -1,47 +1,68 @@
 plugin_blacklist:
-# common
-- 3dr_radio
-# - actuator_control
-- hil
-- ftp
-- manual_control
-- safety_area
-- setpoint_accel
-- setpoint_velocity
-- setpoint_position
-- setpoint_attitude
-- setpoint_trajectory
-- home_position
-- sys_time
-- vfr_hud
-- waypoint
-- landing_target
-- mount_control
-- onboard_computer_status
+  #############################
+  ## mavros package plugins: ##
+  #############################
+  # - sys_status
+  # - imu
+  - param
+  - waypoint
+  - rallypoint
+  - geofence
+  # - rc_io
+  # - command
+  # - local_position
+  # - global_position
+  - setpoint_position
+  - nav_controller_output
+  - safety_area
+  - 3dr_radio
+  - setpoint_velocity
+  - setpoint_accel
+  - setpoint_attitude
+  # - setpoint_raw
+  - setpoint_trajectory
+  - vfr_hud
+  - ftp
+  - sys_time
+  # - actuator_control
+  - manual_control
+  # - altitude
+  - hil
+  - home_position
+  - wind_estimation
 
-# extras
-- image_pub
-- vibration
-# - distance_sensor
-- rangefinder
-- vision_speed_estimate
-- vision_pose_estimate
-- px4flow
-- mocap_pose_estimate
-- cam_imu_sync
-- fake_gps
-- gps_rtk
-- obstacle_distance
-- servo_state_publisher
-- companion_process_status
-- wheel_odometry
-- trajectory
-- odom
-- adsb
-- debug_value
-- wind_estimation
-- log_transfer
+    ###################################
+    ## mavros_extra package plugins: ##
+    ###################################
+  - adsb
+  - cam_imu_sync
+  - camera
+  - companion_process_status
+  - onboard_computer_status
+  - debug_value
+  # - distance_sensor
+  - esc_status
+  - esc_telemetry
+  - fake_gps
+  - gps_input
+  - gps_status
+  - gps_rtk
+  - landing_target
+  - log_transfer
+  - mocap_pose_estimate
+  - obstacle_distance
+  - odom
+  - play_tune
+  - px4flow
+  - rangefinder
+  - terrain
+  - trajectory
+  - tunnel
+  - wheel_odometry
+  - vibration
+  - vision_pose_estimate
+  - vision_speed_estimate
+  - mount_control
+  - mag_calibration_status
 
 plugin_whitelist: []
-# 'sys_*'
-
