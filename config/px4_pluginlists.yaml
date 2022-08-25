@@ -24,7 +24,7 @@ plugin_blacklist:
   - vfr_hud
   - ftp
   - sys_time
-  # - actuator_control
+  - actuator_control
   - manual_control
   # - altitude
   - hil
