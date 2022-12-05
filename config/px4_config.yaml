@@ -68,7 +68,7 @@ setpoint_raw:
 
 distance_sensor:
   garmin:
-    id: 33
+    id: 33 # this id is changed to 0 for the simulations 
     # the frame name is now specified in the launch file
     # frame_id: "garmin"
     orientation: NONE
