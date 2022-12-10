@@ -14,7 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
   mrs_lib
   nodelet
   std_msgs
-  mavros_msgs
   topic_tools
   )
 
@@ -31,7 +30,7 @@ set(EXECUTABLES
 catkin_package(
   LIBRARIES ${LIBRARIES}
   INCLUDE_DIRS include
-  CATKIN_DEPENDS std_msgs mrs_msgs mavros_msgs mrs_lib rosbag_storage rosconsole roscpp std_srvs topic_tools xmlrpcpp
+  CATKIN_DEPENDS std_msgs mrs_msgs mrs_lib rosbag_storage rosconsole roscpp std_srvs topic_tools xmlrpcpp
   )
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}

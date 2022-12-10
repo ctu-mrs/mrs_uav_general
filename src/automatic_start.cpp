@@ -8,9 +8,6 @@
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/mutex.h>
 
-#include <mavros_msgs/State.h>
-#include <mavros_msgs/CommandBool.h>
-
 #include <std_msgs/Bool.h>
 
 #include <std_srvs/Trigger.h>
@@ -21,6 +18,7 @@
 #include <mrs_msgs/ReferenceStampedSrv.h>
 #include <mrs_msgs/ValidateReference.h>
 #include <mrs_msgs/SpawnerDiagnostics.h>
+#include <mrs_msgs/HwApiDiagnostics.h>
 
 #include <geometry_msgs/PoseStamped.h>
 
@@ -108,7 +106,7 @@ private:
 
   // | ----------------------- subscribers ---------------------- |
 
-  ros::Subscriber subscriber_mavros_state_;
+  ros::Subscriber subscriber_hw_api_diagnostics_;
   ros::Subscriber subscriber_control_manager_diagnostics_;
   ros::Subscriber subscriber_spawner_diagnostics_;
 
@@ -122,13 +120,13 @@ private:
   void       timerMain(const ros::TimerEvent& event);
   double     _main_timer_rate_;
 
-  // | ---------------------- mavros state ---------------------- |
+  // | ------------------- hw api diagnostics ------------------- |
 
-  void       callbackMavrosState(const mavros_msgs::StateConstPtr& msg);
-  bool       got_mavros_state_ = false;
-  std::mutex mutex_mavros_state_;
+  void       callbackHwApiDiag(const mrs_msgs::HwApiDiagnosticsConstPtr& msg);
+  bool       got_hw_api_diag_ = false;
+  std::mutex mutex_hw_api_diag_;
 
-  // | ---------------------- mavros state ---------------------- |
+  // | ------------------- spawmer diagnostics ------------------ |
 
   void                         callbackSpawnerDiagnostics(const mrs_msgs::SpawnerDiagnosticsConstPtr& msg);
   bool                         got_spawner_diagnostics = false;
@@ -256,7 +254,7 @@ void AutomaticStart::onInit() {
 
   // | ----------------------- subscribers ---------------------- |
 
-  subscriber_mavros_state_ = nh_.subscribe("mavros_state_in", 1, &AutomaticStart::callbackMavrosState, this, ros::TransportHints().tcpNoDelay());
+  subscriber_hw_api_diagnostics_ = nh_.subscribe("hw_api_diagnostics_in", 1, &AutomaticStart::callbackHwApiDiag, this, ros::TransportHints().tcpNoDelay());
   subscriber_control_manager_diagnostics_ =
       nh_.subscribe("control_manager_diagnostics_in", 1, &AutomaticStart::callbackControlManagerDiagnostics, this, ros::TransportHints().tcpNoDelay());
   subscriber_spawner_diagnostics_ =
@@ -273,7 +271,7 @@ void AutomaticStart::onInit() {
   service_client_land_      = nh_.serviceClient<std_srvs::Trigger>("land_out");
   service_client_eland_     = nh_.serviceClient<std_srvs::Trigger>("eland_out");
   service_client_motors_    = nh_.serviceClient<std_srvs::SetBool>("motors_out");
-  service_client_arm_       = nh_.serviceClient<mavros_msgs::CommandBool>("arm_out");
+  service_client_arm_       = nh_.serviceClient<std_srvs::SetBool>("arm_out");
 
   service_client_validate_reference_ = nh_.serviceClient<mrs_msgs::ValidateReference>("validate_reference_out");
 
@@ -331,23 +329,23 @@ void AutomaticStart::genericCallback([[maybe_unused]] const topic_tools::ShapeSh
 
 //}
 
-/* callbackMavrosState() //{ */
+/* callbackHwApiDiag() //{ */
 
-void AutomaticStart::callbackMavrosState(const mavros_msgs::StateConstPtr& msg) {
+void AutomaticStart::callbackHwApiDiag(const mrs_msgs::HwApiDiagnosticsConstPtr& msg) {
 
   if (!is_initialized_) {
     return;
   }
 
-  ROS_INFO_ONCE("[AutomaticStart]: getting mavros state");
+  ROS_INFO_ONCE("[AutomaticStart]: getting HW API diagnostics");
 
-  std::scoped_lock lock(mutex_mavros_state_);
+  std::scoped_lock lock(mutex_hw_api_diag_);
 
   // check armed_ state
   if (armed_ == false) {
 
     // if armed_ state changed to true, please "start the clock"
-    if (msg->armed > 0) {
+    if (msg->armed) {
 
       armed_      = true;
       armed_time_ = ros::Time::now();
@@ -357,7 +355,7 @@ void AutomaticStart::callbackMavrosState(const mavros_msgs::StateConstPtr& msg) 
   } else if (armed_ == true) {
 
     // and we are not really now
-    if (msg->armed == 0) {
+    if (!msg->armed) {
 
       armed_ = false;
     }
@@ -367,7 +365,7 @@ void AutomaticStart::callbackMavrosState(const mavros_msgs::StateConstPtr& msg) 
   if (offboard_ == false) {
 
     // if offboard_ state changed to true, please "start the clock"
-    if (msg->mode == "OFFBOARD") {
+    if (msg->offboard) {
 
       offboard_      = true;
       offboard_time_ = ros::Time::now();
@@ -377,13 +375,15 @@ void AutomaticStart::callbackMavrosState(const mavros_msgs::StateConstPtr& msg) 
   } else if (offboard_ == true) {
 
     // and we are not really now
-    if (msg->mode != "OFFBOARD") {
+    if (!msg->offboard) {
 
       offboard_ = false;
     }
   }
 
-  got_mavros_state_ = true;
+  if (msg->connected) {
+    got_hw_api_diag_ = true;
+  }
 }
 
 //}
@@ -442,13 +442,13 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
     return;
   }
 
-  if (!got_control_manager_diagnostics_ || !got_mavros_state_) {
-    ROS_WARN_THROTTLE(5.0, "[AutomaticStart]: waiting for data: ControManager=%s, Mavros=%s", got_control_manager_diagnostics_ ? "true" : "FALSE",
-                      got_mavros_state_ ? "true" : "FALSE");
+  if (!got_control_manager_diagnostics_ || !got_hw_api_diag_) {
+    ROS_WARN_THROTTLE(5.0, "[AutomaticStart]: waiting for data: ControManager=%s, HW Api=%s", got_control_manager_diagnostics_ ? "true" : "FALSE",
+                      got_hw_api_diag_ ? "true" : "FALSE");
     return;
   }
 
-  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_mavros_state_, armed_, offboard_, armed_time_, offboard_time_);
+  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_hw_api_diag_, armed_, offboard_, armed_time_, offboard_time_);
   auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
 
   bool   motors           = control_manager_diagnostics.motors;
@@ -933,14 +933,14 @@ bool AutomaticStart::setMotors(const bool value) {
 
 bool AutomaticStart::disarm() {
 
-  if (!got_mavros_state_) {
+  if (!got_hw_api_diag_) {
 
-    ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: cannot disarm, missing mavros state!");
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: cannot disarm, missing HW API diagnostics!");
 
     return false;
   }
 
-  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_mavros_state_, armed_, offboard_, armed_time_, offboard_time_);
+  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_hw_api_diag_, armed_, offboard_, armed_time_, offboard_time_);
   auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
 
   if (offboard) {
@@ -952,8 +952,8 @@ bool AutomaticStart::disarm() {
 
   ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: disarming");
 
-  mavros_msgs::CommandBool srv;
-  srv.request.value = 0;
+  std_srvs::SetBool srv;
+  srv.request.data = false;
 
   bool res = service_client_arm_.call(srv);
 

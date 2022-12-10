@@ -30,7 +30,7 @@
       <param name="simulation" value="$(arg simulation)" />
 
         <!-- Subscribers -->
-      <remap from="~mavros_state_in" to="mavros/state" />
+      <remap from="~hw_api_diagnostics_in" to="hw_api/diagnostics" />
       <remap from="~control_manager_diagnostics_in" to="control_manager/diagnostics" />
       <remap from="~spawner_diagnostics_in" to="/mrs_drone_spawner/diagnostics" />
 
@@ -43,7 +43,7 @@
       <remap from="~land_out" to="uav_manager/land" />
       <remap from="~eland_out" to="control_manager/eland" />
       <remap from="~motors_out" to="control_manager/motors" />
-      <remap from="~arm_out" to="mavros/cmd/arming" />
+      <remap from="~arm_out" to="hw_api/arming" />
       <remap from="~validate_reference_out" to="control_manager/validate_reference_2d" />
 
       <remap from="~start_out" to="~start" />
