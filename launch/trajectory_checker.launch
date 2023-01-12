@@ -3,7 +3,7 @@
   <!-- args corresponding to environment variables -->
   <arg name="config" default="" />
   <arg name="constraints_config" default="" />
-  <arg name="world" default="$(env WORLD_NAME)" />
+  <arg name="world" default="$(optenv WORLD_NAME)" />
 
   <node name="trajectory_checker" pkg="mrs_uav_general" type="trajectory_checker.py" output="screen">
 

@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="UAV_NAME" default="$(env UAV_NAME)" />
+  <arg name="UAV_NAME" default="$(optenv UAV_NAME)" />
 
   <arg name="tf_map_scanmatch_transform_frame_name" default="$(arg UAV_NAME)/scanmatcher_frame" />
   <arg name="map_frame" default="$(arg UAV_NAME)/hector_map" />

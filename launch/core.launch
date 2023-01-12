@@ -1,12 +1,14 @@
 <launch>
 
-  <!-- args corresponding to environment variables -->
-  <arg name="RUN_TYPE" default="$(env RUN_TYPE)" />
-  <arg name="UAV_TYPE" default="$(env UAV_TYPE)" />
+  <!-- ===================== compulsory args ==================== -->
+  <arg name="RUN_TYPE" default="$(optenv RUN_TYPE UNSET)" />
+  <arg name="UAV_TYPE" default="$(optenv UAV_TYPE UNSET)" />
+  <arg name="ODOMETRY_TYPE" default="$(optenv ODOMETRY_TYPE UNSET)" />
+  <arg name="UAV_NAME" default="$(optenv UAV_NAME UNSET)" />
+
+  <!-- ====================== optional args ===================== -->
   <arg name="PROPULSION_TYPE" default="$(optenv PROPULSION_TYPE default)" />
-  <arg name="ODOMETRY_TYPE" default="$(env ODOMETRY_TYPE)" />
   <arg name="PROFILER" default="$(optenv PROFILER false)" />
-  <arg name="UAV_NAME" default="$(env UAV_NAME)" />
   <arg name="PIXGARM" default="$(optenv PIXGARM false)" />
   <arg name="SENSORS" default="$(optenv SENSORS)" />
   <arg name="BODY_DISTURBANCE_X" default="$(optenv INITIAL_DISTURBANCE_X 0.0)" />
@@ -14,8 +16,14 @@
   <arg name="DEBUG" default="$(optenv DEBUG false)" />
   <arg name="LOGGER_DEBUG" default="$(optenv LOGGER_DEBUG false)" />
   <arg name="WORLD_FILE" default="$(optenv WORLD_FILE)" />
-  <arg name="WORLD_NAME" default="$(optenv WORLD_NAME)" />
+  <arg name="WORLD_NAME" default="$(optenv WORLD_NAME simulation)" />
   <arg name="UAV_MASS" default="$(optenv UAV_MASS)" />
+
+  <!-- ============== check for the compulsory args ============= -->
+  <arg if="$(eval arg('RUN_TYPE') == 'UNSET')" name="SET_RUN_TYPE_ENV_VARIABLE" default="$(env MISSING_RUN_TYPE)" />
+  <arg if="$(eval arg('UAV_TYPE') == 'UNSET')" name="SET_UAV_TYPE_ENV_VARIABLE" default="$(env MISSING_UAV_TYPE)" />
+  <arg if="$(eval arg('ODOMETRY_TYPE') == 'UNSET')" name="SET_ODOMETRY_TYPE_ENV_VARIABLE" default="$(env MISSING_ODOMETRY_TYPE)" />
+  <arg if="$(eval arg('UAV_NAME') == 'UNSET')" name="SET_UAV_NAME_ENV_VARIABLE" default="$(env MISSING_UAV_NAME)" />
 
   <arg if="$(eval not arg('LOGGER_DEBUG'))" name="STANDALONE" default="$(optenv STANDALONE false)" />
   <arg if="$(eval arg('LOGGER_DEBUG'))" name="STANDALONE" default="true" />
@@ -61,6 +69,7 @@
 
   <include file="$(find mrs_uav_general)/launch/nodelet_manager.launch">
 
+    <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
     <arg name="standalone" value="$(arg STANDALONE)" />
     <arg name="debug" value="$(arg DEBUG)" />
     <arg name="n_threads" value="$(arg n_threads)" />
@@ -112,6 +121,9 @@
 
   <include file="$(find mrs_uav_odometry)/launch/odometry.launch">
 
+    <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
+    <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
+    <arg name="UAV_TYPE" value="$(arg UAV_TYPE)" />
     <arg name="ODOMETRY_TYPE" value="$(arg ODOMETRY_TYPE)" />
     <arg name="PROFILER" value="$(arg PROFILER)" />
     <arg name="PIXGARM" value="$(arg PIXGARM)" />
