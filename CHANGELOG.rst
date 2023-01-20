@@ -2,6 +2,23 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Delete nimbro.launch
+* fixing missing args
+* quick core launch fix
+* fixed launch, env->optenv
+* added missing uav_name params in core.launch
+* Adding masks
+* added can takeoff publisher
+* kill nimbro if one of the specified hostnames could not be resolved
+* Updaing uvdar mask
+* Adding uvdar masks
+* updating Italy safety area
+* added Italy safety areas
+* Adding two more calibration for UV cameras.
+* Contributors: Dan Hert, Pavel Petracek, Tomas Baca, Viktor Walter, Vojtech Spurny, parakh
+
 1.0.3 (2022-05-09)
 ------------------
 * more masks
