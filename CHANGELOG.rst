@@ -2,8 +2,8 @@
 Changelog for package mrs_general
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.4 (2023-01-20)
+------------------
 * Delete nimbro.launch
 * fixing missing args
 * quick core launch fix
