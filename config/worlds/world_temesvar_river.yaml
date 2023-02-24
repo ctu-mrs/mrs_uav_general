@@ -14,9 +14,9 @@ utm_origin_y: 0.0
 utm_origin_lat: 49.365135
 utm_origin_lon: 14.272215
 
-init_gps_origin_local: false # origin of gps_origin will be in the position of UAV at odometry launch
-init_gps_offset_x: 0.0 # initial position of UAV relative to gps_origin when init_gps_origin_local is enabled
-init_gps_offset_y: 0.0 # initial position of UAV relative to gps_origin when init_gps_origin_local is enabled
+init_gps_garmin_origin_local: false # origin of gps_garmin_origin will be in the position of UAV at odometry launch
+init_gps_offset_x: 0.0 # initial position of UAV relative to gps_garmin_origin when init_gps_garmin_origin_local is enabled
+init_gps_offset_y: 0.0 # initial position of UAV relative to gps_garmin_origin when init_gps_garmin_origin_local is enabled
 
 safety_area:
 
