@@ -30,7 +30,7 @@
       <param name="simulation" value="$(arg simulation)" />
 
         <!-- Subscribers -->
-      <remap from="~hw_api_diagnostics_in" to="hw_api/diagnostics" />
+      <remap from="~hw_api_status_in" to="hw_api/status" />
       <remap from="~control_manager_diagnostics_in" to="control_manager/diagnostics" />
       <remap from="~spawner_diagnostics_in" to="/mrs_drone_spawner/diagnostics" />
 

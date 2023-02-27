@@ -18,7 +18,7 @@
 #include <mrs_msgs/ReferenceStampedSrv.h>
 #include <mrs_msgs/ValidateReference.h>
 #include <mrs_msgs/SpawnerDiagnostics.h>
-#include <mrs_msgs/HwApiDiagnostics.h>
+#include <mrs_msgs/HwApiStatus.h>
 
 #include <geometry_msgs/PoseStamped.h>
 
@@ -106,7 +106,7 @@ private:
 
   // | ----------------------- subscribers ---------------------- |
 
-  ros::Subscriber subscriber_hw_api_diagnostics_;
+  ros::Subscriber subscriber_hw_api_status_;
   ros::Subscriber subscriber_control_manager_diagnostics_;
   ros::Subscriber subscriber_spawner_diagnostics_;
 
@@ -122,9 +122,9 @@ private:
 
   // | ------------------- hw api diagnostics ------------------- |
 
-  void       callbackHwApiDiag(const mrs_msgs::HwApiDiagnosticsConstPtr& msg);
-  bool       got_hw_api_diag_ = false;
-  std::mutex mutex_hw_api_diag_;
+  void       callbackHwApiStatus(const mrs_msgs::HwApiStatusConstPtr& msg);
+  bool       got_hw_api_status_ = false;
+  std::mutex mutex_hw_api_status_;
 
   // | ------------------- spawmer diagnostics ------------------ |
 
@@ -254,7 +254,7 @@ void AutomaticStart::onInit() {
 
   // | ----------------------- subscribers ---------------------- |
 
-  subscriber_hw_api_diagnostics_ = nh_.subscribe("hw_api_diagnostics_in", 1, &AutomaticStart::callbackHwApiDiag, this, ros::TransportHints().tcpNoDelay());
+  subscriber_hw_api_status_ = nh_.subscribe("hw_api_status_in", 1, &AutomaticStart::callbackHwApiStatus, this, ros::TransportHints().tcpNoDelay());
   subscriber_control_manager_diagnostics_ =
       nh_.subscribe("control_manager_diagnostics_in", 1, &AutomaticStart::callbackControlManagerDiagnostics, this, ros::TransportHints().tcpNoDelay());
   subscriber_spawner_diagnostics_ =
@@ -331,7 +331,7 @@ void AutomaticStart::genericCallback([[maybe_unused]] const topic_tools::ShapeSh
 
 /* callbackHwApiDiag() //{ */
 
-void AutomaticStart::callbackHwApiDiag(const mrs_msgs::HwApiDiagnosticsConstPtr& msg) {
+void AutomaticStart::callbackHwApiStatus(const mrs_msgs::HwApiStatusConstPtr& msg) {
 
   if (!is_initialized_) {
     return;
@@ -339,7 +339,7 @@ void AutomaticStart::callbackHwApiDiag(const mrs_msgs::HwApiDiagnosticsConstPtr&
 
   ROS_INFO_ONCE("[AutomaticStart]: getting HW API diagnostics");
 
-  std::scoped_lock lock(mutex_hw_api_diag_);
+  std::scoped_lock lock(mutex_hw_api_status_);
 
   // check armed_ state
   if (armed_ == false) {
@@ -382,7 +382,7 @@ void AutomaticStart::callbackHwApiDiag(const mrs_msgs::HwApiDiagnosticsConstPtr&
   }
 
   if (msg->connected) {
-    got_hw_api_diag_ = true;
+    got_hw_api_status_ = true;
   }
 }
 
@@ -442,13 +442,13 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
     return;
   }
 
-  if (!got_control_manager_diagnostics_ || !got_hw_api_diag_) {
+  if (!got_control_manager_diagnostics_ || !got_hw_api_status_) {
     ROS_WARN_THROTTLE(5.0, "[AutomaticStart]: waiting for data: ControManager=%s, HW Api=%s", got_control_manager_diagnostics_ ? "true" : "FALSE",
-                      got_hw_api_diag_ ? "true" : "FALSE");
+                      got_hw_api_status_ ? "true" : "FALSE");
     return;
   }
 
-  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_hw_api_diag_, armed_, offboard_, armed_time_, offboard_time_);
+  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_hw_api_status_, armed_, offboard_, armed_time_, offboard_time_);
   auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
 
   bool   motors           = control_manager_diagnostics.motors;
@@ -933,14 +933,14 @@ bool AutomaticStart::setMotors(const bool value) {
 
 bool AutomaticStart::disarm() {
 
-  if (!got_hw_api_diag_) {
+  if (!got_hw_api_status_) {
 
-    ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: cannot disarm, missing HW API diagnostics!");
+    ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: cannot disarm, missing HW API status!");
 
     return false;
   }
 
-  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_hw_api_diag_, armed_, offboard_, armed_time_, offboard_time_);
+  auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_hw_api_status_, armed_, offboard_, armed_time_, offboard_time_);
   auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
 
   if (offboard) {
