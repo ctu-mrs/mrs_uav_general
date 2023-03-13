@@ -21,6 +21,6 @@ topic_check:
   # if "/" is provided at the beginning of topic_name, the topic name is considered as written,
   # if there is no "/" at the beginning, UAV_NAME is automatically added in from of the topic name (/uav1/topic_name)
   topics: [
-    "odometry/uav_state",
+    "estimation_manager/uav_state",
     "control_manager/diagnostics",
   ]
