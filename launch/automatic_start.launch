@@ -32,7 +32,8 @@
         <!-- Subscribers -->
       <remap from="~hw_api_status_in" to="hw_api/status" />
       <remap from="~control_manager_diagnostics_in" to="control_manager/diagnostics" />
-      <remap from="~spawner_diagnostics_in" to="/mrs_drone_spawner/diagnostics" />
+      <remap from="~uav_manager_diagnostics_in" to="uav_manager/diagnostics" />
+      <remap from="~gazebo_spawner_diagnostics_in" to="/mrs_drone_spawner/diagnostics" />
 
         <!-- Publishers -->
       <remap from="~can_takeoff_out" to="~can_takeoff" />
@@ -42,7 +43,7 @@
       <remap from="~land_home_out" to="uav_manager/land_home" />
       <remap from="~land_out" to="uav_manager/land" />
       <remap from="~eland_out" to="control_manager/eland" />
-      <remap from="~motors_out" to="control_manager/motors" />
+      <remap from="~toggle_control_output_out" to="control_manager/toggle_output" />
       <remap from="~arm_out" to="hw_api/arming" />
       <remap from="~validate_reference_out" to="control_manager/validate_reference_2d" />
 

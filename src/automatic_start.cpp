@@ -7,6 +7,7 @@
 
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/mutex.h>
+#include <mrs_lib/subscribe_handler.h>
 
 #include <std_msgs/Bool.h>
 
@@ -14,6 +15,7 @@
 #include <std_srvs/SetBool.h>
 
 #include <mrs_msgs/ControlManagerDiagnostics.h>
+#include <mrs_msgs/UavManagerDiagnostics.h>
 #include <mrs_msgs/MpcTrackerDiagnostics.h>
 #include <mrs_msgs/ReferenceStampedSrv.h>
 #include <mrs_msgs/ValidateReference.h>
@@ -85,16 +87,16 @@ public:
   virtual void onInit();
 
 private:
-  ros::NodeHandle nh_;
-  bool            is_initialized_ = false;
-  std::string     _version_;
+  ros::NodeHandle   nh_;
+  std::atomic<bool> is_initialized_ = false;
+  std::string       _version_;
 
   std::string _uav_name_;
   bool        _simulation_;
 
   // | --------------------- service clients -------------------- |
 
-  ros::ServiceClient service_client_motors_;
+  ros::ServiceClient service_client_toggle_control_output_;
   ros::ServiceClient service_client_arm_;
   ros::ServiceClient service_client_takeoff_;
   ros::ServiceClient service_client_land_home_;
@@ -106,9 +108,10 @@ private:
 
   // | ----------------------- subscribers ---------------------- |
 
-  ros::Subscriber subscriber_hw_api_status_;
-  ros::Subscriber subscriber_control_manager_diagnostics_;
-  ros::Subscriber subscriber_spawner_diagnostics_;
+  mrs_lib::SubscribeHandler<mrs_msgs::HwApiStatus>               sh_hw_api_status_;
+  mrs_lib::SubscribeHandler<mrs_msgs::ControlManagerDiagnostics> sh_control_manager_diag_;
+  mrs_lib::SubscribeHandler<mrs_msgs::UavManagerDiagnostics>     sh_uav_manager_diag_;
+  mrs_lib::SubscribeHandler<mrs_msgs::SpawnerDiagnostics>        sh_gazebo_spawner_diag_;
 
   // | ----------------------- publishers ----------------------- |
 
@@ -122,16 +125,16 @@ private:
 
   // | ------------------- hw api diagnostics ------------------- |
 
-  void       callbackHwApiStatus(const mrs_msgs::HwApiStatusConstPtr& msg);
-  bool       got_hw_api_status_ = false;
-  std::mutex mutex_hw_api_status_;
+  void              callbackHwApiStatus(mrs_lib::SubscribeHandler<mrs_msgs::HwApiStatus>& wrp);
+  std::atomic<bool> got_hw_api_status_ = false;
+  std::mutex        mutex_hw_api_status_;
 
-  // | ------------------- spawmer diagnostics ------------------ |
+  // | --------------- Gazebo spawner diagnostics --------------- |
 
-  void                         callbackSpawnerDiagnostics(const mrs_msgs::SpawnerDiagnosticsConstPtr& msg);
-  bool                         got_spawner_diagnostics = false;
-  mrs_msgs::SpawnerDiagnostics spawner_diagnostics_;
-  std::mutex                   mutex_spawner_diagnostics_;
+  void                         callbackGazeboSpawnerDiagnostics(mrs_lib::SubscribeHandler<mrs_msgs::SpawnerDiagnostics>& wrp);
+  std::atomic<bool>            got_gazebo_spawner_diagnostics = false;
+  mrs_msgs::SpawnerDiagnostics gazebo_spawner_diagnostics_;
+  std::mutex                   mutex_gazebo_spawner_diagnostics_;
 
   // | ----------------- arm and offboard check ----------------- |
 
@@ -140,13 +143,6 @@ private:
 
   ros::Time offboard_time_;
   bool      offboard_ = false;
-
-  // | --------------- control manager diagnostics -------------- |
-
-  void                                callbackControlManagerDiagnostics(const mrs_msgs::ControlManagerDiagnosticsConstPtr& msg);
-  std::mutex                          mutex_control_manager_diagnostics_;
-  mrs_msgs::ControlManagerDiagnostics control_manager_diagnostics_;
-  bool                                got_control_manager_diagnostics_ = false;
 
   // | ------------------------ routines ------------------------ |
 
@@ -158,10 +154,13 @@ private:
   bool land();
   bool validateReference();
 
-  bool setMotors(const bool value);
+  bool toggleControlOutput(const bool& value);
   bool disarm();
   bool start(void);
   bool stop();
+
+  bool isGazeboSimulation(void);
+  bool is_gazebo_simulation_ = false;
 
   // | ---------------------- other params ---------------------- |
 
@@ -254,11 +253,20 @@ void AutomaticStart::onInit() {
 
   // | ----------------------- subscribers ---------------------- |
 
-  subscriber_hw_api_status_ = nh_.subscribe("hw_api_status_in", 1, &AutomaticStart::callbackHwApiStatus, this, ros::TransportHints().tcpNoDelay());
-  subscriber_control_manager_diagnostics_ =
-      nh_.subscribe("control_manager_diagnostics_in", 1, &AutomaticStart::callbackControlManagerDiagnostics, this, ros::TransportHints().tcpNoDelay());
-  subscriber_spawner_diagnostics_ =
-      nh_.subscribe("spawner_diagnostics_in", 1, &AutomaticStart::callbackSpawnerDiagnostics, this, ros::TransportHints().tcpNoDelay());
+  mrs_lib::SubscribeHandlerOptions shopts;
+  shopts.nh                 = nh_;
+  shopts.node_name          = "AutomaticStart";
+  shopts.no_message_timeout = mrs_lib::no_timeout;
+  shopts.threadsafe         = true;
+  shopts.autostart          = true;
+  shopts.queue_size         = 10;
+  shopts.transport_hints    = ros::TransportHints().tcpNoDelay();
+
+  sh_hw_api_status_        = mrs_lib::SubscribeHandler<mrs_msgs::HwApiStatus>(shopts, "hw_api_status_in", &AutomaticStart::callbackHwApiStatus, this);
+  sh_control_manager_diag_ = mrs_lib::SubscribeHandler<mrs_msgs::ControlManagerDiagnostics>(shopts, "control_manager_diagnostics_in");
+  sh_uav_manager_diag_     = mrs_lib::SubscribeHandler<mrs_msgs::UavManagerDiagnostics>(shopts, "uav_manager_diagnostics_in");
+  sh_gazebo_spawner_diag_ =
+      mrs_lib::SubscribeHandler<mrs_msgs::SpawnerDiagnostics>(shopts, "gazebo_spawner_diagnostics_in", &AutomaticStart::callbackGazeboSpawnerDiagnostics, this);
 
   // | ----------------------- publishers ----------------------- |
 
@@ -266,12 +274,12 @@ void AutomaticStart::onInit() {
 
   // | --------------------- service clients -------------------- |
 
-  service_client_takeoff_   = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
-  service_client_land_home_ = nh_.serviceClient<std_srvs::Trigger>("land_home_out");
-  service_client_land_      = nh_.serviceClient<std_srvs::Trigger>("land_out");
-  service_client_eland_     = nh_.serviceClient<std_srvs::Trigger>("eland_out");
-  service_client_motors_    = nh_.serviceClient<std_srvs::SetBool>("motors_out");
-  service_client_arm_       = nh_.serviceClient<std_srvs::SetBool>("arm_out");
+  service_client_takeoff_               = nh_.serviceClient<std_srvs::Trigger>("takeoff_out");
+  service_client_land_home_             = nh_.serviceClient<std_srvs::Trigger>("land_home_out");
+  service_client_land_                  = nh_.serviceClient<std_srvs::Trigger>("land_out");
+  service_client_eland_                 = nh_.serviceClient<std_srvs::Trigger>("eland_out");
+  service_client_toggle_control_output_ = nh_.serviceClient<std_srvs::SetBool>("toggle_control_output_out");
+  service_client_arm_                   = nh_.serviceClient<std_srvs::SetBool>("arm_out");
 
   service_client_validate_reference_ = nh_.serviceClient<mrs_msgs::ValidateReference>("validate_reference_out");
 
@@ -331,11 +339,13 @@ void AutomaticStart::genericCallback([[maybe_unused]] const topic_tools::ShapeSh
 
 /* callbackHwApiDiag() //{ */
 
-void AutomaticStart::callbackHwApiStatus(const mrs_msgs::HwApiStatusConstPtr& msg) {
+void AutomaticStart::callbackHwApiStatus(mrs_lib::SubscribeHandler<mrs_msgs::HwApiStatus>& wrp) {
 
   if (!is_initialized_) {
     return;
   }
+
+  auto msg = wrp.getMsg();
 
   ROS_INFO_ONCE("[AutomaticStart]: getting HW API diagnostics");
 
@@ -388,30 +398,9 @@ void AutomaticStart::callbackHwApiStatus(const mrs_msgs::HwApiStatusConstPtr& ms
 
 //}
 
-/* callbackControlManagerDiagnostics() //{ */
+/* callbackGazeboSpawnerDiagnostics() //{ */
 
-void AutomaticStart::callbackControlManagerDiagnostics(const mrs_msgs::ControlManagerDiagnosticsConstPtr& msg) {
-
-  if (!is_initialized_) {
-    return;
-  }
-
-  ROS_INFO_ONCE("[AutomaticStart]: getting control manager diagnostics");
-
-  {
-    std::scoped_lock lock(mutex_control_manager_diagnostics_);
-
-    control_manager_diagnostics_ = *msg;
-
-    got_control_manager_diagnostics_ = true;
-  }
-}
-
-//}
-
-/* callbackSpawnerDiagnostics() //{ */
-
-void AutomaticStart::callbackSpawnerDiagnostics(const mrs_msgs::SpawnerDiagnosticsConstPtr& msg) {
+void AutomaticStart::callbackGazeboSpawnerDiagnostics(mrs_lib::SubscribeHandler<mrs_msgs::SpawnerDiagnostics>& wrp) {
 
   if (!is_initialized_) {
     return;
@@ -419,12 +408,14 @@ void AutomaticStart::callbackSpawnerDiagnostics(const mrs_msgs::SpawnerDiagnosti
 
   ROS_INFO_ONCE("[AutomaticStart]: getting spawner diagnostics");
 
+  auto msg = wrp.getMsg();
+
   {
-    std::scoped_lock lock(mutex_spawner_diagnostics_);
+    std::scoped_lock lock(mutex_gazebo_spawner_diagnostics_);
 
-    spawner_diagnostics_ = *msg;
+    gazebo_spawner_diagnostics_ = *msg;
 
-    got_spawner_diagnostics = true;
+    got_gazebo_spawner_diagnostics = true;
   }
 }
 
@@ -442,16 +433,19 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
     return;
   }
 
-  if (!got_control_manager_diagnostics_ || !got_hw_api_status_) {
-    ROS_WARN_THROTTLE(5.0, "[AutomaticStart]: waiting for data: ControManager=%s, HW Api=%s", got_control_manager_diagnostics_ ? "true" : "FALSE",
-                      got_hw_api_status_ ? "true" : "FALSE");
+  bool got_uav_manager_diag     = sh_uav_manager_diag_.hasMsg();
+  bool got_control_manager_diag = sh_control_manager_diag_.hasMsg();
+
+  if (!got_control_manager_diag || !got_hw_api_status_ || !got_uav_manager_diag) {
+    ROS_WARN_THROTTLE(5.0, "[AutomaticStart]: waiting for data: ControManager=%s, UavManager=%s, HW Api=%s", got_control_manager_diag ? "true" : "FALSE",
+                      got_uav_manager_diag ? "true" : "FALSE", got_hw_api_status_ ? "true" : "FALSE");
     return;
   }
 
   auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_hw_api_status_, armed_, offboard_, armed_time_, offboard_time_);
-  auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
+  auto control_manager_diagnostics                  = sh_control_manager_diag_.getMsg();
 
-  bool   motors           = control_manager_diagnostics.motors;
+  bool   control_output   = sh_control_manager_diag_.getMsg()->output_enabled;
   double time_from_arming = (ros::Time::now() - armed_time).toSec();
   bool   position_valid   = validateReference();
 
@@ -491,31 +485,32 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
 
     case STATE_IDLE: {
 
-      if (armed && !motors) {
+      if (armed && !control_output) {
 
         if (position_valid && got_topics) {
 
-          bool res = setMotors(true);
+          bool res = toggleControlOutput(true);
 
           if (!res) {
-            ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: could not set motors ON");
+            ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: could not set control output ON");
           }
         }
 
         if (time_from_arming > 1.5) {
 
-          ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: could not set motors ON for 1.5 secs, disarming");
+          ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: could not set control output ON for 1.5 secs, disarming");
           disarm();
+          changeState(STATE_FINISHED);
         }
       }
 
-      if (_simulation_) {
+      if (_simulation_ && isGazeboSimulation()) {
 
-        std::scoped_lock lock(mutex_spawner_diagnostics_);
+        std::scoped_lock lock(mutex_gazebo_spawner_diagnostics_);
 
-        if (got_spawner_diagnostics) {
+        if (got_gazebo_spawner_diagnostics) {
 
-          if (!spawner_diagnostics_.spawn_called || spawner_diagnostics_.processing) {
+          if (!gazebo_spawner_diagnostics_.spawn_called || gazebo_spawner_diagnostics_.processing) {
             ROS_WARN_THROTTLE(1.0, "[AutomaticStart]: (simulation) waiting for spawner to finish spawning UAVs");
             return;
           }
@@ -528,7 +523,7 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
       }
 
       // when armed and in offboard, takeoff
-      if (armed && offboard && motors) {
+      if (armed && offboard && control_output) {
 
         double armed_time_diff    = (ros::Time::now() - armed_time).toSec();
         double offboard_time_diff = (ros::Time::now() - offboard_time).toSec();
@@ -554,11 +549,9 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
 
     case STATE_TAKEOFF: {
 
-      std::scoped_lock lock(mutex_control_manager_diagnostics_);
-
       // if takeoff finished
-      if (control_manager_diagnostics.active_tracker != "NullTracker" && control_manager_diagnostics.active_tracker != "LandoffTracker" &&
-          !control_manager_diagnostics.tracker_status.have_goal) {
+      if (control_manager_diagnostics->active_tracker != "NullTracker" && control_manager_diagnostics->active_tracker != "LandoffTracker" &&
+          !control_manager_diagnostics->tracker_status.have_goal) {
 
         ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: takeoff finished");
 
@@ -593,7 +586,7 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
 
     case STATE_LAND: {
 
-      if (!armed || !offboard || !motors) {
+      if (!armed || !offboard || !control_output) {
 
         ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: the UAV has probably landed");
 
@@ -606,7 +599,7 @@ void AutomaticStart::timerMain([[maybe_unused]] const ros::TimerEvent& event) {
     case STATE_FINISHED: {
 
       ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: we are done here");
-
+      ros::requestShutdown();
       break;
     }
   }
@@ -897,16 +890,16 @@ bool AutomaticStart::validateReference() {
 
 //}
 
-/* motors() //{ */
+/* toggleControlOutput() //{ */
 
-bool AutomaticStart::setMotors(const bool value) {
+bool AutomaticStart::toggleControlOutput(const bool& value) {
 
-  ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: setting motors %s", value ? "ON" : "OFF");
+  ROS_INFO_THROTTLE(1.0, "[AutomaticStart]: setting control output %s", value ? "ON" : "OFF");
 
   std_srvs::SetBool srv;
   srv.request.data = value;
 
-  bool res = service_client_motors_.call(srv);
+  bool res = service_client_toggle_control_output_.call(srv);
 
   if (res) {
 
@@ -916,12 +909,12 @@ bool AutomaticStart::setMotors(const bool value) {
 
     } else {
 
-      ROS_ERROR_THROTTLE(1.0, "[AutomaticStart]: setting motors failed: %s", srv.response.message.c_str());
+      ROS_ERROR_THROTTLE(1.0, "[AutomaticStart]: setting of control output failed: %s", srv.response.message.c_str());
     }
 
   } else {
 
-    ROS_ERROR_THROTTLE(1.0, "[AutomaticStart]: service call for setting motors failed");
+    ROS_ERROR_THROTTLE(1.0, "[AutomaticStart]: service call for toggling control output failed");
   }
 
   return false;
@@ -941,7 +934,6 @@ bool AutomaticStart::disarm() {
   }
 
   auto [armed, offboard, armed_time, offboard_time] = mrs_lib::get_mutexed(mutex_hw_api_status_, armed_, offboard_, armed_time_, offboard_time_);
-  auto control_manager_diagnostics                  = mrs_lib::get_mutexed(mutex_control_manager_diagnostics_, control_manager_diagnostics_);
 
   if (offboard) {
 
@@ -1033,6 +1025,30 @@ bool AutomaticStart::stop() {
   } else {
 
     ROS_ERROR_THROTTLE(1.0, "[AutomaticStart]: service call for stopping action failed");
+  }
+
+  return false;
+}
+
+//}
+
+/* isGazeboSimulation() //{ */
+
+bool AutomaticStart::isGazeboSimulation(void) {
+
+  if (is_gazebo_simulation_) {
+    return true;
+  }
+
+  ros::V_string node_list;
+  ros::master::getNodes(node_list);
+
+  for (auto& node : node_list) {
+    if (node.find("mrs_drone_spawner") != std::string::npos) {
+      ROS_INFO("[AutomaticStart]: MRS Gazebo Simulation detected");
+      is_gazebo_simulation_ = true;
+      return true;
+    }
   }
 
   return false;
