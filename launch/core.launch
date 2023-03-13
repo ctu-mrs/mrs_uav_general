@@ -204,6 +204,7 @@
     <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="custom_config" value="$(arg config_trajectory_generation)" />
+    <arg name="standalone" value="$(arg STANDALONE)" />
 
   </include>
 
