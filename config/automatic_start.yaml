@@ -1,8 +1,8 @@
 version: "1.0.4.0"
 
-safety_timeout: 5.0 # [s]
+safety_timeout: 0.0 # [s]
 
-main_timer_rate: 30 # [Hz]
+main_timer_rate: 10 # [Hz]
 
 # how many times it will try to call the start/stop services if the call fails
 call_n_attempts: 10
@@ -15,7 +15,7 @@ pre_takeoff_sleep: 0 # [s]
 
 topic_check:
 
-  enabled: true
+  enabled: false
   timeout: 5.0 # [s], a window for the last accepted message
 
   # if "/" is provided at the beginning of topic_name, the topic name is considered as written,

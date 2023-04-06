@@ -7,10 +7,12 @@
   <!-- other args -->
   <arg name="standalone" default="false" />
   <arg name="debug" default="false" />
+  <arg name="profile" default="false" />
   <arg name="n_threads" default="16" />
 
   <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch" />
-  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+  <arg     if="$(arg profile)" name="launch_prefix" value="valgrind --tool=callgrind --callgrind-out-file=$(find mrs_uav_general)/profiling/call_grind.txt" />
+  <arg if="$(eval arg('debug') == 0 and arg('profile') == 0)" name="launch_prefix" value="nice -n -10" />
 
   <arg     if="$(arg LOGGER_DEBUG)" name="logger_debug_file" value="$(find mrs_uav_general)/config/logger_verbosity/debug_verbosity.conf" />
   <arg unless="$(arg LOGGER_DEBUG)" name="logger_debug_file" value="" />
@@ -20,7 +22,7 @@
   <group ns="$(arg UAV_NAME)" if="$(eval arg('standalone') == 0)">
 
     <!-- Nodelet manager -->
-    <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_nodelet_manager" args="manager" output="screen" launch-prefix="$(arg launch_prefix) nice -n -10">
+    <node pkg="nodelet" type="nodelet" name="$(arg UAV_NAME)_nodelet_manager" args="manager" output="screen" launch-prefix="$(arg launch_prefix)">
       <param name="num_worker_threads" value="$(arg n_threads)" />
     </node>
 
