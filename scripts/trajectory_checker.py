@@ -157,6 +157,7 @@ class TrajectoryChecker:
 
         trajectory_folder = rospy.get_param('~trajectory_folder')
         trajectory_files = rospy.get_param('~trajectory_files')
+        process_all = rospy.get_param('~process_all')
         visualization_trajectory = rospy.get_param('~visualization_python/trajectories')
         visualization_dynamics = rospy.get_param('~visualization_python/dynamics')
         visualization_mutual_dist = rospy.get_param('~visualization_python/mutual_distance')
@@ -202,6 +203,8 @@ class TrajectoryChecker:
 
         # TODO: LOAD SAFETY AREA
 
+        if process_all:
+            trajectory_files = [f for f in os.listdir(trajectory_folder) if os.path.isfile(os.path.join(trajectory_folder, f))]
 
         rospy.loginfo("[TrajectoryChecker] Starting trajectory checker.")
 
