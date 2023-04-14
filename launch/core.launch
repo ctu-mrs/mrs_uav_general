@@ -26,6 +26,12 @@
   <arg if="$(eval not arg('LOGGER_DEBUG'))" name="STANDALONE" default="$(optenv STANDALONE false)" />
   <arg if="$(eval arg('LOGGER_DEBUG'))" name="STANDALONE" default="true" />
 
+  <arg name="nodelet_manager" default="$(optenv NODELET_MANAGER)" />
+  <arg name="bond" default="$(optenv BOND true)" />
+
+  <arg if="$(eval arg('nodelet_manager') == '')" name="nodelet_manager_name" default="$(arg UAV_NAME)_nodelet_manager" />
+  <arg if="$(eval arg('nodelet_manager') != '')" name="nodelet_manager_name" default="$(arg nodelet_manager)" />
+
   <!-- currently, ROS_MASTER_URI has to be set to http://localhost:11311 otherwise ROS dies when -->
   <!-- the drone disconnects from wifi -->
   <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="ROS_MASTER_URI" default="$(optenv ROS_MASTER_URI none)" />
@@ -67,14 +73,15 @@
 
   <!-- NodeletManager //{ -->
 
-  <include file="$(find mrs_uav_general)/launch/nodelet_manager.launch">
+  <group ns="$(arg UAV_NAME)" if="$(eval arg('STANDALONE') == 0 and arg('nodelet_manager') == '')">
+    <include file="$(find mrs_uav_general)/launch/nodelet_manager.launch">
 
-    <arg name="UAV_NAME" value="$(arg UAV_NAME)" />
-    <arg name="standalone" value="$(arg STANDALONE)" />
-    <arg name="debug" value="$(arg DEBUG)" />
-    <arg name="n_threads" value="$(arg n_threads)" />
+      <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
+      <arg name="debug" value="$(arg DEBUG)" />
+      <arg name="n_threads" value="$(arg n_threads)" />
 
-  </include>
+    </include>
+  </group>
 
   <!-- //} -->
 
@@ -93,6 +100,8 @@
     <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="bond" value="$(arg bond)" />
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
     <arg name="WORLD_FILE" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_control_manager)" />
@@ -125,6 +134,8 @@
     <arg name="PROFILER" value="$(arg PROFILER)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="bond" value="$(arg bond)" />
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
     <arg name="WORLD_FILE" value="$(arg world_file)" />
     <arg name="custom_config" value="$(arg config_estimation_manager)" />
     <arg name="custom_config_active_estimators" value="$(arg config_active_estimators)" />
@@ -142,6 +153,8 @@
     <arg name="PROFILER" value="$(arg PROFILER)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="bond" value="$(arg bond)" />
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
     <arg name="WORLD_FILE" value="$(arg world_file)" />
     <arg name="custom_config" value="$(arg config_transform_manager)" />
     <arg name="custom_config_active_estimators" value="$(arg config_active_estimators)" />
@@ -161,6 +174,8 @@
     <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="bond" value="$(arg bond)" />
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
     <arg name="custom_config" value="$(arg config_constraint_manager)" />
 
   </include>
@@ -178,6 +193,8 @@
     <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="bond" value="$(arg bond)" />
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
     <arg name="custom_config" value="$(arg config_gain_manager)" />
 
   </include>
@@ -197,6 +214,8 @@
     <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="bond" value="$(arg bond)" />
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
     <arg name="WORLD_FILE" value="$(arg world_file)" />
     <arg name="g" value="$(arg g)" />
     <arg name="custom_config" value="$(arg config_uav_manager)" />
@@ -214,7 +233,9 @@
     <arg name="LOGGER_DEBUG" value="$(arg LOGGER_DEBUG)" />
 
     <arg name="custom_config" value="$(arg config_trajectory_generation)" />
+    <arg name="bond" value="$(arg bond)" />
     <arg name="standalone" value="$(arg STANDALONE)" />
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)" />
 
   </include>
 
