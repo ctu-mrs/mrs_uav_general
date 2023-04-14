@@ -40,7 +40,7 @@
   <group ns="$(arg UAV_NAME)">
 
   <!-- Static TFs -->
-  <node pkg="tf2_ros" type="static_transform_publisher" name="hector_origin_to_hector_map" args="0 0 0 0 0 0 $(arg UAV_NAME)/hector_origin $(arg map_frame)" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="hector_origin_to_hector_map" args="0 0 0 0 0 0 $(arg UAV_NAME)/hector_garmin_origin $(arg map_frame)" />
 
     <!-- HectorMapping nodelet -->
     <node pkg="nodelet" type="nodelet" name="hector_mapping" args="$(arg nodelet) hector_mapping/HectorMappingRos $(arg nodelet_manager)" launch-prefix="$(arg launch_prefix_debug)" output="screen">
