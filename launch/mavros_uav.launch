@@ -11,8 +11,8 @@
 
 	<arg name="OLD_PX4_FW" default="$(optenv OLD_PX4_FW false)" />
 
-	<arg if="$(eval arg('OLD_PX4_FW') == 'false')" name="config_yaml" value="$(find mrs_uav_general)/config/px4_config.yaml" />
-	<arg if="$(eval arg('OLD_PX4_FW') == 'true')" name="config_yaml" value="$(find mrs_uav_general)/config/px4_config_old.yaml" />
+	<arg if="$(eval arg('OLD_PX4_FW') == 0)" name="config_yaml" value="$(find mrs_uav_general)/config/px4_config.yaml" />
+	<arg if="$(eval arg('OLD_PX4_FW') == 1)" name="config_yaml" value="$(find mrs_uav_general)/config/px4_config_old.yaml" />
 
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
 
