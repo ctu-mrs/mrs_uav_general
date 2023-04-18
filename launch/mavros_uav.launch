@@ -9,7 +9,7 @@
 	<arg name="fcu_protocol" default="v2.0" />
 	<arg name="respawn_mavros" default="false" />
 
-	<arg name="OLD_PX4_FW" default="$(OPTENV OLD_PX4_FW)" />
+	<arg name="OLD_PX4_FW" default="$(optenv OLD_PX4_FW false)" />
 
 	<arg if="$(eval arg('OLD_PX4_FW') == 'false')" name="config_yaml" value="$(find mrs_uav_general)/config/px4_config.yaml" />
 	<arg if="$(eval arg('OLD_PX4_FW') == 'true')" name="config_yaml" value="$(find mrs_uav_general)/config/px4_config_old.yaml" />
