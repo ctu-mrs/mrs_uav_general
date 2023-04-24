@@ -1,14 +1,18 @@
 <launch>
 
 	<arg name="fcu_url" default="/dev/pixhawk:921600" />
-	<arg name="gcs_url" default="" />
+	<arg name="gcs_url" default="tcp-l://" />
 	<arg name="tgt_system" default="" />
 	<arg name="tgt_component" default="" />
 	<arg name="pluginlists_yaml" value="$(find mrs_uav_general)/config/px4_pluginlists.yaml" />
-	<arg name="config_yaml" value="$(find mrs_uav_general)/config/px4_config.yaml" />
 	<arg name="log_output" default="screen" />
 	<arg name="fcu_protocol" default="v2.0" />
 	<arg name="respawn_mavros" default="false" />
+
+	<arg name="OLD_PX4_FW" default="$(optenv OLD_PX4_FW false)" />
+
+	<arg if="$(eval arg('OLD_PX4_FW') == 0)" name="config_yaml" value="$(find mrs_uav_general)/config/px4_config.yaml" />
+	<arg if="$(eval arg('OLD_PX4_FW') == 1)" name="config_yaml" value="$(find mrs_uav_general)/config/px4_config_old.yaml" />
 
   <arg name="UAV_NAME" default="$(env UAV_NAME)" />
 
