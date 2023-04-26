@@ -2,10 +2,10 @@
 ## DEFINITION OF THE ARENA
 #
 
-utm_origin_units: "LATLON" # {"UTM, "LATLON"}
+world_origin_units: "LATLON" # {"UTM, "LATLON"}
 
-utm_origin_x: 49.36225
-utm_origin_y: 14.26143
+world_origin_x: 49.36225
+world_origin_y: 14.26143
 
 safety_area:
 

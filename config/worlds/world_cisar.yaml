@@ -2,23 +2,23 @@
 ## DEFINITION OF THE ARENA
 #
 
-utm_origin_units: "UTM" # {"UTM, "LATLON"}
+world_origin_units: "UTM" # {"UTM, "LATLON"}
 
 # cisar race track
-utm_origin_x: 458422.2
-utm_origin_y: 5551241.4
+world_origin_x: 458422.2
+world_origin_y: 5551241.4
 
 # # mezi stromy a lampou
-# utm_origin_x: 458383.0
-# utm_origin_y: 5551267.0
+# world_origin_x: 458383.0
+# world_origin_y: 5551267.0
 
 # # mezi krtinci
-# utm_origin_x: 458326
-# utm_origin_y: 5551249
+# world_origin_x: 458326
+# world_origin_y: 5551249
 
 # # Giuseppe's lamp
-# utm_origin_x: 458393
-# utm_origin_y: 5551259
+# world_origin_x: 458393
+# world_origin_y: 5551259
 
 safety_area:
 
