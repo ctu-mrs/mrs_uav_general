@@ -9,3 +9,8 @@
 
 # Runtime-python
 *.pyc
+
+debian
+.obj-x86_64-linux-gnu
+
+generate.sh
