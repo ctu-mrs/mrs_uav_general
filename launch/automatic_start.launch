@@ -7,7 +7,7 @@
   <arg name="custom_config" default="" />
 
   <arg if="$(eval arg('RUN_TYPE') == 'simulation')" name="simulation" default="true" />
-  <arg if="$(eval arg('RUN_TYPE') == 'uav')" name="simulation" default="false" />
+  <arg if="$(eval arg('RUN_TYPE') == 'realworld')" name="simulation" default="false" />
 
     <!-- other args -->
   <arg name="standalone" default="true" />
