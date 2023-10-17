@@ -37,13 +37,12 @@ safety_area:
   point_obstacles:
     # loaded as a vector of matrices
     # x, y, radius
-    enabled: false
+    enabled: true
     # [x1, y1, radisu1, height1,
     #  x2, y2, radius2, height2]
-    data: [50.112116, 14.418092, 2, 4,
-           50.112214, 14.418636, 2, 4]
-    rows: 2 # each matrix has a single row
-    cols: [4, 4] # nums of cols of each matrix
+    data: [-49.85, 8.32, 1.5, 5]
+    rows: 1 # each matrix has a single row
+    cols: [4] # nums of cols of each matrix
 
   # convex polygon CCW
   # safety_area: [30.9, 26.4,
